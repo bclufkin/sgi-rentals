@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>St. George Island — Family Rental Ledger</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --ink:#16262b; --navy:#1b3a4b; --paper:#ece5d6; --card:#f7f3e9;
+    --brick:#a84a26; --brick-dark:#8a3b1e; --line:#c9bea3; --muted:#6b6154;
+    --tier-ideal:#4c7a5e; --tier-stretch:#a3792f; --tier-max:#a84a26; --tier-tbd:#8c8477;
+    --edited:#2f6a8f; --star:#c98a2b;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:100%;margin:0 auto;padding:16px 14px 60px;}
+  @media (min-width:900px){.wrap{padding:24px 24px 70px;}}
+  header.hero{padding:22px 20px;background:var(--navy);color:var(--paper);border-radius:10px;margin-bottom:14px;position:relative;overflow:hidden;}
+  header.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:12px;background:repeating-linear-gradient(115deg,transparent,transparent 18px,rgba(236,229,214,.12) 18px,rgba(236,229,214,.12) 36px);}
+  .eyebrow{font-family:Georgia,serif;font-style:italic;color:#cfe0d8;font-size:12px;margin:0 0 4px;}
+  h1{font-family:Georgia,serif;font-weight:700;font-size:clamp(20px,4.5vw,32px);margin:0 0 6px;letter-spacing:-.01em;}
+  .sub{max-width:760px;color:#dbe4de;font-size:13px;line-height:1.5;margin:0;}
+  .identity-bar{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+  .identity-bar .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .id-btn{border:1px solid var(--navy);background:#fff;color:var(--navy);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;}
+  .id-btn.active{background:var(--navy);color:var(--paper);}
+  .id-btn.locked-out{opacity:.35;cursor:not-allowed;}
+  .id-btn.family-avg{border-color:var(--brick);color:var(--brick);}
+  .id-btn.family-avg.active{background:var(--brick);color:#fff;}
+  .id-btn.family-avg:disabled{opacity:.35;cursor:not-allowed;}
+  .id-status{font-size:12.5px;color:var(--muted);margin-top:8px;}
+  .id-status b{color:var(--ink);}
+  .submit-final,.save-progress{border:none;padding:8px 15px;border-radius:6px;font-size:12.5px;font-weight:700;cursor:pointer;margin-top:10px;margin-right:8px;}
+  .submit-final{background:var(--brick);color:#fff;}
+  .save-progress{background:var(--navy);color:#fff;}
+  .gated-banner{background:#fbeee1;border:1px solid var(--brick);border-radius:8px;padding:9px 13px;font-size:12px;margin-top:10px;color:var(--brick-dark);}
+  .admin-badge{display:inline-block;background:var(--brick);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;margin-left:6px;vertical-align:middle;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+  .controls{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;}
+  select,input[type="text"],input[type="number"],input[type="url"],textarea{font-family:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);}
+  .toggle-btn{border:1px solid var(--brick);background:var(--brick);color:#fff;padding:8px 14px;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer;}
+  .month-toggle{display:flex;border:1px solid var(--navy);border-radius:6px;overflow:hidden;}
+  .month-toggle button{border:none;background:#fff;color:var(--navy);padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;}
+  .month-toggle button.active{background:var(--navy);color:#fff;}
+  .count-line{font-size:12px;color:var(--muted);margin-top:8px;}
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);max-width:100%;}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;}
+  thead th{position:sticky;top:0;z-index:2;background:var(--navy);color:var(--paper);text-align:left;padding:8px 8px;font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--brick);}
+  thead th.no-sort{cursor:default;}
+  tbody tr{border-bottom:1px solid var(--line);}
+  tbody tr:nth-child(even){background:rgba(201,190,163,.18);}
+  td{padding:7px 8px;vertical-align:top;}
+  .photo-cell img{width:56px;height:42px;object-fit:cover;border-radius:5px;border:1px solid var(--line);display:block;cursor:pointer;}
+  .photo-fallback,.no-photo{width:56px;height:42px;border-radius:5px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);text-align:center;padding:2px;}
+  .photo-fallback a,.no-photo a{color:var(--brick-dark);font-weight:700;text-decoration:none;}
+  .name-cell a{color:var(--brick-dark);font-weight:700;text-decoration:none;font-size:13px;}
+  .iso-tag{display:block;font-size:10px;color:var(--muted);margin-top:1px;}
+  .num{font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .tier-pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;color:#fff;}
+  .tier-ideal{background:var(--tier-ideal);} .tier-stretch{background:var(--tier-stretch);}
+  .tier-max{background:var(--tier-max);} .tier-tbd{background:var(--tier-tbd);} .edited-pill{background:var(--edited);}
+  .price-note{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;max-width:170px;white-space:normal;}
+  .loc-pill{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;background:var(--tier-ideal);}
+  .loc-pill.beachview{background:var(--tier-stretch);}
+  .loc-pill.secondrow{background:var(--muted);}
+  .crowd-quiet{color:var(--tier-ideal);font-weight:700;}
+  .crowd-moderate{color:var(--tier-stretch);font-weight:700;}
+  .crowd-busy{color:var(--brick);font-weight:700;}
+  .pool-yes{color:var(--tier-ideal);font-weight:700;} .pool-no{color:var(--muted);}
+  .blurred{filter:blur(6px);user-select:none;pointer-events:none;}
+  .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--navy);color:var(--paper);font-size:10px;font-weight:700;}
+  .price-edit-btn,.row-edit-btn,.map-link{display:block;margin-top:3px;font-size:10px;background:none;border:none;color:var(--edited);cursor:pointer;text-decoration:underline;padding:0;}
+  .price-input-row{display:flex;flex-direction:column;gap:4px;margin-top:4px;}
+  .price-input-row input{width:150px;padding:3px 6px;font-size:11px;}
+  .price-input-row button{font-size:10px;padding:3px 7px;border-radius:4px;border:1px solid var(--edited);background:var(--edited);color:#fff;cursor:pointer;}
+  .price-input-row button.cancel{background:#fff;color:var(--muted);border-color:var(--line);}
+  .area-sub{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;}
+  .stars{display:flex;gap:1px;}
+  .starwrap{position:relative;width:17px;height:17px;font-size:17px;line-height:17px;cursor:pointer;}
+  .starwrap .se{position:absolute;top:0;left:0;color:#d8cfb8;}
+  .starwrap .sf{position:absolute;top:0;left:0;color:var(--star);overflow:hidden;white-space:nowrap;}
+  .starwrap .hit-l,.starwrap .hit-r{position:absolute;top:0;width:50%;height:100%;z-index:2;}
+  .starwrap .hit-l{left:0;} .starwrap .hit-r{right:0;}
+  .rating-comment{width:140px;font-size:11px;padding:4px 6px;margin-top:4px;}
+  .avg-rating{font-size:12px;font-weight:700;color:var(--navy);}
+  .comment-block{font-size:10.5px;margin-top:4px;padding:4px 6px;background:rgba(255,255,255,.5);border-radius:4px;}
+  .comment-block b{color:var(--navy);}
+  .locked-tag{font-size:9px;color:var(--tier-ideal);font-style:italic;display:block;margin-top:2px;}
+  .edit-row-btn{background:var(--navy);color:#fff;border:none;padding:5px 9px;border-radius:5px;font-size:10.5px;cursor:pointer;white-space:nowrap;}
+  .no-edit-note{font-size:10px;color:var(--muted);font-style:italic;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(22,38,43,.65);display:none;align-items:center;justify-content:center;z-index:60;padding:16px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:10px;padding:22px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;}
+  .modal h3{margin-top:0;font-family:Georgia,serif;color:var(--navy);}
+  .modal p.confirm-text{font-size:14px;line-height:1.5;color:var(--ink);}
+  .mfield{display:flex;flex-direction:column;gap:3px;margin-bottom:12px;}
+  .mfield label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;}
+  .mfield input,.mfield select,.mfield textarea{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;font-size:13px;}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+  .modal-actions button{padding:8px 16px;border-radius:6px;border:none;font-size:13px;font-weight:700;cursor:pointer;}
+  .modal-actions .save-btn{background:var(--brick);color:#fff;}
+  .modal-actions .cancel-btn{background:#eee;color:var(--ink);}
+  .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;}
+  @media (max-width:560px){.mgrid{grid-template-columns:1fr;}}
+  .lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:70;flex-direction:column;}
+  .lightbox-overlay.open{display:flex;}
+  .lightbox-overlay img{max-width:90vw;max-height:78vh;border-radius:6px;}
+  .lightbox-nav{display:flex;gap:20px;align-items:center;margin-top:14px;}
+  .lightbox-nav button{background:#fff;border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer;}
+  .lightbox-close{position:absolute;top:18px;right:24px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;}
+  .lightbox-count{color:#fff;font-size:12.5px;}
+  .notes-panel{margin-top:16px;}
+  .notes-toggle{width:100%;text-align:left;background:var(--navy);color:var(--paper);border:none;padding:12px 16px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+  .notes-toggle .chev{transition:transform .2s ease;}
+  .notes-toggle.open .chev{transform:rotate(180deg);}
+  .notes-body{display:none;background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;padding:16px 20px;font-size:13px;line-height:1.6;}
+  .notes-body.open{display:block;}
+  .notes-body h3{font-family:Georgia,serif;font-size:16px;margin:18px 0 6px;color:var(--navy);border-bottom:1px solid var(--line);padding-bottom:4px;}
+  .notes-body h3:first-child{margin-top:0;}
+  .notes-body ul{margin:5px 0 5px 18px;padding:0;}
+  .notes-body li{margin-bottom:5px;}
+  .notes-body .tag{display:inline-block;background:var(--brick);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-right:5px;}
+  .add-panel{margin-top:20px;padding:26px 28px;}
+  .add-panel h2{font-family:Georgia,serif;color:var(--navy);margin-top:0;font-size:18px;}
+  .add-panel .helptext{font-size:12.5px;color:var(--muted);margin:4px 0 20px;line-height:1.5;}
+  .add-panel .mgrid{grid-template-columns:1fr 1fr;gap:14px 22px;}
+  .add-panel .mfield{margin-bottom:0;}
+  .add-error{background:#fbe4e0;border:1px solid var(--brick);color:var(--brick-dark);padding:8px 12px;border-radius:6px;font-size:12.5px;margin-bottom:12px;display:none;}
+  .add-success{background:#e5f0e9;border:1px solid var(--tier-ideal);color:#2f5940;padding:8px 12px;border-radius:6px;font-size:12.5px;margin-bottom:12px;display:none;}
+  .share-banner{background:#e7ddc4;border:1px solid var(--line);border-radius:8px;padding:9px 14px;font-size:11.5px;color:var(--ink);margin-bottom:14px;}
+  footer{margin-top:18px;font-size:11.5px;color:var(--muted);line-height:1.6;border-top:1px solid var(--line);padding-top:14px;}
+  .map-modal-body{text-align:center;}
+  @media (max-width:820px){
+    table, thead, tbody, th, td, tr{display:block;}
+    thead{display:none;}
+    .table-scroll{overflow-x:visible;border:none;background:transparent;}
+    tbody tr{background:var(--card)!important;border:1px solid var(--line);border-radius:10px;margin-bottom:12px;padding:10px;}
+    td{padding:5px 0;border:none;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+    td::before{content:attr(data-label);font-weight:700;font-size:10px;text-transform:uppercase;color:var(--muted);min-width:90px;flex-shrink:0;}
+    td.name-cell{display:block;}
+    td.name-cell::before{display:none;}
+    .photo-cell{justify-content:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">St. George Island, Florida — Family Rental Ledger</p>
+    <h1>Beachfront &amp; Pet-Friendly, July &amp; August 2027</h1>
+    <p class="sub">Rate each home on its merits — prices hidden per-row until you lock your rating for it. Submitting locks what you've rated so far; new homes added later stay open for everyone, without unlocking old ones.</p>
+  </header>
+  <div class="share-banner">📌 Share with "always share latest version" on so Brad's edits appear automatically. Steps at the end of the chat reply.</div>
+
+  <div class="identity-bar">
+    <div class="row" id="identity-buttons"></div>
+    <div class="id-status" id="identity-status"></div>
+    <div>
+      <button class="save-progress" id="save-progress-btn" style="display:none;">Save progress (come back later)</button>
+      <button class="submit-final" id="submit-final-btn" style="display:none;">Lock In My Ratings So Far</button>
+    </div>
+    <div class="gated-banner" id="gated-banner" style="display:none;"></div>
+  </div>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="field"><label>Month</label>
+        <div class="month-toggle"><button id="month-jul" data-month="july">July</button><button id="month-aug" data-month="august">August</button></div>
+      </div>
+      <div class="field"><label>Search</label><input type="text" id="f-search" placeholder="name…"></div>
+      <div class="field"><label>Company</label><select id="f-company"><option value="">All</option></select></div>
+      <div class="field"><label>Price tier</label>
+        <select id="f-tier"><option value="">All</option><option value="ideal">Ideal (&lt;$6,000)</option><option value="stretch">Stretch ($6k–7.5k)</option><option value="max">Premium ($7.5k–10k)</option><option value="tbd">TBD</option></select>
+      </div>
+      <div class="field"><label>Min. baths</label><select id="f-ba"><option value="0">Any</option><option value="2">2.0+</option><option value="2.5">2.5+</option><option value="3">3.0+</option><option value="4">4.0+</option></select></div>
+      <div class="field"><label>Min. sleeps</label><select id="f-sleeps"><option value="0">Any</option><option value="5">5+</option><option value="8">8+</option><option value="10">10+</option><option value="12">12+</option></select></div>
+      <div class="field"><label>Beach position</label><select id="f-locpos"><option value="">All</option><option value="oceanfront">Ocean Front</option><option value="beachview">Beach View</option><option value="secondrow">Second Row</option></select></div>
+      <div class="field"><label>Island area</label><select id="f-area"><option value="">All</option></select></div>
+      <div class="field"><label>Pool</label><select id="f-pool"><option value="">Any</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+    </div>
+    <div class="count-line">Showing <b id="shown-count">0</b> of <b id="total-count">0</b>. Click headers to sort.</div>
+  </div>
+
+  <div class="table-scroll">
+    <table id="rental-table">
+      <thead><tr>
+        <th class="no-sort">#</th><th class="no-sort">Photo</th><th data-key="name">Name</th>
+        <th data-key="turnday">Turn Day</th><th data-key="br">BR</th><th data-key="ba">BA</th><th data-key="sleeps">Sleeps</th>
+        <th data-key="locpos">Beach Position</th><th data-key="area">Island Area</th><th data-key="crowd">Crowdedness</th>
+        <th data-key="dogfee">Dog Fee</th><th data-key="rent">Rent Cost</th>
+        <th data-key="perperson">Per-Person</th><th data-key="total">Total</th>
+        <th data-key="pool">Pool</th><th class="no-sort">Family Ratings</th><th class="no-sort">Edit</th>
+      </tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div class="add-panel panel">
+    <h2>Add a new option</h2>
+    <p class="helptext">Fastest way: paste a listing URL to Brad in chat and he'll pull specs automatically. Or enter manually — it saves live to the shared table. Duplicate names are blocked.</p>
+    <div class="add-error" id="add-error"></div>
+    <div class="add-success" id="add-success"></div>
+    <div class="mgrid">
+      <div class="mfield"><label>Name</label><input type="text" id="new-name"></div>
+      <div class="mfield"><label>Link</label><input type="url" id="new-link"></div>
+      <div class="mfield"><label>Street address (for map + drive time)</label><input type="text" id="new-address" placeholder="123 Gulf Beach Dr, St George Island, FL"></div>
+      <div class="mfield"><label>Company</label><input type="text" id="new-iso"></div>
+      <div class="mfield"><label>Photo URLs (comma-separated)</label><input type="text" id="new-photo"></div>
+      <div class="mfield"><label>Turn day</label><select id="new-turnday"><option>Saturday</option><option>Sunday</option><option>Flexible / verify</option></select></div>
+      <div class="mfield"><label>Bedrooms</label><input type="number" id="new-br"></div>
+      <div class="mfield"><label>Bathrooms</label><input type="number" step="0.5" id="new-ba"></div>
+      <div class="mfield"><label>Sleeps</label><input type="number" id="new-sleeps"></div>
+      <div class="mfield"><label>July rent ($/wk, optional)</label><input type="number" id="new-julyrent"></div>
+      <div class="mfield"><label>July dates (e.g. 7/25–8/1)</label><input type="text" id="new-julydates"></div>
+      <div class="mfield"><label>August rent ($/wk, optional)</label><input type="number" id="new-augrent"></div>
+      <div class="mfield"><label>August dates (e.g. 8/8–8/15)</label><input type="text" id="new-augdates"></div>
+      <div class="mfield"><label>Beach position</label><select id="new-locpos"><option value="oceanfront">Ocean Front</option><option value="beachview">Beach View</option><option value="secondrow">Second Row</option></select></div>
+      <div class="mfield"><label>Island area</label><select id="new-area"><option>Plantation (West End)</option><option>East End</option><option>Central Beach</option></select></div>
+      <div class="mfield"><label>Minutes to lighthouse</label><input type="number" id="new-mins"></div>
+    </div>
+    <button class="toggle-btn" id="add-new-btn" style="margin-top:10px;">Add to table</button>
+  </div>
+
+  <div class="notes-panel">
+    <button class="notes-toggle" id="notes-toggle"><span>📋 Full Research Notes &amp; Methodology</span><span class="chev">▾</span></button>
+    <div class="notes-body" id="notes-body">
+      <h3>Key Findings</h3>
+      <ul>
+        <li>Table covers both July and August 2027 — toggle Month to switch prices and specific date ranges. Where confirmed, "August" shows the earliest available week; "July" shows the latest available week before August.</li>
+        <li>"Beach position": <b>Ocean Front</b> = first row on the beach; <b>Beach View</b> = correct side of road, a house or two back; <b>Second Row</b> = not beachfront.</li>
+        <li>Minutes-to-lighthouse are rough estimates by island zone, not precise addresses — Plantation/East End ~12 min, Central Beach ~3 min.</li>
+        <li>Only Collins publishes a seasonal rate range; most other companies hide pricing behind a live quote tool (marked TBD).</li>
+      </ul>
+      <h3>Excluded (hard filter failures)</h3>
+      <p><span class="tag">No pets</span> A Serenity South, The Beach House, Toes in the Water, Sayle Away, East of Eden, One Too Many, Shell Yeah, A Palm Paradise, Reel Close, Two Shores.</p>
+      <p><span class="tag">Too few bedrooms</span> Rising Sun, Beach Bum Cottages, Sunflower.</p>
+      <h3>Contact Numbers</h3>
+      <ul><li>Collins: 877-875-9062</li><li>Cape &amp; Coast: 877-238-4745</li><li>Fickling: 877-927-2218</li><li>Forgotten Shores: 850-670-1025</li></ul>
+    </div>
+  </div>
+  <footer><p><b>Reading this table:</b> per-person assumes 5 guests; total adds two dog fees (parsed from the per-dog amount where possible, else $75/dog default). "TBD" = call for quote.</p></footer>
+</div>
+
+<div class="modal-overlay" id="confirm-identity-overlay"><div class="modal">
+  <h3>Confirm your identity</h3>
+  <p class="confirm-text" id="confirm-identity-text"></p>
+  <div class="modal-actions"><button class="cancel-btn" id="confirm-identity-cancel">Cancel</button><button class="save-btn" id="confirm-identity-yes">Yes, this is me</button></div>
+</div></div>
+
+<div class="modal-overlay" id="edit-modal-overlay"><div class="modal">
+  <h3>Edit listing</h3>
+  <div class="mgrid">
+    <div class="mfield"><label>Name</label><input id="em-name"></div>
+    <div class="mfield"><label>Company</label><input id="em-iso"></div>
+    <div class="mfield"><label>Link</label><input id="em-link"></div>
+    <div class="mfield"><label>Street address (for map + drive time)</label><input id="em-address" placeholder="123 Gulf Beach Dr, St George Island, FL"></div>
+    <div class="mfield"><label>Photo URLs (comma-separated)</label><input id="em-photo"></div>
+    <div class="mfield"><label>Turn day</label><select id="em-turnday"><option>Saturday</option><option>Sunday</option><option>Flexible / verify</option></select></div>
+    <div class="mfield"><label>Bedrooms</label><input type="number" id="em-br"></div>
+    <div class="mfield"><label>Bathrooms</label><input type="number" step="0.5" id="em-ba"></div>
+    <div class="mfield"><label>Sleeps</label><input type="number" id="em-sleeps"></div>
+    <div class="mfield"><label>Beach position</label><select id="em-locpos"><option value="oceanfront">Ocean Front</option><option value="beachview">Beach View</option><option value="secondrow">Second Row</option></select></div>
+    <div class="mfield"><label>Island area</label><select id="em-area"><option>Plantation (West End)</option><option>East End</option><option>Central Beach</option></select></div>
+    <div class="mfield"><label>Minutes to lighthouse</label><input type="number" id="em-mins"></div>
+    <div class="mfield"><label>Crowdedness</label><select id="em-crowd"><option value="quiet">Quiet</option><option value="moderate">Moderate</option><option value="busy">Busy</option></select></div>
+    <div class="mfield"><label>Dog fee</label><input id="em-dogfee"></div>
+    <div class="mfield"><label>July rent ($/wk)</label><input type="number" id="em-julyrent"></div>
+    <div class="mfield"><label>July dates</label><input id="em-julydates"></div>
+    <div class="mfield"><label>July note</label><input id="em-julynote"></div>
+    <div class="mfield"><label>August rent ($/wk)</label><input type="number" id="em-augrent"></div>
+    <div class="mfield"><label>August dates</label><input id="em-augdates"></div>
+    <div class="mfield"><label>August note</label><input id="em-augnote"></div>
+    <div class="mfield"><label>Pool</label><select id="em-pool"><option value="false">No</option><option value="true">Yes</option></select></div>
+  </div>
+  <div class="modal-actions"><button class="cancel-btn" id="em-cancel">Cancel</button><button class="save-btn" id="em-save">Save changes</button></div>
+</div></div>
+
+<div class="modal-overlay" id="map-modal-overlay"><div class="modal map-modal-body" style="max-width:680px;">
+  <h3 id="map-modal-title">Location</h3>
+  <div id="map-svg-container"></div>
+  <div class="modal-actions"><button class="cancel-btn" id="map-close">Close</button></div>
+</div></div>
+
+<div class="lightbox-overlay" id="lightbox-overlay">
+  <button class="lightbox-close" id="lightbox-close">&times;</button>
+  <img id="lightbox-img" src="">
+  <div class="lightbox-nav"><button id="lightbox-prev">&larr; Prev</button><span class="lightbox-count" id="lightbox-count"></span><button id="lightbox-next">Next &rarr;</button></div>
+</div>
+
+<script>
+const NAMES = ["Brad","Wes","Bryan","Mom","Dad"];
+const ADMIN = "Brad";
+const AREA_MINS = {"Plantation (West End)":12, "East End":12, "Central Beach":3};
+
+const BASE_DATA = [
+  {id:"a-sand-box", iso:"Collins", name:"A Sand Box", link:"https://www.collinsvacationrentals.com/rentals/a-sand-box", address:"136 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, rules apply", julyRent:3550, julyDates:"7/31–8/7", julyNote:"Collins seasonal range top (peak/July estimate).", augRent:2700, augDates:"Aug 2027 Saturdays currently show fully booked/Notify — check back or call.", augNote:"Live calendar shows no open August 2027 Saturday check-ins as of this check; call to confirm or get on notify list.", pool:false, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-1.jpg"]},
+  {id:"aboard-katie-leigh", iso:"Collins", name:"Aboard The Katie Leigh", link:"https://www.collinsvacationrentals.com/rentals/aboard-the-katie-leigh", address:"116 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"$100, 1 dog only <35lb", julyRent:3995, julyDates:"7/18–7/25 (confirmed open)", julyNote:"Collins seasonal range top; confirmed available for check-in 7/18/27.", augRent:3040, augDates:"8/15–8/22 (only open Aug week)", augNote:"Confirmed: only 8/15 check-in is open in Aug 2027 (1,8,22,29 blocked); price is est. ~24% below July.", pool:false, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/52307/D10F.jpg?v=90572","https://photos.barefoot.com/v3ccln0929/images/properties/52307/D9FM.jpg?v=90586","https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500578F.jpg?v=90553","https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500595F.jpg?v=90561"]},
+  {id:"american-pie", iso:"Collins", name:"American Pie", link:"https://www.collinsvacationrentals.com/rentals/american-pie", address:"260 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.5, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$75/dog, 2 dogs <50lb", julyRent:4375, julyDates:"7/25–8/1", julyNote:"Collins seasonal range top.", augRent:3325, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/37261/1.jpg"]},
+  {id:"a-great-escape", iso:"Collins", name:"A Great Escape", link:"https://www.collinsvacationrentals.com/rentals/a-great-escape", turnday:"Sunday", br:4, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"$75/dog, 2 dogs <50lb", julyRent:5400, julyDates:"7/25–8/1", julyNote:"July 4th week confirmed $5,400.", augRent:3725, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/47847/1+-+exterior-back+elevation-_elp2030.jpg"]},
+  {id:"an-irish-seabreeze", iso:"Collins", name:"An Irish Seabreeze", link:"https://www.collinsvacationrentals.com/rentals/an-irish-seabreeze", turnday:"Sunday", br:4, ba:3.5, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Verify pet policy", julyRent:5830, julyDates:"7/25–8/1", julyNote:"Collins seasonal range top.", augRent:4430, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:[]},
+  {id:"a-sea-break", iso:"Collins", name:"A Sea Break", link:"https://www.collinsvacationrentals.com/rentals/a-sea-break", turnday:"Sunday", br:3, ba:3.5, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Verify pet policy", julyRent:6600, julyDates:"7/25–8/1", julyNote:"Collins range top ($4,000–$6,600).", augRent:5020, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:[]},
+  {id:"absolutely-paradise", iso:"Collins", name:"Absolutely Paradise", link:"https://www.collinsvacationrentals.com/rentals/absolutely-paradise", turnday:"Sunday", br:3, ba:3.5, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Verify pet policy", julyRent:7550, julyDates:"7/25–8/1", julyNote:"Collins range top ($4,100–$7,550).", augRent:5740, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:true, photos:[]},
+  {id:"an-ocean-remedy", iso:"Collins", name:"An Ocean Remedy", link:"https://www.collinsvacationrentals.com/rentals/an-ocean-remedy", turnday:"Sunday", br:5, ba:5.5, sleeps:16, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Verify pet policy", julyRent:9995, julyDates:"7/25–8/1", julyNote:"Collins seasonal range top.", augRent:7600, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:[]},
+  {id:"beachfront-benefits", iso:"Collins", name:"Beachfront Benefits", link:"https://www.collinsvacationrentals.com/rentals/beachfront-benefits", turnday:"Saturday", br:4, ba:4.0, sleeps:14, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, no weight limit", julyRent:12350, julyDates:"7/31–8/7", julyNote:"July confirmed peak $12,350.", augRent:5450, augDates:"8/7–8/14", augNote:"Aug confirmed as low as $5,450 for later weeks.", pool:true, photos:[]},
+  {id:"beachfront-bliss", iso:"Collins", name:"Beachfront Bliss", link:"https://www.collinsvacationrentals.com/rentals/beachfront-bliss", address:"1000 E Gorrie Dr, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:4.0, sleeps:9, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$75/dog, 2 dogs <35lb", julyRent:6495, julyDates:"7/31–8/7", julyNote:"2027 confirmed $6,495.", augRent:4950, augDates:"8/7–8/14", augNote:"2026 promo confirmed $4,950 (2027 Aug likely similar).", pool:true, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/36766/1000+E+Gorrie+Dr+Drone-11.jpg"]},
+  {id:"sea-hock", iso:"Collins", name:"Sea Hock", link:"https://www.collinsvacationrentals.com/rentals/sea-hock", turnday:"Sunday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, rules apply", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+  {id:"here-comes-sun", iso:"Collins", name:"Here Comes The Sun", link:"https://www.collinsvacationrentals.com/rentals/here-comes-the-sun", turnday:"Sunday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"a-turtle-manor", iso:"Fickling", name:"A Turtle Manor", link:"https://www.ficklingvacationrentals.com/vacation-rentals/rental/aturtle/", turnday:"Sunday", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Verify pet policy", julyRent:null, julyDates:"", julyNote:"Not yet confirmed.", augRent:5800, augDates:"8/8–8/15", augNote:"User-confirmed rate for 8/8–8/15/27.", pool:false, photos:[]},
+  {id:"just-beachy", iso:"Cape & Coast", name:"Just Beachy", link:"https://www.capeandcoast.com/rentals/just-beachy", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, fee not published", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"a-turtles-dream", iso:"Cape & Coast", name:"A Turtle's Dream", link:"https://www.capeandcoast.com/rentals/a-turtles-dream", turnday:"Saturday", br:4, ba:4.0, sleeps:9, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"sugar-magnolia", iso:"Cape & Coast", name:"Sugar Magnolia", link:"https://www.capeandcoast.com/rentals/sugar-magnolia", turnday:"Sunday", br:4, ba:3.0, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, fee not published", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"above-the-dune", iso:"Cape & Coast", name:"Above the Dune", link:"https://www.capeandcoast.com/rentals/above-the-dune", turnday:"Saturday", br:3, ba:3.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, fee applies", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+  {id:"island-kisses", iso:"Cape & Coast", name:"Island Kisses", link:"https://www.capeandcoast.com/rentals/island-kisses", turnday:"Saturday", br:3, ba:2.0, sleeps:6, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, fee applies", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"sunny-moon", iso:"Cape & Coast", name:"Sunny Moon", link:"https://www.capeandcoast.com/rentals/sunny-moon", turnday:"Sunday", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"the-mango-tree", iso:"Cape & Coast", name:"The Mango Tree", link:"https://www.capeandcoast.com/rentals/the-mango-tree", turnday:"Saturday", br:4, ba:4.0, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"one-more-sunset", iso:"Cape & Coast", name:"One More Sunset", link:"https://www.capeandcoast.com/rentals/one-more-sunset", turnday:"Saturday", br:4, ba:4.0, sleeps:13, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"marshlight", iso:"Cape & Coast", name:"Marshlight", link:"https://www.capeandcoast.com/rentals/marshlight", turnday:"Sunday", br:4, ba:4.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"drifted-dunes", iso:"Cape & Coast", name:"Drifted Dunes", link:"https://www.capeandcoast.com/rentals/drifted-dunes", turnday:"Sunday", br:4, ba:4.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"sea-forever-sgi", iso:"Cape & Coast", name:"Sea Forever - SGI", link:"https://www.capeandcoast.com/rentals/sea-forever-sgi", turnday:"Saturday", br:5, ba:4.0, sleeps:16, locpos:"oceanfront", area:"East End", crowd:"quiet", dogfee:"Pet friendly, 2 dog max", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+  {id:"sea-chalet", iso:"Cape & Coast", name:"Sea Chalet", link:"https://www.capeandcoast.com/rentals/sea-chalet", turnday:"Sunday", br:5, ba:4.5, sleeps:14, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"~$100/pet (verify)", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+  {id:"a-sandcastle", iso:"Cape & Coast", name:"A Sandcastle", link:"https://www.capeandcoast.com/rentals/a-sandcastle", turnday:"Saturday", br:5, ba:5.0, sleeps:14, locpos:"oceanfront", area:"East End", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"beach-happy", iso:"Cape & Coast", name:"Beach Happy", link:"https://www.capeandcoast.com/rentals/beach-happy", turnday:"Flexible / verify", br:4, ba:3.5, sleeps:12, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly, limits not published", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"abiding-place", iso:"Forgotten Shores", name:"Abiding Place", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/abiding-place", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$150+tax, 2 dogs <45lb", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote (20% Aug promo advertised for 2026)", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/144407/4585500402.jpg"]},
+  {id:"the-lite-house", iso:"Forgotten Shores", name:"The Lite House", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/lite-house", turnday:"Sunday", br:3, ba:3.0, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"moderate", dogfee:"$150+tax, 1 dog <30lb", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/145035/9450830258.jpg"]},
+  {id:"prime-time", iso:"Forgotten Shores", name:"Prime Time", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/prime-time", turnday:"Saturday", br:5, ba:5.0, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Verify pet policy", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/230292/5101820938.jpg"]},
+  {id:"diamond-beach", iso:"Fickling", name:"Diamond Beach", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:5, ba:4.5, sleeps:14, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"good-vibes", iso:"Fickling", name:"Good Vibes", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:6, ba:6.5, sleeps:14, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+  {id:"tangled-up-blue", iso:"Fickling", name:"Tangled Up in Blue", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:4, ba:4.5, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, 1-2 dogs", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+  {id:"sandy-feet-retreat", iso:"Fickling", name:"Sandy Feet Retreat", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:4, ba:4.0, sleeps:13, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"dunestruck", iso:"VRBO", name:"DuneStruck (Beachfront, Plantation)", link:"https://www.vrbo.com/7292397ha", turnday:"Flexible / verify", br:3, ba:4.0, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+  {id:"vrbo-3287525", iso:"VRBO", name:"Beachfront Plantation 4BR (heated pool)", link:"https://www.vrbo.com/3287525", turnday:"Flexible / verify", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"vrbo-2991447", iso:"VRBO", name:"Dog-friendly beachfront bungalow", link:"https://www.vrbo.com/2991447", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+  {id:"vrbo-2991443", iso:"VRBO", name:"Beachside dog-friendly home w/ private pool", link:"https://www.vrbo.com/2991443", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"vrbo-3229812", iso:"VRBO", name:"Pet Friendly, Beach Front, Pool (SGI)", link:"https://www.vrbo.com/3229812", turnday:"Flexible / verify", br:4, ba:4.0, sleeps:14, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"skinny-mini", iso:"VRBO", name:"Skinny Mini beachfront bungalow", link:"https://www.vrbo.com", turnday:"Flexible / verify", br:3, ba:4.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+  {id:"pura-vida", iso:"VRBO", name:"Pura Vida Beach Front Coastal Cottage", link:"https://www.vrbo.com", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+];
+
+let customData = [];
+let fieldOverrides = {};
+let priceOverrides = {};
+let ratings = {};
+let adminPinHash = null;
+let currentUser = null, identityLocked = false;
+let sortKey="name", sortDir=1, currentMonth="august", sortMode="normal";
+
+function allData(){ return BASE_DATA.concat(customData); }
+function tierForPrice(p){ if(p<6000) return "ideal"; if(p<7500) return "stretch"; return "max"; }
+function tierLabel(t){ return {ideal:"Ideal",stretch:"Stretch",max:"Premium",tbd:"TBD"}[t]||t; }
+function locLabel(l){ return {oceanfront:"Ocean Front",beachview:"Beach View",secondrow:"Second Row"}[l]||l; }
+function locClass(l){ return {oceanfront:"",beachview:"beachview",secondrow:"secondrow"}[l]||""; }
+function crowdClass(c){ return {quiet:"crowd-quiet",moderate:"crowd-moderate",busy:"crowd-busy"}[c]||""; }
+function crowdLabel(c){ return {quiet:"Quiet / secluded",moderate:"Moderate",busy:"Busy"}[c]||c; }
+function simpleHash(s){ let h=0; for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;} return h.toString(36); }
+function perDogFeeAmount(dogfeeStr){
+  if(!dogfeeStr) return 75;
+  const m = String(dogfeeStr).match(/\$(\d+)/);
+  return m ? parseInt(m[1]) : 75;
+}
+
+function mergedRow(d){
+  const fo = fieldOverrides[d.id] || {};
+  const merged = Object.assign({}, d, fo);
+  const po = (priceOverrides[d.id]||{})[currentMonth];
+  const baseRent = currentMonth==="july" ? merged.julyRent : merged.augRent;
+  const baseDates = currentMonth==="july" ? merged.julyDates : merged.augDates;
+  const baseNote = currentMonth==="july" ? merged.julyNote : merged.augNote;
+  merged._effPrice = po ? po.price : baseRent;
+  merged._edited = !!po;
+  merged._editNote = po ? po.note : "";
+  merged._effTier = merged._effPrice ? tierForPrice(merged._effPrice) : "tbd";
+  merged._dates = baseDates;
+  merged._note = baseNote;
+  return merged;
+}
+
+const SUPABASE_URL = "https://fczrwwelmahwrwzcpodk.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_KjU14KBNtsswkmNdUr-QwQ_TgGHUEkJ";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function kvGet(key){
+  try{
+    const { data, error } = await sb.from("app_data").select("value").eq("key", key).maybeSingle();
+    if(error){ console.error(error); return null; }
+    return data ? data.value : null;
+  }catch(e){ console.error(e); return null; }
+}
+async function kvSet(key, value){
+  try{
+    const { error } = await sb.from("app_data").upsert({ key, value, updated_at: new Date().toISOString() });
+    if(error) console.error(error);
+  }catch(e){ console.error(e); }
+}
+
+async function loadAll(){
+  const cd = await kvGet("sgi-custom-listings"); if(cd) customData = cd;
+  const fo = await kvGet("sgi-field-overrides"); if(fo) fieldOverrides = fo;
+  const po = await kvGet("sgi-price-overrides-v2"); if(po) priceOverrides = po;
+  const rt = await kvGet("sgi-ratings-v2"); if(rt) ratings = rt;
+  const pin = await kvGet("sgi-admin-pin"); if(pin) adminPinHash = pin;
+  try{ currentUser=localStorage.getItem("sgi-current-user"); identityLocked=localStorage.getItem("sgi-identity-locked")==="true"; }catch(e){}
+  buildIdentityBar(); buildAreaFilter(); buildCompanyFilter(); setMonthButtons(); applyFilters();
+}
+async function saveCustom(){ await kvSet("sgi-custom-listings", customData); }
+async function saveFieldOverrides(){ await kvSet("sgi-field-overrides", fieldOverrides); }
+async function savePriceOverrides(){ await kvSet("sgi-price-overrides-v2", priceOverrides); }
+async function saveRatings(){ await kvSet("sgi-ratings-v2", ratings); }
+async function saveAdminPin(){ await kvSet("sgi-admin-pin", adminPinHash); }
+
+function buildIdentityBar(){
+  const box = document.getElementById("identity-buttons");
+  box.innerHTML = "";
+  NAMES.forEach(n=>{
+    const b = document.createElement("button");
+    const lockedOut = identityLocked && currentUser !== n;
+    b.className = "id-btn"+(currentUser===n?" active":"")+(lockedOut?" locked-out":"");
+    b.textContent = n;
+    b.disabled = lockedOut;
+    b.addEventListener("click", async ()=>{
+      if(n === ADMIN){ await handleAdminClick(); return; }
+      if(identityLocked) return;
+      showIdentityConfirm(n);
+    });
+    box.appendChild(b);
+  });
+  const meCanFam = currentUser===ADMIN || (ratings[currentUser] && ratings[currentUser].everCompleted);
+  const famBtn = document.createElement("button");
+  famBtn.className = "id-btn family-avg"+(sortMode==="family-avg"?" active":"");
+  famBtn.textContent = "★ Sort by Family Avg";
+  famBtn.disabled = !currentUser || !meCanFam;
+  famBtn.title = famBtn.disabled ? "Complete all your current ratings first to unlock this" : "";
+  famBtn.addEventListener("click", ()=>{ sortMode = sortMode==="family-avg"?"normal":"family-avg"; buildIdentityBar(); applyFilters(); });
+  box.appendChild(famBtn);
+  updateIdentityStatus();
+}
+
+async function handleAdminClick(){
+  if(!adminPinHash){
+    const pin = prompt("Set an admin PIN for Brad (4+ digits). You'll need this every time on a new device. Note: this is a light deterrent, not real security — anyone with page-source access could bypass it.");
+    if(!pin || pin.length<4){ return; }
+    adminPinHash = simpleHash(pin);
+    await saveAdminPin();
+    selectIdentity(ADMIN, false);
+    return;
+  }
+  if(currentUser === ADMIN) return;
+  const pin = prompt("Enter admin PIN:");
+  if(pin && simpleHash(pin) === adminPinHash){ selectIdentity(ADMIN, false); }
+  else if(pin !== null){ alert("Incorrect PIN."); }
+}
+
+function showIdentityConfirm(name){
+  document.getElementById("confirm-identity-text").innerHTML = `Are you sure you are picking <b>${name}</b>? Once confirmed, this name locks to this browser/device — you won't be able to switch to a different name here.`;
+  document.getElementById("confirm-identity-overlay").classList.add("open");
+  document.getElementById("confirm-identity-yes").onclick = ()=>{ selectIdentity(name, true); document.getElementById("confirm-identity-overlay").classList.remove("open"); };
+  document.getElementById("confirm-identity-cancel").onclick = ()=>{ document.getElementById("confirm-identity-overlay").classList.remove("open"); };
+}
+function selectIdentity(name, lock){
+  currentUser = name;
+  if(lock) identityLocked = true;
+  try{ localStorage.setItem("sgi-current-user", name); localStorage.setItem("sgi-identity-locked", identityLocked?"true":"false"); }catch(e){}
+  buildIdentityBar(); applyFilters();
+}
+function meRecord(){
+  if(!currentUser) return null;
+  if(!ratings[currentUser]) ratings[currentUser] = {entries:{}, everCompleted:false};
+  return ratings[currentUser];
+}
+function isAdmin(){ return currentUser === ADMIN; }
+function rowLockedByMe(id){
+  if(!currentUser) return false;
+  const me = ratings[currentUser];
+  return !!(me && me.entries[id] && me.entries[id].locked);
+}
+function rowVisibleToMe(id){ return isAdmin() || rowLockedByMe(id); }
+
+function updateIdentityStatus(){
+  const status=document.getElementById("identity-status"), submitBtn=document.getElementById("submit-final-btn"),
+        saveBtn=document.getElementById("save-progress-btn"), gatedBanner=document.getElementById("gated-banner");
+  if(!currentUser){ status.innerHTML="Pick your name to start rating homes — prices hidden per-row until you lock that row."; submitBtn.style.display="none"; saveBtn.style.display="none"; gatedBanner.style.display="none"; return; }
+  if(isAdmin()){ status.innerHTML=`Viewing as <b>Brad</b> <span class="admin-badge">Admin — always unlocked</span>. You can still rate/lock rows like everyone else.`; submitBtn.style.display="inline-block"; saveBtn.style.display="inline-block"; gatedBanner.style.display="none"; return; }
+  const me=meRecord();
+  const total=allData().length;
+  const lockedCount=Object.keys(me.entries).filter(k=>me.entries[k].locked).length;
+  const ratedUnlocked=Object.keys(me.entries).filter(k=>!me.entries[k].locked && me.entries[k].stars>0).length;
+  status.innerHTML = `Viewing as <b>${currentUser}</b> — ${lockedCount} of ${total} homes locked, ${ratedUnlocked} rated but not yet locked.`;
+  submitBtn.style.display="inline-block"; saveBtn.style.display="inline-block"; gatedBanner.style.display="block";
+  gatedBanner.textContent = "Each home's price stays hidden to you until you lock a rating for it. Locking is permanent for that home.";
+}
+document.getElementById("save-progress-btn").addEventListener("click", async ()=>{ await saveRatings(); alert("Progress saved."); });
+document.getElementById("submit-final-btn").addEventListener("click", async ()=>{
+  if(!confirm("Lock in your ratings for every home you've currently rated? This can't be undone for those homes (homes you haven't rated yet stay open).")) return;
+  const me = meRecord();
+  let lockedAny=false;
+  allData().forEach(d=>{
+    const e = me.entries[d.id];
+    if(e && e.stars>0 && !e.locked){ e.locked=true; lockedAny=true; }
+  });
+  if(Object.keys(me.entries).filter(k=>me.entries[k].locked).length === allData().length){ me.everCompleted = true; }
+  await saveRatings();
+  buildIdentityBar(); applyFilters();
+});
+
+function buildAreaFilter(){ const sel=document.getElementById("f-area"); sel.innerHTML='<option value="">All</option>'; [...new Set(allData().map(d=>d.area))].forEach(a=>{const o=document.createElement("option");o.value=a;o.textContent=a;sel.appendChild(o);}); }
+function buildCompanyFilter(){ const sel=document.getElementById("f-company"); sel.innerHTML='<option value="">All</option>'; [...new Set(allData().map(d=>d.iso))].sort().forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;sel.appendChild(o);}); }
+function setMonthButtons(){ document.getElementById("month-jul").classList.toggle("active",currentMonth==="july"); document.getElementById("month-aug").classList.toggle("active",currentMonth==="august"); }
+document.getElementById("month-jul").addEventListener("click", ()=>{currentMonth="july"; setMonthButtons(); applyFilters();});
+document.getElementById("month-aug").addEventListener("click", ()=>{currentMonth="august"; setMonthButtons(); applyFilters();});
+
+function myRatingFor(id){ if(!currentUser) return null; const me=ratings[currentUser]; if(!me||!me.entries[id]) return null; return me.entries[id].stars||null; }
+function familyAvgFor(id){
+  let sum=0,count=0;
+  NAMES.forEach(n=>{ const rec=ratings[n]; if(rec && rec.entries[id] && rec.entries[id].locked && rec.entries[id].stars>0){ sum+=rec.entries[id].stars; count++; } });
+  return count ? sum/count : null;
+}
+
+function applyFilters(){
+  const company=document.getElementById("f-company").value, tier=document.getElementById("f-tier").value,
+        minBa=parseFloat(document.getElementById("f-ba").value), minSleeps=parseInt(document.getElementById("f-sleeps").value),
+        locpos=document.getElementById("f-locpos").value, area=document.getElementById("f-area").value,
+        pool=document.getElementById("f-pool").value, search=document.getElementById("f-search").value.trim().toLowerCase();
+
+  let rows = allData().map(mergedRow).filter(d=>{
+    if(company && d.iso!==company) return false;
+    if(tier && d._effTier!==tier) return false;
+    if(minBa && d.ba<minBa) return false;
+    if(minSleeps && d.sleeps<minSleeps) return false;
+    if(locpos && d.locpos!==locpos) return false;
+    if(area && d.area!==area) return false;
+    if(pool==="yes" && !d.pool) return false;
+    if(pool==="no" && d.pool) return false;
+    if(search && !d.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  if(sortMode==="family-avg"){
+    rows.sort((a,b)=>{ const av=rowVisibleToMe(a.id)?familyAvgFor(a.id):null, bv=rowVisibleToMe(b.id)?familyAvgFor(b.id):null;
+      const avv=av===null?-1:av, bvv=bv===null?-1:bv; return bvv-avv; });
+  } else if(currentUser && !isAdmin() && ratings[currentUser] && ratings[currentUser].everCompleted){
+    rows.sort((a,b)=>{ const av=myRatingFor(a.id), bv=myRatingFor(b.id); const avv=av===null?-1:av, bvv=bv===null?-1:bv; return bvv-avv; });
+  } else {
+    const km={rent:"_effPrice",perperson:"_effPrice",total:"_effPrice"};
+    const k=km[sortKey]||sortKey;
+    rows.sort((a,b)=>{ let av=a[k],bv=b[k];
+      if(av===null||av===undefined) av=k==="_effPrice"?Infinity:"";
+      if(bv===null||bv===undefined) bv=k==="_effPrice"?Infinity:"";
+      if(typeof av==="string") av=av.toLowerCase(); if(typeof bv==="string") bv=bv.toLowerCase();
+      if(av<bv) return -1*sortDir; if(av>bv) return 1*sortDir; return 0; });
+  }
+  render(rows);
+}
+
+function halfStarWidget(propId, val, editable){
+  let h = `<div class="stars" data-propid="${propId}">`;
+  for(let i=1;i<=5;i++){
+    let fillPct = 0;
+    if(val >= i) fillPct = 100; else if(val >= i-0.5) fillPct = 50;
+    h += `<div class="starwrap">
+      <span class="se">&#9733;</span>
+      <span class="sf" style="width:${fillPct}%;">&#9733;</span>
+      ${editable?`<span class="hit-l" data-star="${i-0.5}"></span><span class="hit-r" data-star="${i}"></span>`:''}
+    </div>`;
+  }
+  h += `</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">${val?val+' / 5':'not rated'}</div>`;
+  return h;
+}
+
+function render(rows){
+  const tbody = document.getElementById("table-body");
+  tbody.innerHTML = "";
+  rows.forEach((d,i)=>{
+    const tr = document.createElement("tr");
+    const photos = d.photos||[];
+    const photoHtml = photos.length
+      ? `<img src="${photos[0]}" alt="${d.name}" loading="lazy" data-gallery="${d.id}" onerror="this.outerHTML='<div class=&quot;photo-fallback&quot;><a href=&quot;${d.link}&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;>View photos &#8599;</a></div>'">`
+      : `<div class="no-photo"><a href="${d.link}" target="_blank" rel="noopener">View listing &#8599;</a></div>`;
+
+    const visible = rowVisibleToMe(d.id);
+    const price = d._effPrice;
+    const rentDisplay = price ? `$${price.toLocaleString()}` : `<span class="tier-pill tier-tbd">TBD</span>`;
+    const perPersonDisplay = price ? `$${Math.round(price/5).toLocaleString()}` : "—";
+    const perDog = perDogFeeAmount(d.dogfee);
+    const totalDisplay = price ? `$${(price+(perDog*2)).toLocaleString()}` : "—";
+    const pillClass = d._edited ? "edited-pill" : `tier-${d._effTier}`;
+    const pillLabel = d._edited ? "You updated" : tierLabel(d._effTier);
+    const priceCellClass = visible ? "num" : "num blurred";
+
+    const mins = AREA_MINS[d.area] !== undefined ? AREA_MINS[d.area] : null;
+
+    let ratingsHtml = "";
+    if(!currentUser){
+      ratingsHtml = `<span style="font-size:11px;color:var(--muted);">Pick a name to rate</span>`;
+    } else {
+      const locked = rowLockedByMe(d.id);
+      const myEntry = (ratings[currentUser] && ratings[currentUser].entries[d.id]) || {stars:0,comment:""};
+      if(locked || isAdmin()){
+        let sum=0,count=0,comments=[];
+        NAMES.forEach(n=>{ const rec=ratings[n]; if(rec && rec.entries[d.id] && rec.entries[d.id].locked && rec.entries[d.id].stars>0){ sum+=rec.entries[d.id].stars; count++;
+          if(rec.entries[d.id].comment) comments.push(`<div class="comment-block"><b>${n}</b> (${rec.entries[d.id].stars}★): ${rec.entries[d.id].comment}</div>`); } });
+        const avg = count ? (sum/count).toFixed(1) : "—";
+        ratingsHtml = (locked ? `<span class="locked-tag">🔒 locked</span>` : ``) + `<div class="avg-rating">${avg} ★ ${count?`(${count})`:'(no ratings)'}</div>${comments.join("")}`;
+        if(isAdmin() && !locked){
+          ratingsHtml += halfStarWidget(d.id, myEntry.stars||0, true)
+            + `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`
+            + (myEntry.stars>0 ? `<button class="price-edit-btn" data-clearrating="${d.id}" style="margin-top:3px;">Clear my rating</button>` : ``);
+        }
+      } else {
+        ratingsHtml = halfStarWidget(d.id, myEntry.stars||0, true)
+          + `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`
+          + (myEntry.stars>0 ? `<button class="price-edit-btn" data-clearrating="${d.id}" style="margin-top:3px;">Clear my rating</button>` : ``);
+      }
+    }
+
+    const editCell = isAdmin()
+      ? `<button class="edit-row-btn" data-rowedit="${d.id}">Edit</button>`
+      : `<span class="no-edit-note">Ask Brad</span>`;
+
+    tr.innerHTML = `
+      <td data-label="#"><span class="rank-badge">${i+1}</span></td>
+      <td data-label="Photo" class="photo-cell">${photoHtml}</td>
+      <td data-label="Name" class="name-cell"><a href="${d.link}" target="_blank" rel="noopener">${d.name}</a><span class="iso-tag">${d.iso}</span></td>
+      <td data-label="Turn Day">${d.turnday}${d._dates?`<span class="area-sub">${currentMonth==='july'?'Jul':'Aug'}: ${d._dates}</span>`:''}</td>
+      <td data-label="BR" class="num">${d.br}</td>
+      <td data-label="BA" class="num">${d.ba}</td>
+      <td data-label="Sleeps" class="num">${d.sleeps}</td>
+      <td data-label="Beach Position"><span class="loc-pill ${locClass(d.locpos)}">${locLabel(d.locpos)}</span></td>
+      <td data-label="Island Area">${d.area}${mins!==null?`<span class="area-sub">~${mins} min to lighthouse</span>`:''}<button class="map-link" data-mapview="${d.id}">📍 View on map</button></td>
+      <td data-label="Crowdedness" class="${crowdClass(d.crowd)}">${crowdLabel(d.crowd)}</td>
+      <td data-label="Dog Fee">${d.dogfee}</td>
+      <td data-label="Rent Cost" class="${priceCellClass}">
+        <span class="tier-pill ${pillClass}">${pillLabel}</span><br><b>${rentDisplay}</b>
+        <span class="price-note">${d._edited ? d._editNote : d._note}</span>
+        ${isAdmin() ? `<button class="price-edit-btn" data-editprice="${d.id}">${price?"Edit price":"Enter confirmed price"}</button>
+        <div class="price-input-row" data-inputrow="${d.id}" style="display:none;">
+          <input type="number" placeholder="$/week" data-priceinput="${d.id}" value="${price||''}">
+          <input type="text" placeholder="note e.g. incl. military discount" data-pricenote="${d.id}" value="${d._editNote||''}">
+          <button data-save="${d.id}">Save (${currentMonth==='july'?'July':'August'})</button>
+          <button class="cancel" data-cancel="${d.id}">Cancel</button>
+        </div>` : ``}
+      </td>
+      <td data-label="Per-Person" class="${priceCellClass}">${perPersonDisplay}</td>
+      <td data-label="Total" class="${priceCellClass}">${totalDisplay}</td>
+      <td data-label="Pool" class="${d.pool?'pool-yes':'pool-no'}">${d.pool?"Yes":"No"}</td>
+      <td data-label="Family Ratings">${ratingsHtml}</td>
+      <td data-label="Edit">${editCell}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("shown-count").textContent = rows.length;
+  document.getElementById("total-count").textContent = allData().length;
+
+  document.querySelectorAll(".starwrap [data-star]").forEach(hit=>{
+    hit.addEventListener("click", async (ev)=>{
+      const propId = ev.target.closest(".stars").getAttribute("data-propid");
+      if(!currentUser || rowLockedByMe(propId)) return;
+      const val = parseFloat(ev.target.getAttribute("data-star"));
+      const me = meRecord();
+      if(!me.entries[propId]) me.entries[propId] = {stars:0, comment:"", locked:false};
+      me.entries[propId].stars = val;
+      await saveRatings();
+      applyFilters();
+    });
+  });
+  document.querySelectorAll("[data-comment]").forEach(ta=>{
+    ta.addEventListener("change", async ()=>{
+      const propId = ta.getAttribute("data-comment");
+      if(rowLockedByMe(propId)) return;
+      const me = meRecord();
+      if(!me.entries[propId]) me.entries[propId] = {stars:0, comment:"", locked:false};
+      me.entries[propId].comment = ta.value;
+      await saveRatings();
+    });
+  });
+  document.querySelectorAll("[data-clearrating]").forEach(btn=>btn.addEventListener("click", async ()=>{
+    const propId = btn.getAttribute("data-clearrating");
+    if(!currentUser || rowLockedByMe(propId)) return;
+    if(!confirm("Clear your rating and comment for this home?")) return;
+    const me = meRecord();
+    me.entries[propId] = {stars:0, comment:"", locked:false};
+    await saveRatings();
+    applyFilters();
+  }));
+  document.querySelectorAll("[data-editprice]").forEach(btn=>btn.addEventListener("click", ()=>{ const id=btn.getAttribute("data-editprice"); document.querySelector(`[data-inputrow="${id}"]`).style.display="flex"; btn.style.display="none"; }));
+  document.querySelectorAll("[data-cancel]").forEach(btn=>btn.addEventListener("click", ()=>{ const id=btn.getAttribute("data-cancel"); document.querySelector(`[data-inputrow="${id}"]`).style.display="none"; document.querySelector(`[data-editprice="${id}"]`).style.display="block"; }));
+  document.querySelectorAll("[data-save]").forEach(btn=>btn.addEventListener("click", async ()=>{
+    const id=btn.getAttribute("data-save"); const val=parseFloat(document.querySelector(`[data-priceinput="${id}"]`).value); const note=document.querySelector(`[data-pricenote="${id}"]`).value;
+    if(val>0){ if(!priceOverrides[id]) priceOverrides[id]={}; priceOverrides[id][currentMonth]={price:val, note:note||"Manually confirmed price"}; await savePriceOverrides(); applyFilters(); }
+  }));
+  document.querySelectorAll("[data-rowedit]").forEach(btn=>btn.addEventListener("click", ()=>openEditModal(btn.getAttribute("data-rowedit"))));
+  document.querySelectorAll("[data-gallery]").forEach(img=>img.addEventListener("click", ()=>openLightbox(img.getAttribute("data-gallery"))));
+  document.querySelectorAll("[data-mapview]").forEach(btn=>btn.addEventListener("click", ()=>openMapModal(btn.getAttribute("data-mapview"))));
+}
+
+// ---- lightbox ----
+let lightboxPhotos=[], lightboxIdx=0;
+function openLightbox(propId){
+  const d = mergedRow(allData().find(x=>x.id===propId));
+  lightboxPhotos = d.photos && d.photos.length ? d.photos : [];
+  if(!lightboxPhotos.length) return;
+  lightboxIdx=0; showLightboxImg();
+  document.getElementById("lightbox-overlay").classList.add("open");
+}
+function showLightboxImg(){ document.getElementById("lightbox-img").src=lightboxPhotos[lightboxIdx]; document.getElementById("lightbox-count").textContent=`${lightboxIdx+1} / ${lightboxPhotos.length}`; }
+document.getElementById("lightbox-close").addEventListener("click", ()=>document.getElementById("lightbox-overlay").classList.remove("open"));
+document.getElementById("lightbox-prev").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx-1+lightboxPhotos.length)%lightboxPhotos.length; showLightboxImg(); });
+document.getElementById("lightbox-next").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx+1)%lightboxPhotos.length; showLightboxImg(); });
+
+// ---- map modal (real Google Maps embed, roadmap not satellite) ----
+function openMapModal(propId){
+  const d = mergedRow(allData().find(x=>x.id===propId));
+  document.getElementById("map-modal-title").textContent = d.name + " — " + d.area;
+  const query = d.address ? d.address : `${d.name}, St George Island, FL`;
+  const encoded = encodeURIComponent(query);
+  const isRealAddress = !!d.address;
+  const iframe = `<iframe
+      width="100%" height="360" style="border:1px solid var(--line); border-radius:8px;"
+      loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+      src="https://maps.google.com/maps?q=${encoded}&t=m&z=${isRealAddress?16:13}&output=embed">
+    </iframe>
+    <p style="font-size:12px;color:var(--muted);margin-top:10px;">
+      ${isRealAddress ? "Exact address on file." : "No exact street address on file yet — showing the property name searched on St George Island, which may be approximate. Brad can add the exact address via the Edit button for precision."}
+      &nbsp;<a href="https://www.google.com/maps/search/${encoded}" target="_blank" rel="noopener">Open in Google Maps ↗</a>
+    </p>`;
+  document.getElementById("map-svg-container").innerHTML = iframe;
+  document.getElementById("map-modal-overlay").classList.add("open");
+}
+document.getElementById("map-close").addEventListener("click", ()=>document.getElementById("map-modal-overlay").classList.remove("open"));
+
+// ---- row edit modal (admin only) ----
+const overlay = document.getElementById("edit-modal-overlay");
+let editingId = null;
+function openEditModal(id){
+  if(!isAdmin()) return;
+  editingId = id;
+  const d = mergedRow(allData().find(x=>x.id===id));
+  document.getElementById("em-name").value=d.name; document.getElementById("em-iso").value=d.iso; document.getElementById("em-link").value=d.link;
+  document.getElementById("em-address").value=d.address||"";
+  document.getElementById("em-photo").value=(d.photos||[]).join(", "); document.getElementById("em-turnday").value=d.turnday;
+  document.getElementById("em-br").value=d.br; document.getElementById("em-ba").value=d.ba; document.getElementById("em-sleeps").value=d.sleeps;
+  document.getElementById("em-locpos").value=d.locpos; document.getElementById("em-area").value=d.area;
+  document.getElementById("em-mins").value = AREA_MINS[d.area] !== undefined ? AREA_MINS[d.area] : "";
+  document.getElementById("em-crowd").value=d.crowd; document.getElementById("em-dogfee").value=d.dogfee;
+  document.getElementById("em-julyrent").value=d.julyRent||""; document.getElementById("em-julydates").value=d.julyDates||""; document.getElementById("em-julynote").value=d.julyNote||"";
+  document.getElementById("em-augrent").value=d.augRent||""; document.getElementById("em-augdates").value=d.augDates||""; document.getElementById("em-augnote").value=d.augNote||"";
+  document.getElementById("em-pool").value=d.pool?"true":"false";
+  overlay.classList.add("open");
+}
+document.getElementById("em-cancel").addEventListener("click", ()=>overlay.classList.remove("open"));
+document.getElementById("em-save").addEventListener("click", async ()=>{
+  const photosArr = document.getElementById("em-photo").value.split(",").map(s=>s.trim()).filter(Boolean);
+  fieldOverrides[editingId] = {
+    name: document.getElementById("em-name").value, iso: document.getElementById("em-iso").value, link: document.getElementById("em-link").value,
+    address: document.getElementById("em-address").value,
+    photos: photosArr, turnday: document.getElementById("em-turnday").value,
+    br: parseFloat(document.getElementById("em-br").value), ba: parseFloat(document.getElementById("em-ba").value), sleeps: parseInt(document.getElementById("em-sleeps").value),
+    locpos: document.getElementById("em-locpos").value, area: document.getElementById("em-area").value,
+    crowd: document.getElementById("em-crowd").value, dogfee: document.getElementById("em-dogfee").value,
+    julyRent: parseFloat(document.getElementById("em-julyrent").value)||null, julyDates: document.getElementById("em-julydates").value, julyNote: document.getElementById("em-julynote").value,
+    augRent: parseFloat(document.getElementById("em-augrent").value)||null, augDates: document.getElementById("em-augdates").value, augNote: document.getElementById("em-augnote").value,
+    pool: document.getElementById("em-pool").value==="true",
+  };
+  await saveFieldOverrides();
+  overlay.classList.remove("open");
+  applyFilters();
+});
+
+// ---- add new listing (open to everyone) ----
+document.getElementById("add-new-btn").addEventListener("click", async ()=>{
+  const name=document.getElementById("new-name").value.trim();
+  const errBox=document.getElementById("add-error"), okBox=document.getElementById("add-success");
+  errBox.style.display="none"; okBox.style.display="none";
+  if(!name){ errBox.textContent="Please enter a name."; errBox.style.display="block"; return; }
+  const dup = allData().some(d=>d.name.trim().toLowerCase()===name.toLowerCase());
+  if(dup){ errBox.textContent=`"${name}" already appears to be in the table.`; errBox.style.display="block"; return; }
+  const id = "custom-"+name.toLowerCase().replace(/[^a-z0-9]+/g,"-")+"-"+Date.now();
+  const julyRent=parseFloat(document.getElementById("new-julyrent").value)||null;
+  const augRent=parseFloat(document.getElementById("new-augrent").value)||null;
+  const photos=document.getElementById("new-photo").value.split(",").map(s=>s.trim()).filter(Boolean);
+  customData.push({
+    id, iso: document.getElementById("new-iso").value||"Owner-added", name, link: document.getElementById("new-link").value,
+    address: document.getElementById("new-address").value, photos,
+    turnday: document.getElementById("new-turnday").value,
+    br: parseInt(document.getElementById("new-br").value)||0, ba: parseFloat(document.getElementById("new-ba").value)||0, sleeps: parseInt(document.getElementById("new-sleeps").value)||0,
+    locpos: document.getElementById("new-locpos").value, area: document.getElementById("new-area").value, crowd:"moderate", dogfee:"Verify pet policy",
+    julyRent, julyDates: document.getElementById("new-julydates").value, julyNote: julyRent?"Manually added":"TBD – call for quote",
+    augRent, augDates: document.getElementById("new-augdates").value, augNote: augRent?"Manually added":"TBD – call for quote",
+    pool:false,
+  });
+  await saveCustom();
+  buildCompanyFilter(); buildAreaFilter(); applyFilters();
+  okBox.textContent = `"${name}" added.`; okBox.style.display="block";
+  ["new-name","new-link","new-iso","new-address","new-photo","new-br","new-ba","new-sleeps","new-julyrent","new-julydates","new-augrent","new-augdates","new-mins"].forEach(id2=>document.getElementById(id2).value="");
+});
+
+// ---- filter/sort wiring ----
+document.querySelectorAll("thead th[data-key]").forEach(th=>th.addEventListener("click", ()=>{
+  sortMode="normal"; const key=th.getAttribute("data-key");
+  if(sortKey===key){ sortDir*=-1; } else { sortKey=key; sortDir=1; }
+  applyFilters();
+}));
+["f-company","f-tier","f-ba","f-sleeps","f-locpos","f-area","f-pool"].forEach(id=>document.getElementById(id).addEventListener("change", applyFilters));
+document.getElementById("f-search").addEventListener("input", applyFilters);
+
+const notesToggle=document.getElementById("notes-toggle"), notesBody=document.getElementById("notes-body");
+notesToggle.addEventListener("click", ()=>{ const open=notesBody.classList.toggle("open"); notesToggle.classList.toggle("open", open); });
+
+loadAll();
+</script>
+</body>
+</html>
