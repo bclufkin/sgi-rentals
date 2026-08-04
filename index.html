@@ -71,8 +71,7 @@
   .crowd-moderate{color:var(--tier-stretch);font-weight:700;}
   .crowd-busy{color:var(--brick);font-weight:700;}
   .pool-yes{color:var(--tier-ideal);font-weight:700;} .pool-no{color:var(--muted);}
-  .locked-placeholder{background:var(--muted);color:var(--muted);border-radius:5px;padding:6px 10px;font-size:11px;font-weight:700;user-select:none;text-align:center;}
-  .locked-placeholder::before{content:"🔒 Locked";color:#fff;}
+  .locked-blur{filter:blur(6px) grayscale(100%);user-select:none;pointer-events:none;}
   .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--navy);color:var(--paper);font-size:10px;font-weight:700;}
   .price-edit-btn,.row-edit-btn,.map-link{display:block;margin-top:3px;font-size:10px;background:none;border:none;color:var(--edited);cursor:pointer;text-decoration:underline;padding:0;}
   .price-input-row{display:flex;flex-direction:column;gap:4px;margin-top:4px;}
@@ -783,21 +782,19 @@ function render(rows){
       <td data-label="Island Area">${d.area}${mins!==null?`<span class="area-sub">~${mins} min to lighthouse</span>`:''}<button class="map-link" data-mapview="${d.id}">📍 View on map</button></td>
       <td data-label="Crowdedness" class="${crowdClass(d.crowd)}">${crowdLabel(d.crowd)}</td>
       <td data-label="Dog Fee">${d.dogfee}</td>
-      <td data-label="Rent Cost" class="num">
-        ${visible ? `
+      <td data-label="Rent Cost" class="num${visible?'':' locked-blur'}">
         <span class="tier-pill ${pillClass}">${pillLabel}</span><br><b>${rentDisplay}</b>
         <span class="price-note">${d._edited ? d._editNote : d._note}</span>
-        ${isAdmin() ? `<button class="price-edit-btn" data-editprice="${d.id}">${price?"Edit price":"Enter confirmed price"}</button>
+        ${(isAdmin() && visible) ? `<button class="price-edit-btn" data-editprice="${d.id}">${price?"Edit price":"Enter confirmed price"}</button>
         <div class="price-input-row" data-inputrow="${d.id}" style="display:none;">
           <input type="number" placeholder="$/week" data-priceinput="${d.id}" value="${price||''}">
           <input type="text" placeholder="note e.g. incl. military discount" data-pricenote="${d.id}" value="${d._editNote||''}">
           <button data-save="${d.id}">Save (${currentMonth==='july'?'July':'August'})</button>
           <button class="cancel" data-cancel="${d.id}">Cancel</button>
         </div>` : ``}
-        ` : `<div class="locked-placeholder"></div>`}
       </td>
-      <td data-label="Per-Person" class="num">${visible ? perPersonDisplay : `<div class="locked-placeholder"></div>`}</td>
-      <td data-label="Total" class="num">${visible ? totalDisplay : `<div class="locked-placeholder"></div>`}</td>
+      <td data-label="Per-Person" class="num${visible?'':' locked-blur'}">${perPersonDisplay}</td>
+      <td data-label="Total" class="num${visible?'':' locked-blur'}">${totalDisplay}</td>
       <td data-label="Pool" class="${d.pool?'pool-yes':'pool-no'}">${d.pool?"Yes":"No"}</td>
       <td data-label="Family Ratings">${ratingsHtml}</td>
       <td data-label="Edit">${editCell}</td>
