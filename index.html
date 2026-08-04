@@ -48,7 +48,7 @@
   .month-toggle button.active{background:var(--navy);color:#fff;}
   .count-line{font-size:12px;color:var(--muted);margin-top:8px;}
   .table-scroll{overflow-x:auto;overflow-y:auto;max-height:72vh;border:1px solid var(--line);border-radius:10px;background:var(--card);max-width:100%;}
-  table{border-collapse:collapse;width:100%;font-size:12.5px;table-layout:fixed;min-width:1700px;}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;table-layout:fixed;min-width:1650px;}
   thead th{position:sticky;top:0;z-index:3;background:var(--navy);color:var(--paper);text-align:left;padding:8px 8px;font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--brick);overflow:hidden;text-overflow:ellipsis;}
   td{padding:7px 8px;vertical-align:top;overflow-wrap:break-word;}
   thead th.no-sort{cursor:default;}
@@ -71,7 +71,8 @@
   .crowd-moderate{color:var(--tier-stretch);font-weight:700;}
   .crowd-busy{color:var(--brick);font-weight:700;}
   .pool-yes{color:var(--tier-ideal);font-weight:700;} .pool-no{color:var(--muted);}
-  .blurred{filter:blur(6px);user-select:none;pointer-events:none;}
+  .locked-placeholder{background:var(--muted);color:var(--muted);border-radius:5px;padding:6px 10px;font-size:11px;font-weight:700;user-select:none;text-align:center;}
+  .locked-placeholder::before{content:"🔒 Locked";color:#fff;}
   .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--navy);color:var(--paper);font-size:10px;font-weight:700;}
   .price-edit-btn,.row-edit-btn,.map-link{display:block;margin-top:3px;font-size:10px;background:none;border:none;color:var(--edited);cursor:pointer;text-decoration:underline;padding:0;}
   .price-input-row{display:flex;flex-direction:column;gap:4px;margin-top:4px;}
@@ -191,6 +192,25 @@
 
   <div class="table-scroll">
     <table id="rental-table">
+      <colgroup>
+        <col style="width:32px;"><!-- # -->
+        <col style="width:64px;"><!-- Photo -->
+        <col style="width:190px;"><!-- Name -->
+        <col style="width:110px;"><!-- Turn Day -->
+        <col style="width:38px;"><!-- BR -->
+        <col style="width:38px;"><!-- BA -->
+        <col style="width:52px;"><!-- Sleeps -->
+        <col style="width:100px;"><!-- Beach Position -->
+        <col style="width:160px;"><!-- Island Area -->
+        <col style="width:90px;"><!-- Crowdedness -->
+        <col style="width:150px;"><!-- Dog Fee -->
+        <col style="width:190px;"><!-- Rent Cost -->
+        <col style="width:80px;"><!-- Per-Person -->
+        <col style="width:80px;"><!-- Total -->
+        <col style="width:44px;"><!-- Pool -->
+        <col style="width:180px;"><!-- Family Ratings -->
+        <col style="width:48px;"><!-- Edit -->
+      </colgroup>
       <thead><tr>
         <th class="no-sort">#</th><th class="no-sort">Photo</th><th data-key="name">Name</th>
         <th data-key="turnday">Turn Day</th><th data-key="br">BR</th><th data-key="ba">BA</th><th data-key="sleeps">Sleeps</th>
@@ -212,7 +232,7 @@
       <div class="mfield"><label>Listing URL</label><input type="url" id="new-link" placeholder="https://..."></div>
       <div class="mfield"><label>Your name (optional)</label><input type="text" id="new-suggester" placeholder="Who's suggesting this?"></div>
     </div>
-    <button class="toggle-btn" id="add-new-btn" style="margin-top:10px;">Send to Brad's queue</button>
+    <button class="toggle-btn" id="add-new-btn" style="margin-top:10px;">Save to shared list</button>
     <div id="pending-suggestions" style="margin-top:16px;"></div>
   </div>
 
@@ -428,7 +448,29 @@ const BASE_DATA = [
   {id:"drifted-dunes", iso:"Cape & Coast", name:"Drifted Dunes", link:"https://www.capeandcoast.com/rentals/drifted-dunes", turnday:"Sunday", br:4, ba:4.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
   {id:"sea-forever-sgi", iso:"Cape & Coast", name:"Sea Forever - SGI", link:"https://www.capeandcoast.com/rentals/sea-forever-sgi", turnday:"Saturday", br:5, ba:4.0, sleeps:16, locpos:"oceanfront", area:"East End", crowd:"quiet", dogfee:"Pet friendly, 2 dog max", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
   {id:"sea-chalet", iso:"Cape & Coast", name:"Sea Chalet", link:"https://www.capeandcoast.com/rentals/sea-chalet", turnday:"Sunday", br:5, ba:4.5, sleeps:14, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"~$100/pet (verify)", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
-  {id:"a-sandcastle", iso:"Cape & Coast", name:"A Sandcastle", link:"https://www.capeandcoast.com/rentals/a-sandcastle", turnday:"Saturday", br:5, ba:5.0, sleeps:14, locpos:"oceanfront", area:"East End", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"a-sandcastle", iso:"Cape & Coast", name:"A Sandcastle", link:"https://www.capeandcoast.com/rentals/a-sandcastle", address:"Sunset Beach community, East End, St George Island, FL 32328", turnday:"Sunday", br:4, ba:4.5, sleeps:14, locpos:"oceanfront", area:"East End", crowd:"quiet", dogfee:"Pet friendly, tile floors, size/count limits TBD", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true,
+    photos:[
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/55af5551-3d6c-4129-a5cc-476ab926dcb0",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/0f1319be-f94e-42d2-8abf-2aad0629cd14",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/780f0a28-e212-4fbe-b6f2-273aa71573da",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/8e20506f-6343-4b87-936f-268799f9dd73",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/e87f61f7-8bf2-4b73-a771-3f833c2a8c70",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/f4ef27a2-1e8f-412c-b6cc-d1fbd5fefebc",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/f44e1add-fd55-439f-a8ef-93d957f2c8d3",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/9220b255-8042-45ce-bfad-3cbf5e35a9e9",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/d1ad63b3-72d4-4d49-a5e5-ca5f6f54784c",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/cd7c414d-5619-4463-8f73-89ffdb745915",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/f712dabe-3798-41be-b3d9-e6f6d3382042",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/e089f9eb-dc03-44ac-a4be-e03e1bec36e9",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/74dd2a42-8246-4bcb-952c-5ad64bcc9216",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/80c6ba42-ab74-4e74-9ccc-9ee826543635",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/35969e1b-676b-4e93-a783-f464ac1e16cf",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/07fd746f-f2ce-4256-97da-5540a0c85090",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/f26343e4-c6de-42f2-ad09-adad52f3495f",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/96612108-b280-409b-ac1a-252d4b3d982a",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/b980397e-2660-4c03-a19b-91159b1c151e",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/9e2f92f2-c064-4fcc-8a5a-7cd8deb18aac"
+    ]},
   {id:"beach-happy", iso:"Cape & Coast", name:"Beach Happy", link:"https://www.capeandcoast.com/rentals/beach-happy", turnday:"Flexible / verify", br:4, ba:3.5, sleeps:12, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly, limits not published", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
   {id:"abiding-place", iso:"Forgotten Shores", name:"Abiding Place", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/abiding-place", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$150+tax, 2 dogs <45lb", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote (20% Aug promo advertised for 2026)", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/144407/4585500402.jpg"]},
   {id:"the-lite-house", iso:"Forgotten Shores", name:"The Lite House", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/lite-house", turnday:"Sunday", br:3, ba:3.0, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"moderate", dogfee:"$150+tax, 1 dog <30lb", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/145035/9450830258.jpg"]},
@@ -696,7 +738,6 @@ function render(rows){
     const totalDisplay = price ? `$${(price+(perDog*2)).toLocaleString()}` : "—";
     const pillClass = d._edited ? "edited-pill" : `tier-${d._effTier}`;
     const pillLabel = d._edited ? "You updated" : tierLabel(d._effTier);
-    const priceCellClass = visible ? "num" : "num blurred";
 
     const mins = AREA_MINS[d.area] !== undefined ? AREA_MINS[d.area] : null;
 
@@ -742,7 +783,8 @@ function render(rows){
       <td data-label="Island Area">${d.area}${mins!==null?`<span class="area-sub">~${mins} min to lighthouse</span>`:''}<button class="map-link" data-mapview="${d.id}">📍 View on map</button></td>
       <td data-label="Crowdedness" class="${crowdClass(d.crowd)}">${crowdLabel(d.crowd)}</td>
       <td data-label="Dog Fee">${d.dogfee}</td>
-      <td data-label="Rent Cost" class="${priceCellClass}">
+      <td data-label="Rent Cost" class="num">
+        ${visible ? `
         <span class="tier-pill ${pillClass}">${pillLabel}</span><br><b>${rentDisplay}</b>
         <span class="price-note">${d._edited ? d._editNote : d._note}</span>
         ${isAdmin() ? `<button class="price-edit-btn" data-editprice="${d.id}">${price?"Edit price":"Enter confirmed price"}</button>
@@ -752,9 +794,10 @@ function render(rows){
           <button data-save="${d.id}">Save (${currentMonth==='july'?'July':'August'})</button>
           <button class="cancel" data-cancel="${d.id}">Cancel</button>
         </div>` : ``}
+        ` : `<div class="locked-placeholder"></div>`}
       </td>
-      <td data-label="Per-Person" class="${priceCellClass}">${perPersonDisplay}</td>
-      <td data-label="Total" class="${priceCellClass}">${totalDisplay}</td>
+      <td data-label="Per-Person" class="num">${visible ? perPersonDisplay : `<div class="locked-placeholder"></div>`}</td>
+      <td data-label="Total" class="num">${visible ? totalDisplay : `<div class="locked-placeholder"></div>`}</td>
       <td data-label="Pool" class="${d.pool?'pool-yes':'pool-no'}">${d.pool?"Yes":"No"}</td>
       <td data-label="Family Ratings">${ratingsHtml}</td>
       <td data-label="Edit">${editCell}</td>
@@ -808,24 +851,31 @@ function render(rows){
 }
 
 // ---- lightbox ----
-let lightboxPhotos=[], lightboxIdx=0;
+let lightboxPhotos=[], lightboxIdx=0, lightboxTimer=null, lightboxPlaying=true;
 function openLightbox(propId){
   const d = mergedRow(allData().find(x=>x.id===propId));
   lightboxPhotos = d.photos && d.photos.length ? d.photos : [];
   if(!lightboxPhotos.length) return;
-  lightboxIdx=0; showLightboxImg();
+  lightboxIdx=0; lightboxPlaying=true; showLightboxImg();
   document.getElementById("lightbox-overlay").classList.add("open");
+  startLightboxAuto();
 }
+function startLightboxAuto(){
+  stopLightboxAuto();
+  if(lightboxPhotos.length<2) return;
+  lightboxTimer = setInterval(()=>{ lightboxIdx=(lightboxIdx+1)%lightboxPhotos.length; showLightboxImg(); }, 3000);
+}
+function stopLightboxAuto(){ if(lightboxTimer){ clearInterval(lightboxTimer); lightboxTimer=null; } }
 function showLightboxImg(){
   document.getElementById("lightbox-img").src=lightboxPhotos[lightboxIdx];
-  document.getElementById("lightbox-count").textContent=`${lightboxIdx+1} / ${lightboxPhotos.length}`;
+  document.getElementById("lightbox-count").textContent=`${lightboxIdx+1} / ${lightboxPhotos.length}${lightboxPhotos.length>1?(lightboxPlaying?" · auto-playing":" · paused"):""}`;
   const thumbBox = document.getElementById("lightbox-thumbs");
   thumbBox.innerHTML = lightboxPhotos.map((p,i)=>`<img src="${p}" class="${i===lightboxIdx?'active':''}" data-thumbidx="${i}">`).join("");
-  thumbBox.querySelectorAll("[data-thumbidx]").forEach(t=>t.addEventListener("click", ()=>{ lightboxIdx=parseInt(t.getAttribute("data-thumbidx")); showLightboxImg(); }));
+  thumbBox.querySelectorAll("[data-thumbidx]").forEach(t=>t.addEventListener("click", ()=>{ lightboxIdx=parseInt(t.getAttribute("data-thumbidx")); lightboxPlaying=false; stopLightboxAuto(); showLightboxImg(); }));
 }
-document.getElementById("lightbox-close").addEventListener("click", ()=>document.getElementById("lightbox-overlay").classList.remove("open"));
-document.getElementById("lightbox-prev").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx-1+lightboxPhotos.length)%lightboxPhotos.length; showLightboxImg(); });
-document.getElementById("lightbox-next").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx+1)%lightboxPhotos.length; showLightboxImg(); });
+document.getElementById("lightbox-close").addEventListener("click", ()=>{ document.getElementById("lightbox-overlay").classList.remove("open"); stopLightboxAuto(); });
+document.getElementById("lightbox-prev").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx-1+lightboxPhotos.length)%lightboxPhotos.length; lightboxPlaying=false; stopLightboxAuto(); showLightboxImg(); });
+document.getElementById("lightbox-next").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx+1)%lightboxPhotos.length; lightboxPlaying=false; stopLightboxAuto(); showLightboxImg(); });
 
 // ---- map modal (real Google Maps embed, roadmap not satellite) ----
 function openMapModal(propId){
@@ -856,7 +906,7 @@ document.getElementById("map-close").addEventListener("click", ()=>document.getE
 document.querySelectorAll(".modal-overlay").forEach(ov=>{
   ov.addEventListener("click", (e)=>{ if(e.target === ov) ov.classList.remove("open"); });
 });
-document.getElementById("lightbox-overlay").addEventListener("click", (e)=>{ if(e.target.id === "lightbox-overlay") e.currentTarget.classList.remove("open"); });
+document.getElementById("lightbox-overlay").addEventListener("click", (e)=>{ if(e.target.id === "lightbox-overlay"){ e.currentTarget.classList.remove("open"); stopLightboxAuto(); } });
 
 // ---- row edit modal (admin only) ----
 const overlay = document.getElementById("edit-modal-overlay");
@@ -927,7 +977,7 @@ document.getElementById("add-new-btn").addEventListener("click", async ()=>{
   if(dup){ errBox.textContent="That URL is already in the queue."; errBox.style.display="block"; return; }
   pendingSuggestions.push({url, suggester: document.getElementById("new-suggester").value.trim(), ts: Date.now()});
   await savePending();
-  okBox.textContent = "Added to Brad's queue — he'll pull the details and update the table."; okBox.style.display="block";
+  okBox.textContent = "Saved to the shared list below — it doesn't notify Brad automatically, so also mention it to him directly if it's time-sensitive."; okBox.style.display="block";
   document.getElementById("new-link").value=""; document.getElementById("new-suggester").value="";
   renderPendingSuggestions();
 });
