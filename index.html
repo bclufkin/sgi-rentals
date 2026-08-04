@@ -47,13 +47,13 @@
   .month-toggle button{border:none;background:#fff;color:var(--navy);padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;}
   .month-toggle button.active{background:var(--navy);color:#fff;}
   .count-line{font-size:12px;color:var(--muted);margin-top:8px;}
-  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);max-width:100%;}
-  table{border-collapse:collapse;width:100%;font-size:12.5px;}
-  thead th{position:sticky;top:0;z-index:2;background:var(--navy);color:var(--paper);text-align:left;padding:8px 8px;font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--brick);}
+  .table-scroll{overflow-x:auto;overflow-y:auto;max-height:72vh;border:1px solid var(--line);border-radius:10px;background:var(--card);max-width:100%;}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;table-layout:fixed;min-width:1700px;}
+  thead th{position:sticky;top:0;z-index:3;background:var(--navy);color:var(--paper);text-align:left;padding:8px 8px;font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--brick);overflow:hidden;text-overflow:ellipsis;}
+  td{padding:7px 8px;vertical-align:top;overflow-wrap:break-word;}
   thead th.no-sort{cursor:default;}
   tbody tr{border-bottom:1px solid var(--line);}
   tbody tr:nth-child(even){background:rgba(201,190,163,.18);}
-  td{padding:7px 8px;vertical-align:top;}
   .photo-cell img{width:56px;height:42px;object-fit:cover;border-radius:5px;border:1px solid var(--line);display:block;cursor:pointer;}
   .photo-fallback,.no-photo{width:56px;height:42px;border-radius:5px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);text-align:center;padding:2px;}
   .photo-fallback a,.no-photo a{color:var(--brick-dark);font-weight:700;text-decoration:none;}
@@ -90,6 +90,8 @@
   .comment-block{font-size:10.5px;margin-top:4px;padding:4px 6px;background:rgba(255,255,255,.5);border-radius:4px;}
   .comment-block b{color:var(--navy);}
   .locked-tag{font-size:9px;color:var(--tier-ideal);font-style:italic;display:block;margin-top:2px;}
+  .unavail-banner{display:inline-block;background:var(--brick);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-top:4px;max-width:220px;}
+  tr.unavailable-row{background:rgba(168,74,38,0.08)!important;}
   .edit-row-btn{background:var(--navy);color:#fff;border:none;padding:5px 9px;border-radius:5px;font-size:10.5px;cursor:pointer;white-space:nowrap;}
   .no-edit-note{font-size:10px;color:var(--muted);font-style:italic;}
   .modal-overlay{position:fixed;inset:0;background:rgba(22,38,43,.65);display:none;align-items:center;justify-content:center;z-index:60;padding:16px;}
@@ -108,9 +110,12 @@
   @media (max-width:560px){.mgrid{grid-template-columns:1fr;}}
   .lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:70;flex-direction:column;}
   .lightbox-overlay.open{display:flex;}
-  .lightbox-overlay img{max-width:90vw;max-height:78vh;border-radius:6px;}
+  .lightbox-overlay img{max-width:90vw;max-height:70vh;border-radius:6px;}
   .lightbox-nav{display:flex;gap:20px;align-items:center;margin-top:14px;}
   .lightbox-nav button{background:#fff;border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer;}
+  .lightbox-thumbs{display:flex;gap:6px;margin-top:12px;max-width:90vw;overflow-x:auto;padding:4px;}
+  .lightbox-thumbs img{width:56px;height:42px;object-fit:cover;border-radius:4px;cursor:pointer;opacity:.55;border:2px solid transparent;flex-shrink:0;}
+  .lightbox-thumbs img.active{opacity:1;border-color:var(--brick);}
   .lightbox-close{position:absolute;top:18px;right:24px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;}
   .lightbox-count{color:#fff;font-size:12.5px;}
   .notes-panel{margin-top:16px;}
@@ -137,7 +142,7 @@
   @media (max-width:820px){
     table, thead, tbody, th, td, tr{display:block;}
     thead{display:none;}
-    .table-scroll{overflow-x:visible;border:none;background:transparent;}
+    .table-scroll{overflow-x:visible;overflow-y:visible;max-height:none;border:none;background:transparent;}
     tbody tr{background:var(--card)!important;border:1px solid var(--line);border-radius:10px;margin-bottom:12px;padding:10px;}
     td{padding:5px 0;border:none;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
     td::before{content:attr(data-label);font-weight:700;font-size:10px;text-transform:uppercase;color:var(--muted);min-width:90px;flex-shrink:0;}
@@ -150,15 +155,13 @@
 <body>
 <div class="wrap">
   <header class="hero">
-    <p class="eyebrow">St. George Island, Florida — Family Rental Ledger</p>
-    <h1>Beachfront &amp; Pet-Friendly, July &amp; August 2027</h1>
-    <p class="sub">Rate each home on its merits — prices hidden per-row until you lock your rating for it. Submitting locks what you've rated so far; new homes added later stay open for everyone, without unlocking old ones.</p>
-    <p style="font-size:11px;color:#9fb0a8;margin:8px 0 0;">v1.1 — live build</p>
+    <h1>St. George Island Trip 2027</h1>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v2 — live build</p>
   </header>
-  <div class="share-banner">📌 Share with "always share latest version" on so Brad's edits appear automatically. Steps at the end of the chat reply.</div>
 
   <div class="identity-bar">
     <div class="row" id="identity-buttons"></div>
+    <p style="font-size:12.5px;color:var(--muted);line-height:1.5;margin:10px 0 0;max-width:640px;">Rate each stay on its own merits first — pricing for a home stays hidden to you until you lock in a rating for it. Once locked, a rating is final. If new homes get added later, they start out open for rating even if you've already locked everything else; nothing you've already finished gets reopened.</p>
     <div class="id-status" id="identity-status"></div>
     <div>
       <button class="save-progress" id="save-progress-btn" style="display:none;">Save progress (come back later)</button>
@@ -201,29 +204,16 @@
   </div>
 
   <div class="add-panel panel">
-    <h2>Add a new option</h2>
-    <p class="helptext">Fastest way: paste a listing URL to Brad in chat and he'll pull specs automatically. Or enter manually — it saves live to the shared table. Duplicate names are blocked.</p>
+    <h2>Found another option?</h2>
+    <p class="helptext">A browser can't reliably pull specs from another rental site's page automatically (most sites block that, same reason photos sometimes don't load) — so the accurate way to add a new home is to send Brad the listing URL directly and he'll pull the details and push the update to everyone. You can also drop the URL here as a placeholder for Brad to pick up.</p>
     <div class="add-error" id="add-error"></div>
     <div class="add-success" id="add-success"></div>
     <div class="mgrid">
-      <div class="mfield"><label>Name</label><input type="text" id="new-name"></div>
-      <div class="mfield"><label>Link</label><input type="url" id="new-link"></div>
-      <div class="mfield"><label>Street address (for map + drive time)</label><input type="text" id="new-address" placeholder="123 Gulf Beach Dr, St George Island, FL"></div>
-      <div class="mfield"><label>Company</label><input type="text" id="new-iso"></div>
-      <div class="mfield"><label>Photo URLs (comma-separated)</label><input type="text" id="new-photo"></div>
-      <div class="mfield"><label>Turn day</label><select id="new-turnday"><option>Saturday</option><option>Sunday</option><option>Flexible / verify</option></select></div>
-      <div class="mfield"><label>Bedrooms</label><input type="number" id="new-br"></div>
-      <div class="mfield"><label>Bathrooms</label><input type="number" step="0.5" id="new-ba"></div>
-      <div class="mfield"><label>Sleeps</label><input type="number" id="new-sleeps"></div>
-      <div class="mfield"><label>July rent ($/wk, optional)</label><input type="number" id="new-julyrent"></div>
-      <div class="mfield"><label>July dates (e.g. 7/25–8/1)</label><input type="text" id="new-julydates"></div>
-      <div class="mfield"><label>August rent ($/wk, optional)</label><input type="number" id="new-augrent"></div>
-      <div class="mfield"><label>August dates (e.g. 8/8–8/15)</label><input type="text" id="new-augdates"></div>
-      <div class="mfield"><label>Beach position</label><select id="new-locpos"><option value="oceanfront">Ocean Front</option><option value="beachview">Beach View</option><option value="secondrow">Second Row</option></select></div>
-      <div class="mfield"><label>Island area</label><select id="new-area"><option>Plantation (West End)</option><option>East End</option><option>Central Beach</option></select></div>
-      <div class="mfield"><label>Minutes to lighthouse</label><input type="number" id="new-mins"></div>
+      <div class="mfield"><label>Listing URL</label><input type="url" id="new-link" placeholder="https://..."></div>
+      <div class="mfield"><label>Your name (optional)</label><input type="text" id="new-suggester" placeholder="Who's suggesting this?"></div>
     </div>
-    <button class="toggle-btn" id="add-new-btn" style="margin-top:10px;">Add to table</button>
+    <button class="toggle-btn" id="add-new-btn" style="margin-top:10px;">Send to Brad's queue</button>
+    <div id="pending-suggestions" style="margin-top:16px;"></div>
   </div>
 
   <div class="notes-panel">
@@ -275,6 +265,8 @@
     <div class="mfield"><label>August rent ($/wk)</label><input type="number" id="em-augrent"></div>
     <div class="mfield"><label>August dates</label><input id="em-augdates"></div>
     <div class="mfield"><label>August note</label><input id="em-augnote"></div>
+    <div class="mfield"><label>Unavailable in July?</label><select id="em-julyunavail"><option value="false">No — normal</option><option value="true">Yes — confirmed unavailable</option></select></div>
+    <div class="mfield"><label>Unavailable in August?</label><select id="em-augunavail"><option value="false">No — normal</option><option value="true">Yes — confirmed unavailable</option></select></div>
     <div class="mfield"><label>Pool</label><select id="em-pool"><option value="false">No</option><option value="true">Yes</option></select></div>
   </div>
   <div class="modal-actions"><button class="cancel-btn" id="em-cancel">Cancel</button><button class="save-btn" id="em-save">Save changes</button></div>
@@ -290,6 +282,7 @@
   <button class="lightbox-close" id="lightbox-close">&times;</button>
   <img id="lightbox-img" src="">
   <div class="lightbox-nav"><button id="lightbox-prev">&larr; Prev</button><span class="lightbox-count" id="lightbox-count"></span><button id="lightbox-next">Next &rarr;</button></div>
+  <div class="lightbox-thumbs" id="lightbox-thumbs"></div>
 </div>
 
 <script>
@@ -298,22 +291,121 @@ const ADMIN = "Brad";
 const AREA_MINS = {"Plantation (West End)":12, "East End":12, "Central Beach":3};
 
 const BASE_DATA = [
-  {id:"a-sand-box", iso:"Collins", name:"A Sand Box", link:"https://www.collinsvacationrentals.com/rentals/a-sand-box", address:"136 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, rules apply", julyRent:3550, julyDates:"7/31–8/7", julyNote:"Collins seasonal range top (peak/July estimate).", augRent:2700, augDates:"Aug 2027 Saturdays currently show fully booked/Notify — check back or call.", augNote:"Live calendar shows no open August 2027 Saturday check-ins as of this check; call to confirm or get on notify list.", pool:false, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-1.jpg"]},
-  {id:"aboard-katie-leigh", iso:"Collins", name:"Aboard The Katie Leigh", link:"https://www.collinsvacationrentals.com/rentals/aboard-the-katie-leigh", address:"116 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"$100, 1 dog only <35lb", julyRent:3995, julyDates:"7/18–7/25 (confirmed open)", julyNote:"Collins seasonal range top; confirmed available for check-in 7/18/27.", augRent:3040, augDates:"8/15–8/22 (only open Aug week)", augNote:"Confirmed: only 8/15 check-in is open in Aug 2027 (1,8,22,29 blocked); price is est. ~24% below July.", pool:false, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/52307/D10F.jpg?v=90572","https://photos.barefoot.com/v3ccln0929/images/properties/52307/D9FM.jpg?v=90586","https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500578F.jpg?v=90553","https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500595F.jpg?v=90561"]},
+  {id:"a-sand-box", iso:"Collins", name:"A Sand Box", link:"https://www.collinsvacationrentals.com/rentals/a-sand-box", address:"136 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, rules apply", julyRent:3550, julyDates:"7/31–8/7", julyNote:"Collins seasonal range top (peak/July estimate).", augRent:null, augUnavailable:true, augDates:"", augNote:"Live calendar shows every August 2027 Saturday blocked/Notify as of last check — call to get on the waitlist.", pool:false, photos:[
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-1.jpg?v=89911",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-3.jpg?v=89914",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-2.jpg?v=89913",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/1+-+exterior-main-_elp2247.jpg?v=85288",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/2+-+1st+floor+main+level-living+room-_elp2403.jpg?v=85268",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/3+-+1st+floor+main+level-living+room-_elp2383.jpg?v=85283",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/4+-+1st+floor+main+level-living+room-_elp2393.jpg?v=85273",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/5+-+1st+floor+main+level-living+room-_elp2388.jpg?v=85284",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/6+-+1st+floor+main+level-covered+patio-_elp2444.jpg?v=85274",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/7+-+1st+floor+main+level-covered+patio-_elp2448.jpg?v=85276",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/9+-+1st+floor+main+level-view-_elp2447.jpg?v=85266",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/10+-+1st+floor+main+level-dining+room-_elp2368.jpg?v=85267",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/12+-+1st+floor+main+level-dining+room-_elp2358.jpg?v=85271",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/15+-+1st+floor+main+level-kitchen-_elp2418.jpg?v=85264",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/16+-+1st+floor+main+level-kitchen-_elp2423.jpg?v=85263",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/17+-+1st+floor+main+level-bath-_elp2348.jpg?v=85257",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/18+-+ground+level-primary+bedroom-_elp2308.jpg?v=85280",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/19+-+ground+level-primary+bedroom-_elp2313.jpg?v=85282",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/20+-+ground+level-primary+bedroom-_elp2318.jpg?v=85286",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/22+-+ground+level-bath-_elp2338.jpg?v=85278",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/23+-+ground+level-bedroom-_elp2293.jpg?v=85259",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/24+-+ground+level-bedroom-_elp2288.jpg?v=85258",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/25+-+ground+level-bath-_elp2298.jpg?v=85261",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/26+-+2nd+level+top+floor-bedroom-_elp2428.jpg?v=85277",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/27+-+2nd+level+top+floor-bedroom-_elp2438.jpg?v=85265",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/28+-+ground+level-washer+dryer-_elp2303.jpg?v=85260",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/29+-+exterior-front+elevation-_elp2263.jpg?v=85285",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/31+-+exterior-view+from+front-_elp2260.jpg?v=85279",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47264/33+-+exterior-front+yard-_elp2266.jpg?v=85289"
+    ]},
+  {id:"aboard-katie-leigh", iso:"Collins", name:"Aboard The Katie Leigh", link:"https://www.collinsvacationrentals.com/rentals/aboard-the-katie-leigh", address:"116 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"$100, 1 dog only <35lb", julyRent:3995, julyDates:"7/18–7/25 (confirmed open)", julyNote:"Collins seasonal range top; confirmed available for check-in 7/18/27.", augRent:3040, augDates:"8/15–8/22 (only open Aug week)", augNote:"Confirmed: only 8/15 check-in is open in Aug 2027 (1,8,22,29 blocked); price is est. ~24% below July.", pool:false, photos:[
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D10F.jpg?v=90572",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D9FM.jpg?v=90586",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500578F.jpg?v=90553",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500589F.jpg?v=90583",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500595F.jpg?v=90561",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500603F.jpg?v=90544",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500609F.jpg?v=90540",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500615F.jpg?v=90569",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500621F.jpg?v=90556",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500627F.jpg?v=90565",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500634F.jpg?v=90566",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500640F.jpg?v=90567",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500646F.jpg?v=90542",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500652F.jpg?v=90541",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500661F.jpg?v=90543",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500667F.jpg?v=90555",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500674F.jpg?v=90568",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500680F.jpg?v=90548",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500692F.jpg?v=90562",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500703F.jpg?v=90558",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500709F.jpg?v=90551",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500714F.jpg?v=90559",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500725F.jpg?v=90557",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500732F.jpg?v=90560",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500738F.jpg?v=90546",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500744F.jpg?v=90550",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500750F.jpg?v=90549",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500756F.jpg?v=90547",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500762F.jpg?v=90554",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500768F.jpg?v=90545",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500774F.jpg?v=90573",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500779F.jpg?v=90571",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500784_HDRF.jpg?v=90580",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500794F.jpg?v=90563",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500799F.jpg?v=90570",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500804F.jpg?v=90552",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500814_HDRF.jpg?v=90564",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500824F.jpg?v=90579",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D1FM.jpg?v=90585",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D2FM.jpg?v=90584",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D3FM.jpg?v=90575",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D4FM.jpg?v=90576",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D5FM.jpg?v=90574",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D6FM.jpg?v=90578",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D7FM.jpg?v=90577",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D8FM.jpg?v=90581",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D11F.jpg?v=90582"
+    ]},
   {id:"american-pie", iso:"Collins", name:"American Pie", link:"https://www.collinsvacationrentals.com/rentals/american-pie", address:"260 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.5, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$75/dog, 2 dogs <50lb", julyRent:4375, julyDates:"7/25–8/1", julyNote:"Collins seasonal range top.", augRent:3325, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/37261/1.jpg"]},
   {id:"a-great-escape", iso:"Collins", name:"A Great Escape", link:"https://www.collinsvacationrentals.com/rentals/a-great-escape", address:"1744 East Gulf Beach Drive, St. George Island, FL 32328", turnday:"Sunday", br:4, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"$75/dog, 2 dogs <50lb", julyRent:5400, julyDates:"7/25–8/1 (July 4th wk confirmed $5,400)", julyNote:"Confirmed July 4th holiday week rate.", augRent:3725, augDates:"Aug 2027 currently shows fully booked/Notify on all Sundays — call to confirm or waitlist.", augNote:"Est. ~24% below July (live Aug 2027 calendar shows no open Sundays as of this check).", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/46+-+exterior-front+elevation-_elp2018.jpg?v=85485",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/1+-+exterior-back+elevation-_elp2030.jpg?v=85505",
-      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/12+-+floor+plan-kitchen-_elp2064.jpg?v=85477",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/2+-+exterior-view+from+front-_elp2033.jpg?v=85516",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/47+-+exterior-parking-_elp2020.jpg?v=85500",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/4+-+floor+plan-living+room-_elp2084a.jpg?v=85506",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/5+-+floor+plan-living+room-_elp2104.jpg?v=85475",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/6+-+floor+plan-living+room-_elp2114.jpg?v=85472",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/9+-+floor+plan-dining+room-_elp2049a.jpg?v=85474",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/12+-+floor+plan-kitchen-_elp2064.jpg?v=85477",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/13+-+floor+plan-kitchen-_elp2044.jpg?v=85494",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/14+-+floor+plan-kitchen-_elp2079.jpg?v=85480",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/15+-+floor+plan-bedroom-_elp2159.jpg?v=85489",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/16+-+floor+plan-bedroom-_elp2154.jpg?v=85481",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/17+-+floor+plan-bedroom-_elp2164.jpg?v=85497",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/18+-+floor+plan-bedroom-_elp2169.jpg?v=85483",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/20+-+floor+plan-bedroom-_elp2134.jpg?v=85482",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/21+-+floor+plan-bedroom-_elp2139.jpg?v=85512",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/22+-+floor+plan-bedroom-_elp2144.jpg?v=85486",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/23+-+floor+plan-bedroom-_elp2189.jpg?v=85513",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/24+-+floor+plan-bedroom-_elp2174.jpg?v=85491",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/25+-+floor+plan-bedroom-_elp2179.jpg?v=85499",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/26+-+floor+plan-bedroom-_elp2194.jpg?v=85476",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/27+-+floor+plan-bedroom-_elp2184.jpg?v=85473",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/19+-+floor+plan-bath-_elp2149.jpg?v=85469",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/28+-+floor+plan-bath-_elp2199.jpg?v=85478",
-      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/34+-+floor+plan-deck-_elp2124.jpg?v=85503"
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/32+-+floor+plan-balcony-_elp2131.jpg?v=85502",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/33+-+floor+plan-deck-_elp2128.jpg?v=85504",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/34+-+floor+plan-deck-_elp2124.jpg?v=85503",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/35+-+floor+plan-deck-_elp2120a.jpg?v=85490",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/42+-+floor+plan-view-_elp2025.jpg?v=85515",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/43+-+floor+plan-view-_elp2123.jpg?v=85495",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47847/44+-+floor+plan-view-_elp2027.jpg?v=85498"
     ]},
   {id:"an-irish-seabreeze", iso:"Collins", name:"An Irish Seabreeze", link:"https://www.collinsvacationrentals.com/rentals/an-irish-seabreeze", turnday:"Sunday", br:4, ba:3.5, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Verify pet policy", julyRent:5830, julyDates:"7/25–8/1", julyNote:"Collins seasonal range top.", augRent:4430, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:[]},
   {id:"a-sea-break", iso:"Collins", name:"A Sea Break", link:"https://www.collinsvacationrentals.com/rentals/a-sea-break", turnday:"Sunday", br:3, ba:3.5, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Verify pet policy", julyRent:6600, julyDates:"7/25–8/1", julyNote:"Collins range top ($4,000–$6,600).", augRent:5020, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:[]},
@@ -383,12 +475,14 @@ function mergedRow(d){
   const baseRent = currentMonth==="july" ? merged.julyRent : merged.augRent;
   const baseDates = currentMonth==="july" ? merged.julyDates : merged.augDates;
   const baseNote = currentMonth==="july" ? merged.julyNote : merged.augNote;
+  const baseUnavailable = currentMonth==="july" ? !!merged.julyUnavailable : !!merged.augUnavailable;
   merged._effPrice = po ? po.price : baseRent;
   merged._edited = !!po;
   merged._editNote = po ? po.note : "";
   merged._effTier = merged._effPrice ? tierForPrice(merged._effPrice) : "tbd";
   merged._dates = baseDates;
   merged._note = baseNote;
+  merged._unavailable = baseUnavailable;
   return merged;
 }
 
@@ -418,6 +512,7 @@ async function loadAll(){
   const pin = await kvGet("sgi-admin-pin"); if(pin) adminPinHash = pin;
   try{ currentUser=localStorage.getItem("sgi-current-user"); identityLocked=localStorage.getItem("sgi-identity-locked")==="true"; }catch(e){}
   buildIdentityBar(); buildAreaFilter(); buildCompanyFilter(); setMonthButtons(); applyFilters();
+  loadPending();
 }
 async function saveCustom(){ await kvSet("sgi-custom-listings", customData); }
 async function saveFieldOverrides(){ await kvSet("sgi-field-overrides", fieldOverrides); }
@@ -633,10 +728,12 @@ function render(rows){
       ? `<button class="edit-row-btn" data-rowedit="${d.id}">Edit</button>`
       : `<span class="no-edit-note">Ask Brad</span>`;
 
+    if(d._unavailable) tr.classList.add("unavailable-row");
+
     tr.innerHTML = `
       <td data-label="#"><span class="rank-badge">${i+1}</span></td>
       <td data-label="Photo" class="photo-cell">${photoHtml}</td>
-      <td data-label="Name" class="name-cell"><a href="${d.link}" target="_blank" rel="noopener">${d.name}</a><span class="iso-tag">${d.iso}</span></td>
+      <td data-label="Name" class="name-cell"><a href="${d.link}" target="_blank" rel="noopener">${d.name}</a><span class="iso-tag">${d.iso}</span>${d._unavailable?`<span class="unavail-banner">🚫 Not available in ${currentMonth==='july'?'July':'August'} 2027 — rate it anyway, just can't book this month</span>`:''}</td>
       <td data-label="Turn Day">${d.turnday}${d._dates?`<span class="area-sub">${currentMonth==='july'?'Jul':'Aug'}: ${d._dates}</span>`:''}</td>
       <td data-label="BR" class="num">${d.br}</td>
       <td data-label="BA" class="num">${d.ba}</td>
@@ -719,7 +816,13 @@ function openLightbox(propId){
   lightboxIdx=0; showLightboxImg();
   document.getElementById("lightbox-overlay").classList.add("open");
 }
-function showLightboxImg(){ document.getElementById("lightbox-img").src=lightboxPhotos[lightboxIdx]; document.getElementById("lightbox-count").textContent=`${lightboxIdx+1} / ${lightboxPhotos.length}`; }
+function showLightboxImg(){
+  document.getElementById("lightbox-img").src=lightboxPhotos[lightboxIdx];
+  document.getElementById("lightbox-count").textContent=`${lightboxIdx+1} / ${lightboxPhotos.length}`;
+  const thumbBox = document.getElementById("lightbox-thumbs");
+  thumbBox.innerHTML = lightboxPhotos.map((p,i)=>`<img src="${p}" class="${i===lightboxIdx?'active':''}" data-thumbidx="${i}">`).join("");
+  thumbBox.querySelectorAll("[data-thumbidx]").forEach(t=>t.addEventListener("click", ()=>{ lightboxIdx=parseInt(t.getAttribute("data-thumbidx")); showLightboxImg(); }));
+}
 document.getElementById("lightbox-close").addEventListener("click", ()=>document.getElementById("lightbox-overlay").classList.remove("open"));
 document.getElementById("lightbox-prev").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx-1+lightboxPhotos.length)%lightboxPhotos.length; showLightboxImg(); });
 document.getElementById("lightbox-next").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx+1)%lightboxPhotos.length; showLightboxImg(); });
@@ -730,20 +833,30 @@ function openMapModal(propId){
   document.getElementById("map-modal-title").textContent = d.name + " — " + d.area;
   const query = d.address ? d.address : `${d.name}, St George Island, FL`;
   const encoded = encodeURIComponent(query);
+  const lighthouse = encodeURIComponent("Cape St George Lighthouse, St George Island, FL");
   const isRealAddress = !!d.address;
+  // Directions mode plots two labeled markers (this home + the lighthouse) and
+  // auto-fits the zoom so you see the whole island, Plantation to East End.
   const iframe = `<iframe
-      width="100%" height="360" style="border:1px solid var(--line); border-radius:8px;"
+      width="100%" height="380" style="border:1px solid var(--line); border-radius:8px;"
       loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-      src="https://maps.google.com/maps?q=${encoded}&t=m&z=${isRealAddress?16:13}&output=embed">
+      src="https://maps.google.com/maps?saddr=${encoded}&daddr=${lighthouse}&t=m&output=embed">
     </iframe>
     <p style="font-size:12px;color:var(--muted);margin-top:10px;">
-      ${isRealAddress ? "Exact address on file." : "No exact street address on file yet — showing the property name searched on St George Island, which may be approximate. Brad can add the exact address via the Edit button for precision."}
+      Marker A is this home; marker B is the Cape St. George Lighthouse, for orientation.
+      ${isRealAddress ? " Exact address on file." : " No exact street address on file yet — showing the property name searched on St George Island, which may be approximate. Brad can add the exact address via the Edit button for precision."}
       &nbsp;<a href="https://www.google.com/maps/search/${encoded}" target="_blank" rel="noopener">Open in Google Maps ↗</a>
     </p>`;
   document.getElementById("map-svg-container").innerHTML = iframe;
   document.getElementById("map-modal-overlay").classList.add("open");
 }
 document.getElementById("map-close").addEventListener("click", ()=>document.getElementById("map-modal-overlay").classList.remove("open"));
+
+// click outside modal content closes it
+document.querySelectorAll(".modal-overlay").forEach(ov=>{
+  ov.addEventListener("click", (e)=>{ if(e.target === ov) ov.classList.remove("open"); });
+});
+document.getElementById("lightbox-overlay").addEventListener("click", (e)=>{ if(e.target.id === "lightbox-overlay") e.currentTarget.classList.remove("open"); });
 
 // ---- row edit modal (admin only) ----
 const overlay = document.getElementById("edit-modal-overlay");
@@ -761,6 +874,8 @@ function openEditModal(id){
   document.getElementById("em-crowd").value=d.crowd; document.getElementById("em-dogfee").value=d.dogfee;
   document.getElementById("em-julyrent").value=d.julyRent||""; document.getElementById("em-julydates").value=d.julyDates||""; document.getElementById("em-julynote").value=d.julyNote||"";
   document.getElementById("em-augrent").value=d.augRent||""; document.getElementById("em-augdates").value=d.augDates||""; document.getElementById("em-augnote").value=d.augNote||"";
+  document.getElementById("em-julyunavail").value = d.julyUnavailable ? "true":"false";
+  document.getElementById("em-augunavail").value = d.augUnavailable ? "true":"false";
   document.getElementById("em-pool").value=d.pool?"true":"false";
   overlay.classList.add("open");
 }
@@ -776,6 +891,8 @@ document.getElementById("em-save").addEventListener("click", async ()=>{
     crowd: document.getElementById("em-crowd").value, dogfee: document.getElementById("em-dogfee").value,
     julyRent: parseFloat(document.getElementById("em-julyrent").value)||null, julyDates: document.getElementById("em-julydates").value, julyNote: document.getElementById("em-julynote").value,
     augRent: parseFloat(document.getElementById("em-augrent").value)||null, augDates: document.getElementById("em-augdates").value, augNote: document.getElementById("em-augnote").value,
+    julyUnavailable: document.getElementById("em-julyunavail").value==="true",
+    augUnavailable: document.getElementById("em-augunavail").value==="true",
     pool: document.getElementById("em-pool").value==="true",
   };
   await saveFieldOverrides();
@@ -784,31 +901,35 @@ document.getElementById("em-save").addEventListener("click", async ()=>{
 });
 
 // ---- add new listing (open to everyone) ----
+let pendingSuggestions = [];
+async function loadPending(){ const p = await kvGet("sgi-pending-suggestions"); if(p) pendingSuggestions = p; renderPendingSuggestions(); }
+async function savePending(){ await kvSet("sgi-pending-suggestions", pendingSuggestions); }
+function renderPendingSuggestions(){
+  const box = document.getElementById("pending-suggestions");
+  if(!pendingSuggestions.length){ box.innerHTML = ""; return; }
+  box.innerHTML = `<div style="font-size:11.5px;color:var(--muted);margin-bottom:6px;font-weight:700;">Pending suggestions${isAdmin()?" (Brad's queue)":""}:</div>` +
+    pendingSuggestions.map((s,i)=>`
+      <div style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:center;">
+        <span><a href="${s.url}" target="_blank" rel="noopener">${s.url}</a>${s.suggester?` — suggested by ${s.suggester}`:''}</span>
+        ${isAdmin() ? `<button class="price-edit-btn" data-removepending="${i}">Mark handled</button>` : ''}
+      </div>`).join("");
+  document.querySelectorAll("[data-removepending]").forEach(btn=>btn.addEventListener("click", async ()=>{
+    pendingSuggestions.splice(parseInt(btn.getAttribute("data-removepending")),1);
+    await savePending(); renderPendingSuggestions();
+  }));
+}
 document.getElementById("add-new-btn").addEventListener("click", async ()=>{
-  const name=document.getElementById("new-name").value.trim();
+  const url=document.getElementById("new-link").value.trim();
   const errBox=document.getElementById("add-error"), okBox=document.getElementById("add-success");
   errBox.style.display="none"; okBox.style.display="none";
-  if(!name){ errBox.textContent="Please enter a name."; errBox.style.display="block"; return; }
-  const dup = allData().some(d=>d.name.trim().toLowerCase()===name.toLowerCase());
-  if(dup){ errBox.textContent=`"${name}" already appears to be in the table.`; errBox.style.display="block"; return; }
-  const id = "custom-"+name.toLowerCase().replace(/[^a-z0-9]+/g,"-")+"-"+Date.now();
-  const julyRent=parseFloat(document.getElementById("new-julyrent").value)||null;
-  const augRent=parseFloat(document.getElementById("new-augrent").value)||null;
-  const photos=document.getElementById("new-photo").value.split(",").map(s=>s.trim()).filter(Boolean);
-  customData.push({
-    id, iso: document.getElementById("new-iso").value||"Owner-added", name, link: document.getElementById("new-link").value,
-    address: document.getElementById("new-address").value, photos,
-    turnday: document.getElementById("new-turnday").value,
-    br: parseInt(document.getElementById("new-br").value)||0, ba: parseFloat(document.getElementById("new-ba").value)||0, sleeps: parseInt(document.getElementById("new-sleeps").value)||0,
-    locpos: document.getElementById("new-locpos").value, area: document.getElementById("new-area").value, crowd:"moderate", dogfee:"Verify pet policy",
-    julyRent, julyDates: document.getElementById("new-julydates").value, julyNote: julyRent?"Manually added":"TBD – call for quote",
-    augRent, augDates: document.getElementById("new-augdates").value, augNote: augRent?"Manually added":"TBD – call for quote",
-    pool:false,
-  });
-  await saveCustom();
-  buildCompanyFilter(); buildAreaFilter(); applyFilters();
-  okBox.textContent = `"${name}" added.`; okBox.style.display="block";
-  ["new-name","new-link","new-iso","new-address","new-photo","new-br","new-ba","new-sleeps","new-julyrent","new-julydates","new-augrent","new-augdates","new-mins"].forEach(id2=>document.getElementById(id2).value="");
+  if(!url){ errBox.textContent="Please paste a listing URL."; errBox.style.display="block"; return; }
+  const dup = pendingSuggestions.some(s=>s.url===url);
+  if(dup){ errBox.textContent="That URL is already in the queue."; errBox.style.display="block"; return; }
+  pendingSuggestions.push({url, suggester: document.getElementById("new-suggester").value.trim(), ts: Date.now()});
+  await savePending();
+  okBox.textContent = "Added to Brad's queue — he'll pull the details and update the table."; okBox.style.display="block";
+  document.getElementById("new-link").value=""; document.getElementById("new-suggester").value="";
+  renderPendingSuggestions();
 });
 
 // ---- filter/sort wiring ----
