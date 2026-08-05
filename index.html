@@ -70,7 +70,8 @@
   .tier-ideal{background:var(--tier-ideal);} .tier-stretch{background:var(--tier-stretch);}
   .tier-max{background:var(--tier-max);} .tier-tbd{background:var(--tier-tbd);} .edited-pill{background:var(--edited);}
   .price-note{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;max-width:170px;white-space:normal;}
-  .price-info-icon{display:inline-block;font-size:12px;color:var(--edited);cursor:help;margin-left:4px;}
+  .price-info-icon{display:inline-block;font-size:12px;color:var(--edited);cursor:pointer;margin-left:4px;position:relative;}
+  .info-popover{position:fixed;background:var(--navy);color:#fff;padding:8px 12px;border-radius:6px;font-size:11.5px;max-width:220px;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.3);}
   .loc-pill{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;background:var(--tier-ideal);}
   .loc-pill.beachview{background:var(--tier-stretch);}
   .loc-pill.secondrow{background:var(--muted);}
@@ -93,11 +94,20 @@
   .swipe-container{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px;}
   .swipe-progress{font-size:12px;color:var(--muted);text-align:center;margin-bottom:10px;font-weight:700;}
   .swipe-card{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;touch-action:pan-y;}
-  .swipe-card img.swipe-photo{width:100%;height:200px;object-fit:cover;display:block;}
+  .swipe-photo-wrap{position:relative;width:100%;height:230px;background:#000;cursor:pointer;}
+  .swipe-photo-wrap img.swipe-photo{width:100%;height:230px;object-fit:cover;display:block;}
+  .swipe-photo-none{width:100%;height:230px;display:flex;align-items:center;justify-content:center;background:var(--paper-2);color:var(--muted);font-size:13px;}
+  .swipe-photo-none a{color:var(--brick-dark);}
+  .swipe-photo-dots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:5px;}
+  .swipe-photo-dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);}
+  .swipe-photo-dots span.active{background:#fff;}
+  .swipe-photo-count{position:absolute;top:8px;right:10px;background:rgba(0,0,0,.55);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:10px;}
+  .swipe-card .swipe-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin-bottom:14px;background:var(--paper-2);border-radius:8px;padding:10px 12px;}
+  .swipe-card .swipe-info-grid > div{display:flex;flex-direction:column;}
+  .swipe-info-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700;}
+  .swipe-info-val{font-size:13px;color:var(--ink);font-weight:600;}
   .swipe-card .swipe-body{padding:14px;}
   .swipe-card h3{font-family:Georgia,serif;color:var(--navy);margin:0 0 6px;font-size:18px;}
-  .swipe-card .swipe-specs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-  .swipe-card .swipe-specs span{background:var(--paper-2);padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;}
   .swipe-card .swipe-stars{display:flex;justify-content:center;gap:4px;margin:14px 0 8px;}
   .swipe-card .swipe-stars .starwrap{width:34px;height:34px;font-size:34px;}
   .swipe-card textarea{width:100%;min-height:60px;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;}
@@ -125,7 +135,7 @@
   .comment-block{font-size:10.5px;margin-top:4px;padding:4px 6px;background:rgba(255,255,255,.5);border-radius:4px;}
   .comment-block b{color:var(--navy);}
   .locked-tag{font-size:9px;color:var(--tier-ideal);font-style:italic;display:block;margin-top:2px;}
-  .unavail-banner{display:inline-block;background:var(--brick);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-top:4px;max-width:220px;}
+  .unavail-banner{display:block;background:var(--brick);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;margin-top:4px;max-width:170px;white-space:normal;line-height:1.3;}
   tr.unavailable-row{background:rgba(168,74,38,0.08)!important;}
   .edit-row-btn{background:var(--navy);color:#fff;border:none;padding:5px 9px;border-radius:5px;font-size:10.5px;cursor:pointer;white-space:nowrap;}
   .no-edit-note{font-size:10px;color:var(--muted);font-style:italic;}
@@ -178,12 +188,17 @@
     table, thead, tbody, th, td, tr{display:block;}
     thead{display:none;}
     .table-scroll{overflow-x:visible;overflow-y:visible;max-height:none;border:none;background:transparent;}
-    tbody tr{background:var(--card)!important;border:1px solid var(--line);border-radius:10px;margin-bottom:12px;padding:10px;}
-    td{padding:5px 0;border:none;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
-    td::before{content:attr(data-label);font-weight:700;font-size:10px;text-transform:uppercase;color:var(--muted);min-width:90px;flex-shrink:0;}
-    td.name-cell{display:block;}
+    tbody tr{background:var(--card)!important;border:1px solid var(--line);border-radius:10px;margin-bottom:14px;padding:0;overflow:hidden;}
+    tbody tr td.photo-cell{padding:0;}
+    tbody tr td.photo-cell img{width:100%;height:150px;object-fit:cover;border-radius:0;border:none;}
+    tbody tr td.photo-cell .photo-fallback,tbody tr td.photo-cell .no-photo{width:100%;height:80px;border-radius:0;border:none;background:var(--paper-2);}
+    td{padding:7px 12px;border:none;border-bottom:1px solid var(--line);display:grid;grid-template-columns:100px 1fr;gap:10px;align-items:start;}
+    tbody tr td:last-child{border-bottom:none;}
+    td::before{content:attr(data-label);font-weight:700;font-size:10px;text-transform:uppercase;color:var(--muted);}
+    td.name-cell{display:block;padding:12px 12px 8px;}
     td.name-cell::before{display:none;}
-    .photo-cell{justify-content:flex-start;}
+    td[data-label="#"]{display:none;}
+    #filters-panel{position:sticky;top:8px;z-index:20;}
   }
 </style>
 </head>
@@ -214,7 +229,7 @@
       <div class="field"><label>Search</label><input type="text" id="f-search" placeholder="name…"></div>
       <div class="field"><label>Company</label><select id="f-company"><option value="">All</option></select></div>
       <div class="field"><label>Price tier</label>
-        <select id="f-tier"><option value="">All</option><option value="ideal">Ideal (&lt;$6,000)</option><option value="stretch">Stretch ($6k–7.5k)</option><option value="max">Premium ($7.5k–10k)</option><option value="tbd">TBD</option></select>
+        <select id="f-tier"><option value="">All</option><option value="ideal">Ideal (&lt;$6,000)</option><option value="stretch">Stretch ($6k-7.5k)</option><option value="max">Premium ($7.5k-10k)</option><option value="tbd">TBD</option></select>
       </div>
       <div class="field"><label>Min. baths</label><select id="f-ba"><option value="0">Any</option><option value="2">2.0+</option><option value="2.5">2.5+</option><option value="3">3.0+</option><option value="4">4.0+</option></select></div>
       <div class="field"><label>Min. sleeps</label><select id="f-sleeps"><option value="0">Any</option><option value="5">5+</option><option value="8">8+</option><option value="10">10+</option><option value="12">12+</option></select></div>
@@ -250,19 +265,19 @@
       <colgroup>
         <col style="width:1.9%;"><!-- # -->
         <col style="width:3.9%;"><!-- Photo -->
-        <col style="width:14%;"><!-- Name -->
-        <col style="width:7.5%;"><!-- Turn Day -->
+        <col style="width:10%;"><!-- Name -->
+        <col style="width:9%;"><!-- Turn Day -->
         <col style="width:2.6%;"><!-- BR -->
         <col style="width:2.6%;"><!-- BA -->
         <col style="width:3.6%;"><!-- Sleeps -->
-        <col style="width:7%;"><!-- Beach Position -->
-        <col style="width:13%;"><!-- Island Area -->
-        <col style="width:6.2%;"><!-- Crowdedness -->
-        <col style="width:13%;"><!-- Rent Cost -->
-        <col style="width:5.5%;"><!-- Per-Person -->
-        <col style="width:5.5%;"><!-- Total -->
+        <col style="width:8%;"><!-- Beach Position -->
+        <col style="width:9%;"><!-- Island Area -->
+        <col style="width:9%;"><!-- Crowdedness -->
+        <col style="width:9.5%;"><!-- Rent Cost -->
+        <col style="width:6%;"><!-- Per-Person -->
+        <col style="width:6%;"><!-- Total -->
         <col style="width:3%;"><!-- Pool -->
-        <col style="width:12.5%;"><!-- Family Ratings -->
+        <col style="width:13%;"><!-- Family Ratings -->
         <col style="width:3.5%;"><!-- Edit -->
       </colgroup>
       <thead><tr>
@@ -330,7 +345,6 @@
     <div class="mfield"><label>Sleeps</label><input type="number" id="em-sleeps"></div>
     <div class="mfield"><label>Beach position</label><select id="em-locpos"><option value="oceanfront">Ocean Front</option><option value="beachview">Beach View</option><option value="secondrow">Second Row</option></select></div>
     <div class="mfield"><label>Island area</label><select id="em-area"><option>Plantation (West End)</option><option>East End</option><option>Central Beach</option></select></div>
-    <div class="mfield"><label>Minutes to lighthouse</label><input type="number" id="em-mins"></div>
     <div class="mfield"><label>Crowdedness</label><select id="em-crowd"><option value="quiet">Quiet</option><option value="moderate">Moderate</option><option value="busy">Busy</option></select></div>
     <div class="mfield"><label>Dog fee</label><input id="em-dogfee"></div>
     <div class="mfield"><label>July rent ($/wk)</label><input type="number" id="em-julyrent"></div>
@@ -363,10 +377,9 @@
 <script>
 const NAMES = ["Brad","Wes","Bryan","Mom","Dad"];
 const ADMIN = "Brad";
-const AREA_MINS = {"Plantation (West End)":12, "East End":12, "Central Beach":3};
 
 const BASE_DATA = [
-  {id:"a-sand-box", iso:"Collins", name:"A Sand Box", link:"https://www.collinsvacationrentals.com/rentals/a-sand-box", address:"136 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"Pet friendly, rules apply", julyRent:3550, julyDates:"7/31–8/7", julyNote:"Collins seasonal range top (peak/July estimate).", augRent:null, augUnavailable:true, augDates:"", augNote:"Live calendar shows every August 2027 Saturday blocked/Notify as of last check — call to get on the waitlist.", pool:false, photos:[
+  {id:"a-sand-box", iso:"Collins", name:"A Sand Box", link:"https://www.collinsvacationrentals.com/rentals/a-sand-box", address:"136 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"Pet friendly, rules apply", julyRent:3550, julyDates:"7/31-8/7", julyNote:"Collins seasonal range top (peak/July estimate).", augRent:null, augUnavailable:true, augDates:"", augNote:"Live calendar shows every August 2027 Saturday blocked/Notify as of last check — call to get on the waitlist.", pool:false, photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-1.jpg?v=89911",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-3.jpg?v=89914",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-2.jpg?v=89913",
@@ -397,7 +410,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/47264/31+-+exterior-view+from+front-_elp2260.jpg?v=85279",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47264/33+-+exterior-front+yard-_elp2266.jpg?v=85289"
     ]},
-  {id:"aboard-katie-leigh", iso:"Collins", name:"Aboard The Katie Leigh", link:"https://www.collinsvacationrentals.com/rentals/aboard-the-katie-leigh", address:"116 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$100, 1 dog only <35lb", julyRent:3995, julyDates:"7/18–7/25 (confirmed open)", julyNote:"Collins seasonal range top; confirmed available for check-in 7/18/27.", augRent:3040, augDates:"8/15–8/22 (only open Aug week)", augNote:"Confirmed: only 8/15 check-in is open in Aug 2027 (1,8,22,29 blocked); price is est. ~24% below July.", pool:false, photos:[
+  {id:"aboard-katie-leigh", iso:"Collins", name:"Aboard The Katie Leigh", link:"https://www.collinsvacationrentals.com/rentals/aboard-the-katie-leigh", address:"116 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$100, 1 dog only <35lb", julyRent:3995, julyDates:"7/18-7/25 (confirmed open)", julyNote:"Collins seasonal range top; confirmed available for check-in 7/18/27.", augRent:3040, augDates:"8/15-8/22 (only open Aug week)", augNote:"Confirmed: only 8/15 check-in is open in Aug 2027 (1,8,22,29 blocked); price is est. ~24% below July.", pool:false, photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D10F.jpg?v=90572",
       "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D9FM.jpg?v=90586",
       "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500578F.jpg?v=90553",
@@ -446,8 +459,8 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D8FM.jpg?v=90581",
       "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D11F.jpg?v=90582"
     ]},
-  {id:"american-pie", iso:"Collins", name:"American Pie", link:"https://www.collinsvacationrentals.com/rentals/american-pie", address:"260 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.5, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$75/dog, 2 dogs <50lb", julyRent:4375, julyDates:"7/25–8/1", julyNote:"Collins seasonal range top.", augRent:3325, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/37261/1.jpg"]},
-  {id:"a-great-escape", iso:"Collins", name:"A Great Escape", link:"https://www.collinsvacationrentals.com/rentals/a-great-escape", address:"1744 East Gulf Beach Drive, St. George Island, FL 32328", turnday:"Sunday", br:4, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"$75/dog, 2 dogs <50lb", julyRent:5400, julyDates:"7/25–8/1", julyNote:"Confirmed July 4th holiday week rate ($5,400).", augRent:3725, augDates:"", augNote:"Live Aug 2027 calendar currently shows every Sunday blocked/Notify — call to confirm or waitlist. Price is an est. ~24% below July.", augUnavailable:true, pool:false,
+  {id:"american-pie", iso:"Collins", name:"American Pie", link:"https://www.collinsvacationrentals.com/rentals/american-pie", address:"260 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.5, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$75/dog, 2 dogs <50lb", julyRent:4375, julyDates:"7/25-8/1", julyNote:"Collins seasonal range top.", augRent:3325, augDates:"8/1-8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/37261/1.jpg"]},
+  {id:"a-great-escape", iso:"Collins", name:"A Great Escape", link:"https://www.collinsvacationrentals.com/rentals/a-great-escape", address:"1744 East Gulf Beach Drive, St. George Island, FL 32328", turnday:"Sunday", br:4, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"$75/dog, 2 dogs <50lb", julyRent:5400, julyDates:"7/25-8/1", julyNote:"Confirmed July 4th holiday week rate ($5,400).", augRent:3725, augDates:"", augNote:"Live Aug 2027 calendar currently shows every Sunday blocked/Notify — call to confirm or waitlist. Price is an est. ~24% below July.", augUnavailable:true, pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/46+-+exterior-front+elevation-_elp2018.jpg?v=85485",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/1+-+exterior-back+elevation-_elp2030.jpg?v=85505",
@@ -482,8 +495,8 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/43+-+floor+plan-view-_elp2123.jpg?v=85495",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/44+-+floor+plan-view-_elp2027.jpg?v=85498"
     ]},
-  {id:"an-irish-seabreeze", iso:"Collins", name:"An Irish Seabreeze", link:"https://www.collinsvacationrentals.com/rentals/an-irish-seabreeze", address:"2254 Sailfish Drive, St. George Island, FL 32328", turnday:"Saturday", br:4, ba:3.5, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Verify pet policy", julyRent:5830, julyDates:"7/31–8/7", julyNote:"Collins seasonal range top.", augRent:4430, augDates:"8/7–8/14", augNote:"Est. ~24% below July (verify).", pool:false, photos:[]},
-  {id:"a-sea-break", iso:"Collins", name:"A Sea Break", link:"https://www.collinsvacationrentals.com/rentals/a-sea-break", address:"1504 Canopy Lane, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.5, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 2 dogs <80lb", julyRent:6600, julyDates:"7/31–8/7", julyNote:"Collins range top ($4,000–$6,600); confirmed 'Book any Summer week $5,900' special seen too.", augRent:5020, augDates:"8/7–8/14", augNote:"Est. ~24% below July (verify) — live Aug 2027 calendar currently shows all Saturdays blocked/Notify, call to confirm.", augUnavailable:true, pool:false,
+  {id:"an-irish-seabreeze", iso:"Collins", name:"An Irish Seabreeze", link:"https://www.collinsvacationrentals.com/rentals/an-irish-seabreeze", address:"2254 Sailfish Drive, St. George Island, FL 32328", turnday:"Saturday", br:4, ba:3.5, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Verify pet policy", julyRent:5830, julyDates:"7/31-8/7", julyNote:"Collins seasonal range top.", augRent:4430, augDates:"8/7-8/14", augNote:"Est. ~24% below July (verify).", pool:false, photos:[]},
+  {id:"a-sea-break", iso:"Collins", name:"A Sea Break", link:"https://www.collinsvacationrentals.com/rentals/a-sea-break", address:"1504 Canopy Lane, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.5, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 2 dogs <80lb", julyRent:6600, julyDates:"7/31-8/7", julyNote:"Collins range top ($4,000-$6,600); confirmed 'Book any Summer week $5,900' special seen too.", augRent:5020, augDates:"8/7-8/14", augNote:"Est. ~24% below July (verify) — live Aug 2027 calendar currently shows all Saturdays blocked/Notify, call to confirm.", augUnavailable:true, pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/16944/1+-+Beachside+Exterior+3+rev.jpg?v=80954",
       "https://photos.barefoot.com/v3ccln0929/images/properties/16944/2+-+exterior-1504+canopy+lane-elp004.jpg?v=80956",
@@ -508,11 +521,11 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/16944/1+-+Plantation+Community+Pool+(2).jpg?v=80928",
       "https://photos.barefoot.com/v3ccln0929/images/properties/16944/8+-+Plantation+Tennis+Court.jpg?v=80957"
     ]},
-  {id:"absolutely-paradise", iso:"Collins", name:"Absolutely Paradise", link:"https://www.collinsvacationrentals.com/rentals/absolutely-paradise", address:"756 West Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.5, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Verify pet policy", julyRent:7550, julyDates:"7/25–8/1", julyNote:"Collins range top ($4,100–$7,550). Note: 10% AARP and 10% military discounts available (call to apply).", augRent:5740, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify). Same AARP/military 10% discounts available.", pool:true, photos:[]},
-  {id:"an-ocean-remedy", iso:"Collins", name:"An Ocean Remedy", link:"https://www.collinsvacationrentals.com/rentals/an-ocean-remedy", address:"1420 Camellia Court, St. George Island, FL 32328", turnday:"Saturday", br:5, ba:5.5, sleeps:16, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Verify pet policy", julyRent:9995, julyDates:"7/31–8/7", julyNote:"Collins seasonal range top. Note: August 2026 got a 'Fall Rate' promo ($1,435 off) — ask if similar applies for Aug 2027.", augRent:7600, augDates:"8/7–8/14", augNote:"Est. ~24% below July (verify).", pool:false, photos:[]},
-  {id:"beachfront-benefits", iso:"Collins", name:"Beachfront Benefits", link:"https://www.collinsvacationrentals.com/rentals/beachfront-benefits", address:"1620 Guava Trail, St. George Island, FL 32328", turnday:"Saturday", br:4, ba:4.0, sleeps:14, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, no weight limit", julyRent:12350, julyDates:"7/31–8/7", julyNote:"July confirmed peak $12,350.", augRent:5450, augDates:"8/7–8/14", augNote:"Aug confirmed as low as $5,450 for later weeks.", pool:true, photos:[]},
-  {id:"beachfront-bliss", iso:"Collins", name:"Beachfront Bliss", link:"https://www.collinsvacationrentals.com/rentals/beachfront-bliss", address:"1000 E Gorrie Dr, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:4.0, sleeps:9, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$75/dog, 2 dogs <35lb", julyRent:6495, julyDates:"7/31–8/7", julyNote:"2027 confirmed $6,495.", augRent:4950, augDates:"8/7–8/14", augNote:"2026 promo confirmed $4,950 (2027 Aug likely similar).", pool:true, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/36766/1000+E+Gorrie+Dr+Drone-11.jpg"]},
-  {id:"sea-hock", iso:"Collins", name:"Sea Hock", link:"https://www.collinsvacationrentals.com/rentals/sea-hock", address:"824 West Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"$100, 1 dog only <35lb", julyRent:3995, julyDates:"7/25–8/1", julyNote:"CONFIRMED exact 2027 calendar price (not estimated) — every July 2027 week is $3,995.", augRent:3995, augDates:"8/1–8/8", augNote:"CONFIRMED exact 2027 calendar price. Note: it drops to $2,995/week starting 8/8 — cheaper if you can shift a week later.", pool:false,
+  {id:"absolutely-paradise", iso:"Collins", name:"Absolutely Paradise", link:"https://www.collinsvacationrentals.com/rentals/absolutely-paradise", address:"756 West Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.5, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Verify pet policy", julyRent:7550, julyDates:"7/25-8/1", julyNote:"Collins range top ($4,100-$7,550). Note: 10% AARP and 10% military discounts available (call to apply).", augRent:5740, augDates:"8/1-8/8", augNote:"Est. ~24% below July (verify). Same AARP/military 10% discounts available.", pool:true, photos:[]},
+  {id:"an-ocean-remedy", iso:"Collins", name:"An Ocean Remedy", link:"https://www.collinsvacationrentals.com/rentals/an-ocean-remedy", address:"1420 Camellia Court, St. George Island, FL 32328", turnday:"Saturday", br:5, ba:5.5, sleeps:16, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Verify pet policy", julyRent:9995, julyDates:"7/31-8/7", julyNote:"Collins seasonal range top. Note: August 2026 got a 'Fall Rate' promo ($1,435 off) — ask if similar applies for Aug 2027.", augRent:7600, augDates:"8/7-8/14", augNote:"Est. ~24% below July (verify).", pool:false, photos:[]},
+  {id:"beachfront-benefits", iso:"Collins", name:"Beachfront Benefits", link:"https://www.collinsvacationrentals.com/rentals/beachfront-benefits", address:"1620 Guava Trail, St. George Island, FL 32328", turnday:"Saturday", br:4, ba:4.0, sleeps:14, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, no weight limit", julyRent:12350, julyDates:"7/31-8/7", julyNote:"July confirmed peak $12,350.", augRent:5450, augDates:"8/7-8/14", augNote:"Aug confirmed as low as $5,450 for later weeks.", pool:true, photos:[]},
+  {id:"beachfront-bliss", iso:"Collins", name:"Beachfront Bliss", link:"https://www.collinsvacationrentals.com/rentals/beachfront-bliss", address:"1000 E Gorrie Dr, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:4.0, sleeps:9, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$75/dog, 2 dogs <35lb", julyRent:6495, julyDates:"7/31-8/7", julyNote:"2027 confirmed $6,495.", augRent:4950, augDates:"8/7-8/14", augNote:"2026 promo confirmed $4,950 (2027 Aug likely similar).", pool:true, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/36766/1000+E+Gorrie+Dr+Drone-11.jpg"]},
+  {id:"sea-hock", iso:"Collins", name:"Sea Hock", link:"https://www.collinsvacationrentals.com/rentals/sea-hock", address:"824 West Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"$100, 1 dog only <35lb", julyRent:3995, julyDates:"7/25-8/1", julyNote:"CONFIRMED exact 2027 calendar price (not estimated) — every July 2027 week is $3,995.", augRent:3995, augDates:"8/1-8/8", augNote:"CONFIRMED exact 2027 calendar price. Note: it drops to $2,995/week starting 8/8 — cheaper if you can shift a week later.", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/33857/%231.jpg?v=94674",
       "https://photos.barefoot.com/v3ccln0929/images/properties/33857/%233.jpg?v=94685",
@@ -527,10 +540,10 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/33857/%2323.jpg?v=94690",
       "https://photos.barefoot.com/v3ccln0929/images/properties/33857/%2325.jpg?v=94691"
     ]},
-  {id:"here-comes-sun", iso:"Collins", name:"Here Comes The Sun", link:"https://www.collinsvacationrentals.com/rentals/here-comes-the-sun", address:"1057 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"secondrow", area:"Central Beach", crowd:"busy", dogfee:"Pet friendly, rules apply", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"a-turtle-manor", iso:"Fickling", name:"A Turtle Manor", link:"https://www.ficklingvacationrentals.com/vacation-rentals/rental/aturtle/", turnday:"Sunday", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Verify pet policy", julyRent:null, julyDates:"", julyNote:"Not yet confirmed.", augRent:5800, augDates:"8/8–8/15", augNote:"User-confirmed rate for 8/8–8/15/27.", pool:false, photos:[]},
-  {id:"auburn-sunrise", iso:"Collins", name:"Auburn Sunrise", link:"https://www.collinsvacationrentals.com/rentals/auburn-sunrise", address:"2116 Dolphin Court East, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.5, sleeps:8, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 2 dogs <35lb", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"the-lazy-dolphinn", iso:"Collins", name:"The Lazy Dolph-Inn", link:"https://www.collinsvacationrentals.com/rentals/the-lazy-dolphinn", address:"2112 Dolphin Court East, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.0, sleeps:8, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 1 dog <80lb", julyRent:2950, julyDates:"7/25–8/1", julyNote:"CONFIRMED exact 2027 calendar price.", augRent:2950, augDates:"8/1–8/8", augNote:"CONFIRMED exact 2027 calendar price; drops to $1,950/wk starting 8/8.", pool:false,
+  {id:"here-comes-sun", iso:"Collins", name:"Here Comes The Sun", link:"https://www.collinsvacationrentals.com/rentals/here-comes-the-sun", address:"1057 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"secondrow", area:"Central Beach", crowd:"busy", dogfee:"Pet friendly, rules apply", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"a-turtle-manor", iso:"Fickling", name:"A Turtle Manor", link:"https://www.ficklingvacationrentals.com/vacation-rentals/rental/aturtle/", turnday:"Sunday", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Verify pet policy", julyRent:null, julyDates:"", julyNote:"Not yet confirmed.", augRent:5800, augDates:"8/8-8/15", augNote:"User-confirmed rate for 8/8-8/15/27.", pool:false, photos:[]},
+  {id:"auburn-sunrise", iso:"Collins", name:"Auburn Sunrise", link:"https://www.collinsvacationrentals.com/rentals/auburn-sunrise", address:"2116 Dolphin Court East, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.5, sleeps:8, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 2 dogs <35lb", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"the-lazy-dolphinn", iso:"Collins", name:"The Lazy Dolph-Inn", link:"https://www.collinsvacationrentals.com/rentals/the-lazy-dolphinn", address:"2112 Dolphin Court East, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.0, sleeps:8, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 1 dog <80lb", julyRent:2950, julyDates:"7/25-8/1", julyNote:"CONFIRMED exact 2027 calendar price.", augRent:2950, augDates:"8/1-8/8", augNote:"CONFIRMED exact 2027 calendar price; drops to $1,950/wk starting 8/8.", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/47579/1+-+2112+Dolphin+Court+East-10.jpg?v=81924",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47579/3+-+2112+Dolphin+Court+East-7.jpg?v=81923",
@@ -542,7 +555,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/47579/17+-+upper+level+main+floor-bath-elp157.jpg?v=81887",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47579/25+-+lower+level-bath-elp039.jpg?v=81909"
     ]},
-  {id:"just-beachy", iso:"Cape & Coast", name:"Just Beachy", link:"https://www.capeandcoast.com/rentals/just-beachy", address:"St. George Island, Gulf Beaches (exact address not published — confirmed beachfront)", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, size/count limits TBD", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true,
+  {id:"just-beachy", iso:"Cape & Coast", name:"Just Beachy", link:"https://www.capeandcoast.com/rentals/just-beachy", address:"St. George Island, Gulf Beaches (exact address not published — confirmed beachfront)", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, size/count limits TBD", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true,
     photos:[
       "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/e250172e-e486-4033-a94c-e6d02dfcd5e9",
       "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/e4543606-b953-4360-8cd5-5997d1e077af",
@@ -565,18 +578,18 @@ const BASE_DATA = [
       "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/29e2dcdb-7c33-480d-bd01-4e72f80779f5",
       "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/302dcf96-6575-4955-8543-65757ee94e30"
     ]},
-  {id:"a-turtles-dream", iso:"Cape & Coast", name:"A Turtle's Dream", link:"https://www.capeandcoast.com/rentals/a-turtles-dream", turnday:"Saturday", br:4, ba:4.0, sleeps:9, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"sugar-magnolia", iso:"Cape & Coast", name:"Sugar Magnolia", link:"https://www.capeandcoast.com/rentals/sugar-magnolia", turnday:"Sunday", br:4, ba:3.0, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, fee not published", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"above-the-dune", iso:"Cape & Coast", name:"Above the Dune", link:"https://www.capeandcoast.com/rentals/above-the-dune", turnday:"Saturday", br:3, ba:3.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, fee applies", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
-  {id:"island-kisses", iso:"Cape & Coast", name:"Island Kisses", link:"https://www.capeandcoast.com/rentals/island-kisses", turnday:"Saturday", br:3, ba:2.0, sleeps:6, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, fee applies", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"sunny-moon", iso:"Cape & Coast", name:"Sunny Moon", link:"https://www.capeandcoast.com/rentals/sunny-moon", turnday:"Sunday", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"the-mango-tree", iso:"Cape & Coast", name:"The Mango Tree", link:"https://www.capeandcoast.com/rentals/the-mango-tree", turnday:"Saturday", br:4, ba:4.0, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"one-more-sunset", iso:"Cape & Coast", name:"One More Sunset", link:"https://www.capeandcoast.com/rentals/one-more-sunset", turnday:"Saturday", br:4, ba:4.0, sleeps:13, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"marshlight", iso:"Cape & Coast", name:"Marshlight", link:"https://www.capeandcoast.com/rentals/marshlight", turnday:"Sunday", br:4, ba:4.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"drifted-dunes", iso:"Cape & Coast", name:"Drifted Dunes", link:"https://www.capeandcoast.com/rentals/drifted-dunes", turnday:"Sunday", br:4, ba:4.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"sea-forever-sgi", iso:"Cape & Coast", name:"Sea Forever - SGI", link:"https://www.capeandcoast.com/rentals/sea-forever-sgi", turnday:"Saturday", br:5, ba:4.0, sleeps:16, locpos:"oceanfront", area:"East End", crowd:"quiet", dogfee:"Pet friendly, 2 dog max", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
-  {id:"sea-chalet", iso:"Cape & Coast", name:"Sea Chalet", link:"https://www.capeandcoast.com/rentals/sea-chalet", turnday:"Sunday", br:5, ba:4.5, sleeps:14, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"~$100/pet (verify)", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
-  {id:"a-sandcastle", iso:"Cape & Coast", name:"A Sandcastle", link:"https://www.capeandcoast.com/rentals/a-sandcastle", address:"Sunset Beach community, East End, St George Island, FL 32328", turnday:"Sunday", br:4, ba:4.5, sleeps:14, locpos:"oceanfront", area:"East End", crowd:"quiet", dogfee:"Pet friendly, tile floors, size/count limits TBD", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true,
+  {id:"a-turtles-dream", iso:"Cape & Coast", name:"A Turtle's Dream", link:"https://www.capeandcoast.com/rentals/a-turtles-dream", turnday:"Saturday", br:4, ba:4.0, sleeps:9, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"sugar-magnolia", iso:"Cape & Coast", name:"Sugar Magnolia", link:"https://www.capeandcoast.com/rentals/sugar-magnolia", turnday:"Sunday", br:4, ba:3.0, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, fee not published", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"above-the-dune", iso:"Cape & Coast", name:"Above the Dune", link:"https://www.capeandcoast.com/rentals/above-the-dune", turnday:"Saturday", br:3, ba:3.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, fee applies", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
+  {id:"island-kisses", iso:"Cape & Coast", name:"Island Kisses", link:"https://www.capeandcoast.com/rentals/island-kisses", turnday:"Saturday", br:3, ba:2.0, sleeps:6, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, fee applies", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"sunny-moon", iso:"Cape & Coast", name:"Sunny Moon", link:"https://www.capeandcoast.com/rentals/sunny-moon", turnday:"Sunday", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"the-mango-tree", iso:"Cape & Coast", name:"The Mango Tree", link:"https://www.capeandcoast.com/rentals/the-mango-tree", turnday:"Saturday", br:4, ba:4.0, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"one-more-sunset", iso:"Cape & Coast", name:"One More Sunset", link:"https://www.capeandcoast.com/rentals/one-more-sunset", turnday:"Saturday", br:4, ba:4.0, sleeps:13, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"marshlight", iso:"Cape & Coast", name:"Marshlight", link:"https://www.capeandcoast.com/rentals/marshlight", turnday:"Sunday", br:4, ba:4.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"drifted-dunes", iso:"Cape & Coast", name:"Drifted Dunes", link:"https://www.capeandcoast.com/rentals/drifted-dunes", turnday:"Sunday", br:4, ba:4.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"sea-forever-sgi", iso:"Cape & Coast", name:"Sea Forever - SGI", link:"https://www.capeandcoast.com/rentals/sea-forever-sgi", turnday:"Saturday", br:5, ba:4.0, sleeps:16, locpos:"oceanfront", area:"East End", crowd:"quiet", dogfee:"Pet friendly, 2 dog max", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
+  {id:"sea-chalet", iso:"Cape & Coast", name:"Sea Chalet", link:"https://www.capeandcoast.com/rentals/sea-chalet", turnday:"Sunday", br:5, ba:4.5, sleeps:14, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"~$100/pet (verify)", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
+  {id:"a-sandcastle", iso:"Cape & Coast", name:"A Sandcastle", link:"https://www.capeandcoast.com/rentals/a-sandcastle", address:"Sunset Beach community, East End, St George Island, FL 32328", turnday:"Sunday", br:4, ba:4.5, sleeps:14, locpos:"oceanfront", area:"East End", crowd:"quiet", dogfee:"Pet friendly, tile floors, size/count limits TBD", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true,
     photos:[
       "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/55af5551-3d6c-4129-a5cc-476ab926dcb0",
       "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/0f1319be-f94e-42d2-8abf-2aad0629cd14",
@@ -599,21 +612,21 @@ const BASE_DATA = [
       "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/b980397e-2660-4c03-a19b-91159b1c151e",
       "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/9e2f92f2-c064-4fcc-8a5a-7cd8deb18aac"
     ]},
-  {id:"beach-happy", iso:"Cape & Coast", name:"Beach Happy", link:"https://www.capeandcoast.com/rentals/beach-happy", turnday:"Flexible / verify", br:4, ba:3.5, sleeps:12, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly, limits not published", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"abiding-place", iso:"Forgotten Shores", name:"Abiding Place", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/abiding-place", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$150+tax, 2 dogs <45lb", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote (20% Aug promo advertised for 2026)", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/144407/4585500402.jpg"]},
-  {id:"the-lite-house", iso:"Forgotten Shores", name:"The Lite House", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/lite-house", turnday:"Sunday", br:3, ba:3.0, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"moderate", dogfee:"$150+tax, 1 dog <30lb", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/145035/9450830258.jpg"]},
-  {id:"prime-time", iso:"Forgotten Shores", name:"Prime Time", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/prime-time", turnday:"Saturday", br:5, ba:5.0, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Verify pet policy", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/230292/5101820938.jpg"]},
-  {id:"diamond-beach", iso:"Fickling", name:"Diamond Beach", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:5, ba:4.5, sleeps:14, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"good-vibes", iso:"Fickling", name:"Good Vibes", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:6, ba:6.5, sleeps:14, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
-  {id:"tangled-up-blue", iso:"Fickling", name:"Tangled Up in Blue", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:4, ba:4.5, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, 1-2 dogs", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
-  {id:"sandy-feet-retreat", iso:"Fickling", name:"Sandy Feet Retreat", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:4, ba:4.0, sleeps:13, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"dunestruck", iso:"VRBO", name:"DuneStruck (Beachfront, Plantation)", link:"https://www.vrbo.com/7292397ha", turnday:"Flexible / verify", br:3, ba:4.0, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
-  {id:"vrbo-3287525", iso:"VRBO", name:"Beachfront Plantation 4BR (heated pool)", link:"https://www.vrbo.com/3287525", turnday:"Flexible / verify", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"vrbo-2991447", iso:"VRBO", name:"Dog-friendly beachfront bungalow", link:"https://www.vrbo.com/2991447", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
-  {id:"vrbo-2991443", iso:"VRBO", name:"Beachside dog-friendly home w/ private pool", link:"https://www.vrbo.com/2991443", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"vrbo-3229812", iso:"VRBO", name:"Pet Friendly, Beach Front, Pool (SGI)", link:"https://www.vrbo.com/3229812", turnday:"Flexible / verify", br:4, ba:4.0, sleeps:14, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
-  {id:"skinny-mini", iso:"VRBO", name:"Skinny Mini beachfront bungalow", link:"https://www.vrbo.com", turnday:"Flexible / verify", br:3, ba:4.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
-  {id:"pura-vida", iso:"VRBO", name:"Pura Vida Beach Front Coastal Cottage", link:"https://www.vrbo.com", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:false, photos:[]},
+  {id:"beach-happy", iso:"Cape & Coast", name:"Beach Happy", link:"https://www.capeandcoast.com/rentals/beach-happy", turnday:"Flexible / verify", br:4, ba:3.5, sleeps:12, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly, limits not published", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"abiding-place", iso:"Forgotten Shores", name:"Abiding Place", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/abiding-place", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$150+tax, 2 dogs <45lb", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote (20% Aug promo advertised for 2026)", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/144407/4585500402.jpg"]},
+  {id:"the-lite-house", iso:"Forgotten Shores", name:"The Lite House", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/lite-house", turnday:"Sunday", br:3, ba:3.0, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"moderate", dogfee:"$150+tax, 1 dog <30lb", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/145035/9450830258.jpg"]},
+  {id:"prime-time", iso:"Forgotten Shores", name:"Prime Time", link:"https://www.forgottenshoresproperties.com/st-george-island-rentals/prime-time", turnday:"Saturday", br:5, ba:5.0, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Verify pet policy", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:["https://images.rezfusion.com/evrn/FGSPRS/230292/5101820938.jpg"]},
+  {id:"diamond-beach", iso:"Fickling", name:"Diamond Beach", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:5, ba:4.5, sleeps:14, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"good-vibes", iso:"Fickling", name:"Good Vibes", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:6, ba:6.5, sleeps:14, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
+  {id:"tangled-up-blue", iso:"Fickling", name:"Tangled Up in Blue", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:4, ba:4.5, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, 1-2 dogs", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
+  {id:"sandy-feet-retreat", iso:"Fickling", name:"Sandy Feet Retreat", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:4, ba:4.0, sleeps:13, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"dunestruck", iso:"VRBO", name:"DuneStruck (Beachfront, Plantation)", link:"https://www.vrbo.com/7292397ha", turnday:"Flexible / verify", br:3, ba:4.0, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
+  {id:"vrbo-3287525", iso:"VRBO", name:"Beachfront Plantation 4BR (heated pool)", link:"https://www.vrbo.com/3287525", turnday:"Flexible / verify", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"vrbo-2991447", iso:"VRBO", name:"Dog-friendly beachfront bungalow", link:"https://www.vrbo.com/2991447", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
+  {id:"vrbo-2991443", iso:"VRBO", name:"Beachside dog-friendly home w/ private pool", link:"https://www.vrbo.com/2991443", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"vrbo-3229812", iso:"VRBO", name:"Pet Friendly, Beach Front, Pool (SGI)", link:"https://www.vrbo.com/3229812", turnday:"Flexible / verify", br:4, ba:4.0, sleeps:14, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
+  {id:"skinny-mini", iso:"VRBO", name:"Skinny Mini beachfront bungalow", link:"https://www.vrbo.com", turnday:"Flexible / verify", br:3, ba:4.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
+  {id:"pura-vida", iso:"VRBO", name:"Pura Vida Beach Front Coastal Cottage", link:"https://www.vrbo.com", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
 ];
 
 let customData = [];
@@ -630,7 +643,7 @@ function tierLabel(t){ return {ideal:"Ideal",stretch:"Stretch",max:"Premium",tbd
 function locLabel(l){ return {oceanfront:"Ocean Front",beachview:"Beach View",secondrow:"Second Row"}[l]||l; }
 function locClass(l){ return {oceanfront:"",beachview:"beachview",secondrow:"secondrow"}[l]||""; }
 function crowdClass(c){ return {quiet:"crowd-quiet",moderate:"crowd-moderate",busy:"crowd-busy"}[c]||""; }
-function crowdLabel(c){ return {quiet:"Quiet / secluded",moderate:"Moderate",busy:"Busy"}[c]||c; }
+function crowdLabel(c){ return {quiet:"Quiet / secluded beach",moderate:"Moderate crowds",busy:"Busy beach"}[c]||c; }
 function simpleHash(s){ let h=0; for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;} return h.toString(36); }
 function perDogFeeAmount(dogfeeStr){
   if(!dogfeeStr) return 75;
@@ -884,7 +897,6 @@ function render(rows){
     const pillClass = d._edited ? "edited-pill" : `tier-${d._effTier}`;
     const pillLabel = d._edited ? "You updated" : tierLabel(d._effTier);
 
-    const mins = AREA_MINS[d.area] !== undefined ? AREA_MINS[d.area] : null;
 
     let ratingsHtml = "";
     if(!currentUser){
@@ -919,18 +931,18 @@ function render(rows){
     tr.innerHTML = `
       <td data-label="#"><span class="rank-badge">${i+1}</span></td>
       <td data-label="Photo" class="photo-cell">${photoHtml}</td>
-      <td data-label="Name" class="name-cell"><a href="${d.link}" target="_blank" rel="noopener">${d.name}</a><span class="iso-tag">${d.iso}</span>${d._unavailable?`<span class="unavail-banner" title="Rate it anyway, just can't book this month">🚫 Not available in ${currentMonth==='july'?'July':'August'}</span>`:''}</td>
+      <td data-label="Name" class="name-cell"><a href="${d.link}" target="_blank" rel="noopener">${d.name}</a><span class="iso-tag">${d.iso}</span>${d._unavailable?`<span class="unavail-banner" title="Rate it anyway, just can't book this month">Not available in ${currentMonth==='july'?'July':'August'}</span>`:''}</td>
       <td data-label="Turn Day">${d.turnday}${d._dates?`<span class="area-sub">${currentMonth==='july'?'Jul':'Aug'}: ${d._dates}</span>`:''}</td>
       <td data-label="BR" class="num">${d.br}</td>
       <td data-label="BA" class="num">${d.ba}</td>
       <td data-label="Sleeps" class="num">${d.sleeps}</td>
       <td data-label="Beach Position"><span class="loc-pill ${locClass(d.locpos)}">${locLabel(d.locpos)}</span></td>
-      <td data-label="Island Area">${d.area}${mins!==null?`<span class="area-sub">~${mins} min to lighthouse</span>`:''}<button class="map-link" data-mapview="${d.id}">📍 View on map</button></td>
+      <td data-label="Island Area">${d.area}<button class="map-link" data-mapview="${d.id}">📍 View on map</button></td>
       <td data-label="Crowdedness" class="${crowdClass(d.crowd)}">${crowdLabel(d.crowd)}</td>
       <td data-label="Rent Cost" class="num${visible?'':' locked-blur'}">
         <span class="tier-pill ${pillClass}">${pillLabel}</span><br><b>${rentDisplay}</b>
-        <span class="price-info-icon" title="${(d._edited ? d._editNote : d._note).replace(/"/g,'&quot;')}">ⓘ</span>
-        ${(isAdmin() && visible) ? `<button class="price-edit-btn" data-editprice="${d.id}">${price?"Edit price":"Enter confirmed price"}</button>
+        <span class="price-info-icon" data-infopop="${d.id}" data-notetext="${(d._edited ? d._editNote : d._note).replace(/"/g,'&quot;')}">ⓘ</span>
+        ${(isAdmin() && visible) ? `<button class="price-edit-btn" data-editprice="${d.id}">Edit price</button>
         <div class="price-input-row" data-inputrow="${d.id}" style="display:none;">
           <input type="number" placeholder="$/week" data-priceinput="${d.id}" value="${price||''}">
           <input type="text" placeholder="note e.g. incl. military discount" data-pricenote="${d.id}" value="${d._editNote||''}">
@@ -990,6 +1002,20 @@ function render(rows){
   document.querySelectorAll("[data-rowedit]").forEach(btn=>btn.addEventListener("click", ()=>openEditModal(btn.getAttribute("data-rowedit"))));
   document.querySelectorAll("[data-gallery]").forEach(img=>img.addEventListener("click", ()=>openLightbox(img.getAttribute("data-gallery"))));
   document.querySelectorAll("[data-mapview]").forEach(btn=>btn.addEventListener("click", ()=>openMapModal(btn.getAttribute("data-mapview"))));
+  document.querySelectorAll("[data-infopop]").forEach(icon=>{
+    icon.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      document.querySelectorAll(".info-popover").forEach(p=>p.remove());
+      const pop = document.createElement("div");
+      pop.className = "info-popover";
+      pop.textContent = icon.getAttribute("data-notetext");
+      document.body.appendChild(pop);
+      const rect = icon.getBoundingClientRect();
+      pop.style.left = Math.min(rect.left, window.innerWidth-240) + "px";
+      pop.style.top = (rect.bottom + 6) + "px";
+      setTimeout(()=>{ document.addEventListener("click", function closeIt(){ pop.remove(); document.removeEventListener("click", closeIt); }); }, 10);
+    });
+  });
 }
 
 // ---- lightbox ----
@@ -1070,7 +1096,6 @@ function openEditModal(id){
   document.getElementById("em-photo").value=(d.photos||[]).join(", "); document.getElementById("em-turnday").value=d.turnday;
   document.getElementById("em-br").value=d.br; document.getElementById("em-ba").value=d.ba; document.getElementById("em-sleeps").value=d.sleeps;
   document.getElementById("em-locpos").value=d.locpos; document.getElementById("em-area").value=d.area;
-  document.getElementById("em-mins").value = AREA_MINS[d.area] !== undefined ? AREA_MINS[d.area] : "";
   document.getElementById("em-crowd").value=d.crowd; document.getElementById("em-dogfee").value=d.dogfee;
   document.getElementById("em-julyrent").value=d.julyRent||""; document.getElementById("em-julydates").value=d.julyDates||""; document.getElementById("em-julynote").value=d.julyNote||"";
   document.getElementById("em-augrent").value=d.augRent||""; document.getElementById("em-augdates").value=d.augDates||""; document.getElementById("em-augnote").value=d.augNote||"";
@@ -1188,12 +1213,13 @@ function exitRateMode(){
 }
 window.addEventListener("resize", ()=>{ refreshRateModeBar(); });
 
+let swipePhotoIdx = 0;
 function renderSwipeCard(){
   const card = document.getElementById("swipe-card");
   const progress = document.getElementById("swipe-progress");
   if(swipeIdx >= swipeQueue.length){
     card.className = "swipe-card locked-msg";
-    card.innerHTML = `🎉 That's everyone left to rate! Hit "Lock in ratings so far" below to save these permanently, or Exit to browse.`;
+    card.innerHTML = `That's everyone left to rate! Hit "Lock in ratings so far" below to save these permanently, or Exit to browse.`;
     progress.textContent = "";
     return;
   }
@@ -1201,16 +1227,24 @@ function renderSwipeCard(){
   progress.textContent = `${swipeIdx+1} of ${swipeQueue.length} left to rate`;
   const me = meRecord();
   const entry = me.entries[d.id] || {stars:0, comment:""};
-  const photo = (d.photos && d.photos[0]) || "";
+  const photos = d.photos && d.photos.length ? d.photos : [];
+  swipePhotoIdx = 0;
   card.className = "swipe-card";
   card.innerHTML = `
-    ${photo ? `<img class="swipe-photo" src="${photo}" alt="${d.name}" onerror="this.style.display='none'">` : ``}
+    <div class="swipe-photo-wrap" id="swipe-photo-wrap">
+      ${photos.length ? `<img class="swipe-photo" id="swipe-photo-img" src="${photos[0]}" alt="${d.name}" onerror="this.style.display='none'">` : `<div class="swipe-photo-none">No photo yet — <a href="${d.link}" target="_blank" rel="noopener">view listing ↗</a></div>`}
+      ${photos.length>1 ? `<div class="swipe-photo-dots" id="swipe-photo-dots">${photos.map((p,i)=>`<span class="${i===0?'active':''}"></span>`).join("")}</div>` : ``}
+      ${photos.length>1 ? `<div class="swipe-photo-count" id="swipe-photo-count">1 / ${photos.length}</div>` : ``}
+    </div>
     <div class="swipe-body">
       <h3>${d.name}</h3>
-      <div class="swipe-specs">
-        <span>${d.br} BR</span><span>${d.ba} BA</span><span>Sleeps ${d.sleeps}</span>
-        <span>${locLabel(d.locpos)}</span><span>${d.area}</span><span>${crowdLabel(d.crowd)}</span>
-        ${d.pool?'<span>Private Pool</span>':''}
+      <div class="swipe-info-grid">
+        <div><span class="swipe-info-label">Beds / Baths</span><span class="swipe-info-val">${d.br} BR / ${d.ba} BA</span></div>
+        <div><span class="swipe-info-label">Sleeps</span><span class="swipe-info-val">${d.sleeps}</span></div>
+        <div><span class="swipe-info-label">Beach Position</span><span class="swipe-info-val">${locLabel(d.locpos)}</span></div>
+        <div><span class="swipe-info-label">Island Area</span><span class="swipe-info-val">${d.area}</span></div>
+        <div><span class="swipe-info-label">Crowdedness</span><span class="swipe-info-val">${crowdLabel(d.crowd)}</span></div>
+        <div><span class="swipe-info-label">Private Pool</span><span class="swipe-info-val">${d.pool?'Yes':'No'}</span></div>
       </div>
       <div class="swipe-stars" data-propid="${d.id}" data-swipe="1">
         ${(()=>{ let h=""; for(let i=1;i<=5;i++){ let fillPct=0; if((entry.stars||0)>=i) fillPct=100; else if((entry.stars||0)>=i-0.5) fillPct=50;
@@ -1219,7 +1253,7 @@ function renderSwipeCard(){
       </div>
       <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:8px;">${entry.stars?entry.stars+' / 5':'tap to rate'}</div>
       <textarea placeholder="Comment (optional)" data-swipecomment="${d.id}">${entry.comment||""}</textarea>
-      <div style="margin-top:8px;"><a href="${d.link}" target="_blank" rel="noopener" style="font-size:12px;">View full listing ↗</a></div>
+      <div style="margin-top:8px;text-align:center;"><a href="${d.link}" target="_blank" rel="noopener" style="font-size:12px;">View full listing ↗</a></div>
     </div>
   `;
   card.querySelectorAll(".hit-l,.hit-r").forEach(hit=>{
@@ -1240,14 +1274,29 @@ function renderSwipeCard(){
     await saveRatings();
   });
 
-  // touch swipe support
-  card.ontouchstart = (e)=>{ swipeTouchStartX = e.touches[0].clientX; };
-  card.ontouchend = (e)=>{
-    if(swipeTouchStartX===null) return;
-    const dx = e.changedTouches[0].clientX - swipeTouchStartX;
-    if(Math.abs(dx) > 60){ dx < 0 ? swipeGoNext() : swipeGoPrev(); }
-    swipeTouchStartX = null;
-  };
+  // touch swipe on the PHOTO ONLY changes photos, never navigates to next listing
+  if(photos.length>1){
+    const photoWrap = document.getElementById("swipe-photo-wrap");
+    photoWrap.ontouchstart = (e)=>{ swipeTouchStartX = e.touches[0].clientX; };
+    photoWrap.ontouchend = (e)=>{
+      if(swipeTouchStartX===null) return;
+      const dx = e.changedTouches[0].clientX - swipeTouchStartX;
+      if(Math.abs(dx) > 40){
+        swipePhotoIdx = dx < 0 ? (swipePhotoIdx+1)%photos.length : (swipePhotoIdx-1+photos.length)%photos.length;
+        updateSwipePhoto(photos);
+      }
+      swipeTouchStartX = null;
+    };
+    photoWrap.addEventListener("click", ()=>{
+      swipePhotoIdx = (swipePhotoIdx+1)%photos.length;
+      updateSwipePhoto(photos);
+    });
+  }
+}
+function updateSwipePhoto(photos){
+  document.getElementById("swipe-photo-img").src = photos[swipePhotoIdx];
+  document.getElementById("swipe-photo-count").textContent = `${swipePhotoIdx+1} / ${photos.length}`;
+  document.querySelectorAll("#swipe-photo-dots span").forEach((dot,i)=>dot.classList.toggle("active", i===swipePhotoIdx));
 }
 function swipeGoNext(){ if(swipeIdx < swipeQueue.length){ swipeIdx++; renderSwipeCard(); } }
 function swipeGoPrev(){ if(swipeIdx > 0){ swipeIdx--; renderSwipeCard(); } }
