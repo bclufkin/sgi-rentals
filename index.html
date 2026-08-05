@@ -71,7 +71,26 @@
   .crowd-moderate{color:var(--tier-stretch);font-weight:700;}
   .crowd-busy{color:var(--brick);font-weight:700;}
   .pool-yes{color:var(--tier-ideal);font-weight:700;} .pool-no{color:var(--muted);}
+  .rate-mode-bar{margin-bottom:14px;}
   .locked-blur{filter:blur(6px) grayscale(100%);user-select:none;pointer-events:none;}
+  .rate-mode-bar .toggle-btn{width:100%;font-size:13.5px;padding:12px;}
+  .swipe-container{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px;}
+  .swipe-progress{font-size:12px;color:var(--muted);text-align:center;margin-bottom:10px;font-weight:700;}
+  .swipe-card{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;touch-action:pan-y;}
+  .swipe-card img.swipe-photo{width:100%;height:200px;object-fit:cover;display:block;}
+  .swipe-card .swipe-body{padding:14px;}
+  .swipe-card h3{font-family:Georgia,serif;color:var(--navy);margin:0 0 6px;font-size:18px;}
+  .swipe-card .swipe-specs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+  .swipe-card .swipe-specs span{background:var(--paper-2);padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600;}
+  .swipe-card .swipe-stars{display:flex;justify-content:center;gap:4px;margin:14px 0 8px;}
+  .swipe-card .swipe-stars .starwrap{width:34px;height:34px;font-size:34px;}
+  .swipe-card textarea{width:100%;min-height:60px;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;}
+  .swipe-nav-buttons{display:flex;gap:8px;margin-top:12px;}
+  .swipe-nav-buttons button{flex:1;padding:12px;border-radius:8px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-weight:700;font-size:13px;cursor:pointer;}
+  .swipe-nav-buttons #swipe-next{background:var(--navy);color:#fff;}
+  .swipe-bottom-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;position:sticky;bottom:0;background:var(--card);padding-top:8px;}
+  .swipe-bottom-bar button{flex:1;min-width:110px;margin:0;}
+  .swipe-card.locked-msg{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;}
   .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--navy);color:var(--paper);font-size:10px;font-weight:700;}
   .price-edit-btn,.row-edit-btn,.map-link{display:block;margin-top:3px;font-size:10px;background:none;border:none;color:var(--edited);cursor:pointer;text-decoration:underline;padding:0;}
   .price-input-row{display:flex;flex-direction:column;gap:4px;margin-top:4px;}
@@ -189,7 +208,26 @@
     <div class="count-line">Showing <b id="shown-count">0</b> of <b id="total-count">0</b>. Click headers to sort.</div>
   </div>
 
-  <div class="table-scroll">
+  <div class="rate-mode-bar" id="rate-mode-bar" style="display:none;">
+    <button class="toggle-btn" id="rate-mode-toggle">📱 Rate Mode — swipe through one home at a time</button>
+  </div>
+
+  <div class="swipe-container" id="swipe-container" style="display:none;">
+    <div class="swipe-progress" id="swipe-progress"></div>
+    <div class="swipe-card" id="swipe-card"></div>
+    <div class="swipe-nav-buttons">
+      <button id="swipe-prev">&larr; Prev</button>
+      <button id="swipe-skip">Skip</button>
+      <button id="swipe-next">Next &rarr;</button>
+    </div>
+    <div class="swipe-bottom-bar">
+      <button class="save-progress" id="swipe-save">Save progress</button>
+      <button class="submit-final" id="swipe-submit">Lock in ratings so far</button>
+      <button class="toggle-btn off" id="swipe-exit">Exit Rate Mode</button>
+    </div>
+  </div>
+
+  <div class="table-scroll" id="table-scroll-wrap">
     <table id="rental-table">
       <colgroup>
         <col style="width:1.9%;"><!-- # -->
@@ -660,6 +698,7 @@ function buildIdentityBar(){
   famBtn.addEventListener("click", ()=>{ sortMode = sortMode==="family-avg"?"normal":"family-avg"; buildIdentityBar(); applyFilters(); });
   box.appendChild(famBtn);
   updateIdentityStatus();
+  refreshRateModeBar();
 }
 
 async function handleAdminClick(){
@@ -791,6 +830,7 @@ function applyFilters(){
       if(av<bv) return -1*sortDir; if(av>bv) return 1*sortDir; return 0; });
   }
   render(rows);
+  refreshRateModeBar();
 }
 
 function halfStarWidget(propId, val, editable){
@@ -1087,6 +1127,122 @@ document.getElementById("f-search").addEventListener("input", applyFilters);
 
 const notesToggle=document.getElementById("notes-toggle"), notesBody=document.getElementById("notes-body");
 notesToggle.addEventListener("click", ()=>{ const open=notesBody.classList.toggle("open"); notesToggle.classList.toggle("open", open); });
+
+// ---- Rate Mode (mobile-friendly swipe-through rating) ----
+let swipeQueue = [], swipeIdx = 0, swipeTouchStartX = null;
+
+function refreshRateModeBar(){
+  const bar = document.getElementById("rate-mode-bar");
+  if(!currentUser){ bar.style.display="none"; return; }
+  const me = meRecord();
+  const unlockedCount = allData().filter(d=>!(me.entries[d.id]&&me.entries[d.id].locked)).length;
+  if(unlockedCount > 0){
+    bar.style.display="block";
+    document.getElementById("rate-mode-toggle").textContent = `📱 Rate Mode — ${unlockedCount} home${unlockedCount>1?'s':''} left to rate`;
+  } else {
+    bar.style.display="none";
+  }
+}
+
+function enterRateMode(){
+  if(!currentUser){ alert("Pick your name first."); return; }
+  const me = meRecord();
+  swipeQueue = allData().filter(d=>!(me.entries[d.id]&&me.entries[d.id].locked)).map(d=>d.id);
+  if(!swipeQueue.length){ alert("You've already locked ratings for every current home!"); return; }
+  swipeIdx = 0;
+  document.getElementById("swipe-container").style.display="block";
+  document.getElementById("table-scroll-wrap").style.display="none";
+  document.querySelector(".panel").style.display="none";
+  renderSwipeCard();
+  document.getElementById("swipe-container").scrollIntoView({behavior:"smooth"});
+}
+function exitRateMode(){
+  document.getElementById("swipe-container").style.display="none";
+  document.getElementById("table-scroll-wrap").style.display="block";
+  document.querySelector(".panel").style.display="block";
+  applyFilters();
+  refreshRateModeBar();
+}
+
+function renderSwipeCard(){
+  const card = document.getElementById("swipe-card");
+  const progress = document.getElementById("swipe-progress");
+  if(swipeIdx >= swipeQueue.length){
+    card.className = "swipe-card locked-msg";
+    card.innerHTML = `🎉 That's everyone left to rate! Hit "Lock in ratings so far" below to save these permanently, or Exit to browse.`;
+    progress.textContent = "";
+    return;
+  }
+  const d = mergedRow(allData().find(x=>x.id===swipeQueue[swipeIdx]));
+  progress.textContent = `${swipeIdx+1} of ${swipeQueue.length} left to rate`;
+  const me = meRecord();
+  const entry = me.entries[d.id] || {stars:0, comment:""};
+  const photo = (d.photos && d.photos[0]) || "";
+  card.className = "swipe-card";
+  card.innerHTML = `
+    ${photo ? `<img class="swipe-photo" src="${photo}" alt="${d.name}" onerror="this.style.display='none'">` : ``}
+    <div class="swipe-body">
+      <h3>${d.name}</h3>
+      <div class="swipe-specs">
+        <span>${d.br} BR</span><span>${d.ba} BA</span><span>Sleeps ${d.sleeps}</span>
+        <span>${locLabel(d.locpos)}</span><span>${d.area}</span><span>${crowdLabel(d.crowd)}</span>
+        ${d.pool?'<span>Private Pool</span>':''}
+      </div>
+      <div class="swipe-stars" data-propid="${d.id}" data-swipe="1">
+        ${(()=>{ let h=""; for(let i=1;i<=5;i++){ let fillPct=0; if((entry.stars||0)>=i) fillPct=100; else if((entry.stars||0)>=i-0.5) fillPct=50;
+          h+=`<div class="starwrap"><span class="se">&#9733;</span><span class="sf" style="width:${fillPct}%;">&#9733;</span><span class="hit-l" data-star="${i-0.5}"></span><span class="hit-r" data-star="${i}"></span></div>`; }
+          return h; })()}
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:8px;">${entry.stars?entry.stars+' / 5':'tap to rate'}</div>
+      <textarea placeholder="Comment (optional)" data-swipecomment="${d.id}">${entry.comment||""}</textarea>
+      <div style="margin-top:8px;"><a href="${d.link}" target="_blank" rel="noopener" style="font-size:12px;">View full listing ↗</a></div>
+    </div>
+  `;
+  card.querySelectorAll(".hit-l,.hit-r").forEach(hit=>{
+    hit.addEventListener("click", async (ev)=>{
+      const val = parseFloat(ev.target.getAttribute("data-star"));
+      const me2 = meRecord();
+      if(!me2.entries[d.id]) me2.entries[d.id] = {stars:0, comment:"", locked:false};
+      me2.entries[d.id].stars = val;
+      await saveRatings();
+      renderSwipeCard();
+    });
+  });
+  const ta = card.querySelector("[data-swipecomment]");
+  if(ta) ta.addEventListener("change", async ()=>{
+    const me2 = meRecord();
+    if(!me2.entries[d.id]) me2.entries[d.id] = {stars:0, comment:"", locked:false};
+    me2.entries[d.id].comment = ta.value;
+    await saveRatings();
+  });
+
+  // touch swipe support
+  card.ontouchstart = (e)=>{ swipeTouchStartX = e.touches[0].clientX; };
+  card.ontouchend = (e)=>{
+    if(swipeTouchStartX===null) return;
+    const dx = e.changedTouches[0].clientX - swipeTouchStartX;
+    if(Math.abs(dx) > 60){ dx < 0 ? swipeGoNext() : swipeGoPrev(); }
+    swipeTouchStartX = null;
+  };
+}
+function swipeGoNext(){ if(swipeIdx < swipeQueue.length){ swipeIdx++; renderSwipeCard(); } }
+function swipeGoPrev(){ if(swipeIdx > 0){ swipeIdx--; renderSwipeCard(); } }
+
+document.getElementById("rate-mode-toggle").addEventListener("click", enterRateMode);
+document.getElementById("swipe-exit").addEventListener("click", exitRateMode);
+document.getElementById("swipe-next").addEventListener("click", swipeGoNext);
+document.getElementById("swipe-prev").addEventListener("click", swipeGoPrev);
+document.getElementById("swipe-skip").addEventListener("click", swipeGoNext);
+document.getElementById("swipe-save").addEventListener("click", async ()=>{ await saveRatings(); alert("Progress saved."); });
+document.getElementById("swipe-submit").addEventListener("click", async ()=>{
+  if(!confirm("Lock in your ratings for every home you've currently rated? This can't be undone for those homes.")) return;
+  const me = meRecord();
+  allData().forEach(d=>{ const e=me.entries[d.id]; if(e && e.stars>0 && !e.locked) e.locked=true; });
+  if(Object.keys(me.entries).filter(k=>me.entries[k].locked).length === allData().length){ me.everCompleted = true; }
+  await saveRatings();
+  exitRateMode();
+  buildIdentityBar();
+});
 
 loadAll();
 </script>
