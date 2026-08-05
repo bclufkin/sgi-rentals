@@ -48,7 +48,7 @@
   .month-toggle button.active{background:var(--navy);color:#fff;}
   .count-line{font-size:12px;color:var(--muted);margin-top:8px;}
   .table-scroll{overflow-x:auto;overflow-y:auto;max-height:72vh;border:1px solid var(--line);border-radius:10px;background:var(--card);max-width:100%;}
-  table{border-collapse:collapse;width:100%;font-size:12.5px;table-layout:fixed;min-width:1650px;}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;table-layout:fixed;min-width:1100px;}
   thead th{position:sticky;top:0;z-index:3;background:var(--navy);color:var(--paper);text-align:left;padding:8px 8px;font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--brick);overflow:hidden;text-overflow:ellipsis;}
   td{padding:7px 8px;vertical-align:top;overflow-wrap:break-word;}
   thead th.no-sort{cursor:default;}
@@ -192,23 +192,23 @@
   <div class="table-scroll">
     <table id="rental-table">
       <colgroup>
-        <col style="width:32px;"><!-- # -->
-        <col style="width:64px;"><!-- Photo -->
-        <col style="width:190px;"><!-- Name -->
-        <col style="width:110px;"><!-- Turn Day -->
-        <col style="width:38px;"><!-- BR -->
-        <col style="width:38px;"><!-- BA -->
-        <col style="width:52px;"><!-- Sleeps -->
-        <col style="width:100px;"><!-- Beach Position -->
-        <col style="width:160px;"><!-- Island Area -->
-        <col style="width:90px;"><!-- Crowdedness -->
-        <col style="width:150px;"><!-- Dog Fee -->
-        <col style="width:190px;"><!-- Rent Cost -->
-        <col style="width:80px;"><!-- Per-Person -->
-        <col style="width:80px;"><!-- Total -->
-        <col style="width:44px;"><!-- Pool -->
-        <col style="width:180px;"><!-- Family Ratings -->
-        <col style="width:48px;"><!-- Edit -->
+        <col style="width:1.9%;"><!-- # -->
+        <col style="width:3.9%;"><!-- Photo -->
+        <col style="width:11.5%;"><!-- Name -->
+        <col style="width:6.7%;"><!-- Turn Day -->
+        <col style="width:2.3%;"><!-- BR -->
+        <col style="width:2.3%;"><!-- BA -->
+        <col style="width:3.2%;"><!-- Sleeps -->
+        <col style="width:6.1%;"><!-- Beach Position -->
+        <col style="width:9.7%;"><!-- Island Area -->
+        <col style="width:5.5%;"><!-- Crowdedness -->
+        <col style="width:9.1%;"><!-- Dog Fee -->
+        <col style="width:11.5%;"><!-- Rent Cost -->
+        <col style="width:4.9%;"><!-- Per-Person -->
+        <col style="width:4.9%;"><!-- Total -->
+        <col style="width:2.7%;"><!-- Pool -->
+        <col style="width:10.9%;"><!-- Family Ratings -->
+        <col style="width:2.9%;"><!-- Edit -->
       </colgroup>
       <thead><tr>
         <th class="no-sort">#</th><th class="no-sort">Photo</th><th data-key="name">Name</th>
@@ -300,7 +300,8 @@
 <div class="lightbox-overlay" id="lightbox-overlay">
   <button class="lightbox-close" id="lightbox-close">&times;</button>
   <img id="lightbox-img" src="">
-  <div class="lightbox-nav"><button id="lightbox-prev">&larr; Prev</button><span class="lightbox-count" id="lightbox-count"></span><button id="lightbox-next">Next &rarr;</button></div>
+  <div class="lightbox-nav"><button id="lightbox-prev">&larr; Prev</button><button id="lightbox-pause">⏸ Pause</button><button id="lightbox-next">Next &rarr;</button></div>
+  <span class="lightbox-count" id="lightbox-count"></span>
   <div class="lightbox-thumbs" id="lightbox-thumbs"></div>
 </div>
 
@@ -310,7 +311,7 @@ const ADMIN = "Brad";
 const AREA_MINS = {"Plantation (West End)":12, "East End":12, "Central Beach":3};
 
 const BASE_DATA = [
-  {id:"a-sand-box", iso:"Collins", name:"A Sand Box", link:"https://www.collinsvacationrentals.com/rentals/a-sand-box", address:"136 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, rules apply", julyRent:3550, julyDates:"7/31–8/7", julyNote:"Collins seasonal range top (peak/July estimate).", augRent:null, augUnavailable:true, augDates:"", augNote:"Live calendar shows every August 2027 Saturday blocked/Notify as of last check — call to get on the waitlist.", pool:false, photos:[
+  {id:"a-sand-box", iso:"Collins", name:"A Sand Box", link:"https://www.collinsvacationrentals.com/rentals/a-sand-box", address:"136 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"Pet friendly, rules apply", julyRent:3550, julyDates:"7/31–8/7", julyNote:"Collins seasonal range top (peak/July estimate).", augRent:null, augUnavailable:true, augDates:"", augNote:"Live calendar shows every August 2027 Saturday blocked/Notify as of last check — call to get on the waitlist.", pool:false, photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-1.jpg?v=89911",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-3.jpg?v=89914",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-2.jpg?v=89913",
@@ -341,7 +342,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/47264/31+-+exterior-view+from+front-_elp2260.jpg?v=85279",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47264/33+-+exterior-front+yard-_elp2266.jpg?v=85289"
     ]},
-  {id:"aboard-katie-leigh", iso:"Collins", name:"Aboard The Katie Leigh", link:"https://www.collinsvacationrentals.com/rentals/aboard-the-katie-leigh", address:"116 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"$100, 1 dog only <35lb", julyRent:3995, julyDates:"7/18–7/25 (confirmed open)", julyNote:"Collins seasonal range top; confirmed available for check-in 7/18/27.", augRent:3040, augDates:"8/15–8/22 (only open Aug week)", augNote:"Confirmed: only 8/15 check-in is open in Aug 2027 (1,8,22,29 blocked); price is est. ~24% below July.", pool:false, photos:[
+  {id:"aboard-katie-leigh", iso:"Collins", name:"Aboard The Katie Leigh", link:"https://www.collinsvacationrentals.com/rentals/aboard-the-katie-leigh", address:"116 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$100, 1 dog only <35lb", julyRent:3995, julyDates:"7/18–7/25 (confirmed open)", julyNote:"Collins seasonal range top; confirmed available for check-in 7/18/27.", augRent:3040, augDates:"8/15–8/22 (only open Aug week)", augNote:"Confirmed: only 8/15 check-in is open in Aug 2027 (1,8,22,29 blocked); price is est. ~24% below July.", pool:false, photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D10F.jpg?v=90572",
       "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D9FM.jpg?v=90586",
       "https://photos.barefoot.com/v3ccln0929/images/properties/52307/SR500578F.jpg?v=90553",
@@ -391,7 +392,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/52307/D11F.jpg?v=90582"
     ]},
   {id:"american-pie", iso:"Collins", name:"American Pie", link:"https://www.collinsvacationrentals.com/rentals/american-pie", address:"260 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.5, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"busy", dogfee:"$75/dog, 2 dogs <50lb", julyRent:4375, julyDates:"7/25–8/1", julyNote:"Collins seasonal range top.", augRent:3325, augDates:"8/1–8/8", augNote:"Est. ~24% below July (verify).", pool:false, photos:["https://photos.barefoot.com/v3ccln0929/images/properties/37261/1.jpg"]},
-  {id:"a-great-escape", iso:"Collins", name:"A Great Escape", link:"https://www.collinsvacationrentals.com/rentals/a-great-escape", address:"1744 East Gulf Beach Drive, St. George Island, FL 32328", turnday:"Sunday", br:4, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"$75/dog, 2 dogs <50lb", julyRent:5400, julyDates:"7/25–8/1 (July 4th wk confirmed $5,400)", julyNote:"Confirmed July 4th holiday week rate.", augRent:3725, augDates:"Aug 2027 currently shows fully booked/Notify on all Sundays — call to confirm or waitlist.", augNote:"Est. ~24% below July (live Aug 2027 calendar shows no open Sundays as of this check).", pool:false,
+  {id:"a-great-escape", iso:"Collins", name:"A Great Escape", link:"https://www.collinsvacationrentals.com/rentals/a-great-escape", address:"1744 East Gulf Beach Drive, St. George Island, FL 32328", turnday:"Sunday", br:4, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"$75/dog, 2 dogs <50lb", julyRent:5400, julyDates:"7/25–8/1", julyNote:"Confirmed July 4th holiday week rate ($5,400).", augRent:3725, augDates:"", augNote:"Live Aug 2027 calendar currently shows every Sunday blocked/Notify — call to confirm or waitlist. Price is an est. ~24% below July.", augUnavailable:true, pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/46+-+exterior-front+elevation-_elp2018.jpg?v=85485",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/1+-+exterior-back+elevation-_elp2030.jpg?v=85505",
@@ -471,8 +472,21 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/33857/%2323.jpg?v=94690",
       "https://photos.barefoot.com/v3ccln0929/images/properties/33857/%2325.jpg?v=94691"
     ]},
-  {id:"here-comes-sun", iso:"Collins", name:"Here Comes The Sun [EXCLUDED - see note]", link:"https://www.collinsvacationrentals.com/rentals/here-comes-the-sun", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"secondrow", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"CORRECTED: Collins lists this as 'Across Street' location, not beachfront — fails the beachfront requirement. Left in table only so you can see it was checked and excluded; filter it out via Beach Position.", augRent:null, augDates:"", augNote:"Same correction as July.", pool:true, photos:[]},
+  {id:"here-comes-sun", iso:"Collins", name:"Here Comes The Sun", link:"https://www.collinsvacationrentals.com/rentals/here-comes-the-sun", address:"1057 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"secondrow", area:"Central Beach", crowd:"busy", dogfee:"Pet friendly, rules apply", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
   {id:"a-turtle-manor", iso:"Fickling", name:"A Turtle Manor", link:"https://www.ficklingvacationrentals.com/vacation-rentals/rental/aturtle/", turnday:"Sunday", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Verify pet policy", julyRent:null, julyDates:"", julyNote:"Not yet confirmed.", augRent:5800, augDates:"8/8–8/15", augNote:"User-confirmed rate for 8/8–8/15/27.", pool:false, photos:[]},
+  {id:"auburn-sunrise", iso:"Collins", name:"Auburn Sunrise", link:"https://www.collinsvacationrentals.com/rentals/auburn-sunrise", address:"2116 Dolphin Court East, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.5, sleeps:8, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 2 dogs <35lb", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true, photos:[]},
+  {id:"the-lazy-dolphinn", iso:"Collins", name:"The Lazy Dolph-Inn", link:"https://www.collinsvacationrentals.com/rentals/the-lazy-dolphinn", address:"2112 Dolphin Court East, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:3.0, sleeps:8, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 1 dog <80lb", julyRent:2950, julyDates:"7/25–8/1", julyNote:"CONFIRMED exact 2027 calendar price.", augRent:2950, augDates:"8/1–8/8", augNote:"CONFIRMED exact 2027 calendar price; drops to $1,950/wk starting 8/8.", pool:false,
+    photos:[
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47579/1+-+2112+Dolphin+Court+East-10.jpg?v=81924",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47579/3+-+2112+Dolphin+Court+East-7.jpg?v=81923",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47579/6+-+upper+level+main+floor-living+room-elp132.jpg?v=81905",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47579/11+-+upper+level+main+floor-kitchen-elp107.jpg?v=81889",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47579/22+-+lower+level-bedroom-elp049.jpg?v=81888",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47579/26+-+lower+level-bedroom-elp084.jpg?v=81900",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47579/28+-+lower+level-bedroom-elp059.jpg?v=81886",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47579/17+-+upper+level+main+floor-bath-elp157.jpg?v=81887",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/47579/25+-+lower+level-bath-elp039.jpg?v=81909"
+    ]},
   {id:"just-beachy", iso:"Cape & Coast", name:"Just Beachy", link:"https://www.capeandcoast.com/rentals/just-beachy", address:"St. George Island, Gulf Beaches (exact address not published — confirmed beachfront)", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, size/count limits TBD", julyRent:null, julyDates:"", julyNote:"TBD – call for quote", augRent:null, augDates:"", augNote:"TBD – call for quote", pool:true,
     photos:[
       "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/e250172e-e486-4033-a94c-e6d02dfcd5e9",
@@ -691,15 +705,30 @@ function rowVisibleToMe(id){ return isAdmin() || rowLockedByMe(id); }
 function updateIdentityStatus(){
   const status=document.getElementById("identity-status"), submitBtn=document.getElementById("submit-final-btn"),
         saveBtn=document.getElementById("save-progress-btn"), gatedBanner=document.getElementById("gated-banner");
-  if(!currentUser){ status.innerHTML="Pick your name to start rating homes — prices hidden per-row until you lock that row."; submitBtn.style.display="none"; saveBtn.style.display="none"; gatedBanner.style.display="none"; return; }
-  if(isAdmin()){ status.innerHTML=`Viewing as <b>Brad</b> <span class="admin-badge">Admin — always unlocked</span>. You can still rate/lock rows like everyone else.`; submitBtn.style.display="inline-block"; saveBtn.style.display="inline-block"; gatedBanner.style.display="none"; return; }
+  const tierSelect = document.getElementById("f-tier");
+  if(!currentUser){
+    status.innerHTML="Pick your name to start rating homes — prices hidden per-row until you lock that row.";
+    submitBtn.style.display="none"; saveBtn.style.display="none"; gatedBanner.style.display="none";
+    tierSelect.disabled = true; tierSelect.value=""; tierSelect.title="Complete all your ratings to filter by price";
+    return;
+  }
+  if(isAdmin()){
+    status.innerHTML=`Viewing as <b>Brad</b> <span class="admin-badge">Admin — always unlocked</span>. You can still rate/lock rows like everyone else.`;
+    submitBtn.style.display="inline-block"; saveBtn.style.display="inline-block"; gatedBanner.style.display="none";
+    tierSelect.disabled = false; tierSelect.title="";
+    return;
+  }
   const me=meRecord();
   const total=allData().length;
   const lockedCount=Object.keys(me.entries).filter(k=>me.entries[k].locked).length;
   const ratedUnlocked=Object.keys(me.entries).filter(k=>!me.entries[k].locked && me.entries[k].stars>0).length;
   status.innerHTML = `Viewing as <b>${currentUser}</b> — ${lockedCount} of ${total} homes locked, ${ratedUnlocked} rated but not yet locked.`;
   submitBtn.style.display="inline-block"; saveBtn.style.display="inline-block"; gatedBanner.style.display="block";
-  gatedBanner.textContent = "Each home's price stays hidden to you until you lock a rating for it. Locking is permanent for that home.";
+  gatedBanner.textContent = "Each home's price stays hidden to you until you lock a rating for it. Locking is permanent for that home. Price filtering unlocks once every current home is locked.";
+  const canFilterPrice = !!me.everCompleted;
+  tierSelect.disabled = !canFilterPrice;
+  tierSelect.title = canFilterPrice ? "" : "Complete all your ratings to filter by price";
+  if(!canFilterPrice) tierSelect.value = "";
 }
 document.getElementById("save-progress-btn").addEventListener("click", async ()=>{ await saveRatings(); alert("Progress saved."); });
 document.getElementById("submit-final-btn").addEventListener("click", async ()=>{
@@ -913,14 +942,16 @@ function openLightbox(propId){
   const d = mergedRow(allData().find(x=>x.id===propId));
   lightboxPhotos = d.photos && d.photos.length ? d.photos : [];
   if(!lightboxPhotos.length) return;
-  lightboxIdx=0; lightboxPlaying=true; showLightboxImg();
+  lightboxIdx=0; lightboxPlaying=true;
+  document.getElementById("lightbox-pause").textContent = "⏸ Pause";
+  showLightboxImg();
   document.getElementById("lightbox-overlay").classList.add("open");
   startLightboxAuto();
 }
 function startLightboxAuto(){
   stopLightboxAuto();
   if(lightboxPhotos.length<2) return;
-  lightboxTimer = setInterval(()=>{ lightboxIdx=(lightboxIdx+1)%lightboxPhotos.length; showLightboxImg(); }, 3000);
+  lightboxTimer = setInterval(()=>{ lightboxIdx=(lightboxIdx+1)%lightboxPhotos.length; showLightboxImg(); }, 1800);
 }
 function stopLightboxAuto(){ if(lightboxTimer){ clearInterval(lightboxTimer); lightboxTimer=null; } }
 function showLightboxImg(){
@@ -933,6 +964,12 @@ function showLightboxImg(){
 document.getElementById("lightbox-close").addEventListener("click", ()=>{ document.getElementById("lightbox-overlay").classList.remove("open"); stopLightboxAuto(); });
 document.getElementById("lightbox-prev").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx-1+lightboxPhotos.length)%lightboxPhotos.length; lightboxPlaying=false; stopLightboxAuto(); showLightboxImg(); });
 document.getElementById("lightbox-next").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx+1)%lightboxPhotos.length; lightboxPlaying=false; stopLightboxAuto(); showLightboxImg(); });
+document.getElementById("lightbox-pause").addEventListener("click", ()=>{
+  lightboxPlaying = !lightboxPlaying;
+  document.getElementById("lightbox-pause").textContent = lightboxPlaying ? "⏸ Pause" : "▶ Resume";
+  if(lightboxPlaying) startLightboxAuto(); else stopLightboxAuto();
+  showLightboxImg();
+});
 
 // ---- map modal (real Google Maps embed, roadmap not satellite) ----
 function openMapModal(propId){
