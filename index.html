@@ -90,6 +90,10 @@
     #filters-controls{display:none;}
     #filters-controls.open{display:flex;}
   }
+  .rater-pill-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+  .rater-pill{background:var(--paper-2);border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600;color:var(--ink);}
+  .rater-pill.has-comment{cursor:pointer;background:#e8e0d0;color:var(--brick-dark);}
+  .rater-pill.has-comment:hover{background:var(--brick);color:#fff;}
   .locked-blur{filter:blur(6px) grayscale(100%);user-select:none;pointer-events:none;}
   .rate-mode-bar .toggle-btn{width:100%;font-size:13.5px;padding:12px;}
   .swipe-container{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px;}
@@ -133,8 +137,6 @@
   .starwrap .hit-l{left:0;} .starwrap .hit-r{right:0;}
   .rating-comment{width:140px;font-size:11px;padding:4px 6px;margin-top:4px;}
   .avg-rating{font-size:12px;font-weight:700;color:var(--navy);}
-  .comment-block{font-size:10.5px;margin-top:4px;padding:4px 6px;background:rgba(255,255,255,.5);border-radius:4px;}
-  .comment-block b{color:var(--navy);}
   .locked-tag{font-size:9px;color:var(--tier-ideal);font-style:italic;display:block;margin-top:2px;}
   .unavail-banner{display:inline-block;width:fit-content;background:var(--brick);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;margin-top:4px;max-width:120px;white-space:normal;line-height:1.3;}
   tr.unavailable-row{background:rgba(168,74,38,0.08)!important;}
@@ -207,7 +209,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v2.14</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v2.15</p>
   </header>
 
   <div class="identity-bar">
@@ -996,8 +998,8 @@ function render(rows){
       : `<div class="no-photo"><a href="${d.link}" target="_blank" rel="noopener">View listing &#8599;</a></div>`;
 
     const visible = rowVisibleToMe(d.id);
-    const price = d._effPrice;
-    const rentDisplay = price ? `$${price.toLocaleString()}` : `<span class="tier-pill tier-tbd">TBD</span>`;
+    const price = d._unavailable ? null : d._effPrice;
+    const rentDisplay = d._unavailable ? `<span class="tier-pill tier-tbd">N/A</span>` : (price ? `$${price.toLocaleString()}` : `<span class="tier-pill tier-tbd">TBD</span>`);
     const perPersonDisplay = price ? `$${Math.round(price/5).toLocaleString()}` : "—";
     const perDog = perDogFeeAmount(d.dogfee);
     const totalDisplay = price ? `$${(price+(perDog*2)).toLocaleString()}` : "—";
@@ -1012,11 +1014,12 @@ function render(rows){
       const locked = rowLockedByMe(d.id);
       const myEntry = (ratings[currentUser] && ratings[currentUser].entries[d.id]) || {stars:0,comment:""};
       if(locked || isAdmin()){
-        let sum=0,count=0,comments=[];
+        let sum=0,count=0,namePills=[];
         NAMES.forEach(n=>{ const rec=ratings[n]; if(rec && rec.entries[d.id] && rec.entries[d.id].locked && rec.entries[d.id].stars>0){ sum+=rec.entries[d.id].stars; count++;
-          if(rec.entries[d.id].comment) comments.push(`<div class="comment-block"><b>${n}</b> (${rec.entries[d.id].stars}★): ${rec.entries[d.id].comment}</div>`); } });
+          const hasComment = !!rec.entries[d.id].comment;
+          namePills.push(`<span class="rater-pill${hasComment?' has-comment':''}" ${hasComment?`data-raterpop="1" data-ratername="${n}" data-raterstars="${rec.entries[d.id].stars}" data-ratercomment="${rec.entries[d.id].comment.replace(/"/g,'&quot;')}"`:''}>${n} ${rec.entries[d.id].stars}★${hasComment?' 💬':''}</span>`); } });
         const avg = count ? (sum/count).toFixed(1) : "—";
-        ratingsHtml = (locked ? `<span class="locked-tag">🔒 locked</span>` : ``) + `<div class="avg-rating">${avg} ★ ${count?`(${count})`:'(no ratings)'}</div>${comments.join("")}`;
+        ratingsHtml = (locked ? `<span class="locked-tag">🔒 locked</span>` : ``) + `<div class="avg-rating">${avg} ★ ${count?`(${count})`:'(no ratings)'}</div><div class="rater-pill-row">${namePills.join("")}</div>`;
         if(isAdmin() && !locked){
           ratingsHtml += halfStarWidget(d.id, myEntry.stars||0, true)
             + `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`
@@ -1044,7 +1047,7 @@ function render(rows){
       <td data-label="BA" class="num">${d.ba}</td>
       <td data-label="Sleeps" class="num">${d.sleeps}</td>
       <td data-label="Beach Position"><span class="loc-pill ${locClass(d.locpos)}">${locLabel(d.locpos)}</span></td>
-      <td data-label="Island Area">${d.area}<button class="map-link" data-mapview="${d.id}">📍 View on map</button></td>
+      <td data-label="Island Area">${d.area}<button class="map-link" data-mapview="${d.id}">Map View 📍</button></td>
       <td data-label="Crowdedness" class="${crowdClass(d.crowd)}">${crowdLabel(d.crowd)}</td>
       <td data-label="Rent Cost" class="num${visible?'':' locked-blur'}">
         <span class="tier-pill ${pillClass}">${pillLabel}</span><br><b>${rentDisplay}</b>
@@ -1118,6 +1121,20 @@ function render(rows){
       pop.textContent = icon.getAttribute("data-notetext");
       document.body.appendChild(pop);
       const rect = icon.getBoundingClientRect();
+      pop.style.left = Math.min(rect.left, window.innerWidth-240) + "px";
+      pop.style.top = (rect.bottom + 6) + "px";
+      setTimeout(()=>{ document.addEventListener("click", function closeIt(){ pop.remove(); document.removeEventListener("click", closeIt); }); }, 10);
+    });
+  });
+  document.querySelectorAll("[data-raterpop]").forEach(pill=>{
+    pill.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      document.querySelectorAll(".info-popover").forEach(p=>p.remove());
+      const pop = document.createElement("div");
+      pop.className = "info-popover";
+      pop.innerHTML = `<b>${pill.getAttribute("data-ratername")} — ${pill.getAttribute("data-raterstars")}★</b><br>${pill.getAttribute("data-ratercomment")}`;
+      document.body.appendChild(pop);
+      const rect = pill.getBoundingClientRect();
       pop.style.left = Math.min(rect.left, window.innerWidth-240) + "px";
       pop.style.top = (rect.bottom + 6) + "px";
       setTimeout(()=>{ document.addEventListener("click", function closeIt(){ pop.remove(); document.removeEventListener("click", closeIt); }); }, 10);
