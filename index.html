@@ -57,6 +57,7 @@
   table{border-collapse:collapse;width:100%;font-size:12.5px;table-layout:fixed;min-width:1300px;}
   thead th{position:sticky;top:0;z-index:3;background:var(--navy);color:var(--paper);text-align:left;padding:8px 8px;font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--brick);overflow:hidden;text-overflow:ellipsis;}
   td{padding:7px 8px;vertical-align:top;overflow-wrap:break-word;}
+  td.name-cell{padding-left:14px;}
   thead th.no-sort{cursor:default;}
   tbody tr{border-bottom:1px solid var(--line);}
   tbody tr:nth-child(even){background:rgba(201,190,163,.18);}
@@ -135,7 +136,7 @@
   .comment-block{font-size:10.5px;margin-top:4px;padding:4px 6px;background:rgba(255,255,255,.5);border-radius:4px;}
   .comment-block b{color:var(--navy);}
   .locked-tag{font-size:9px;color:var(--tier-ideal);font-style:italic;display:block;margin-top:2px;}
-  .unavail-banner{display:block;background:var(--brick);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;margin-top:4px;max-width:170px;white-space:normal;line-height:1.3;}
+  .unavail-banner{display:inline-block;width:fit-content;background:var(--brick);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;margin-top:4px;max-width:120px;white-space:normal;line-height:1.3;}
   tr.unavailable-row{background:rgba(168,74,38,0.08)!important;}
   .edit-row-btn{background:var(--navy);color:#fff;border:none;padding:5px 9px;border-radius:5px;font-size:10.5px;cursor:pointer;white-space:nowrap;}
   .no-edit-note{font-size:10px;color:var(--muted);font-style:italic;}
@@ -206,7 +207,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v2.3</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v2.4</p>
   </header>
 
   <div class="identity-bar">
@@ -265,19 +266,19 @@
       <colgroup>
         <col style="width:1.9%;"><!-- # -->
         <col style="width:3.9%;"><!-- Photo -->
-        <col style="width:10%;"><!-- Name -->
-        <col style="width:9%;"><!-- Turn Day -->
+        <col style="width:11%;"><!-- Name -->
+        <col style="width:7%;"><!-- Turn Day -->
         <col style="width:2.6%;"><!-- BR -->
         <col style="width:2.6%;"><!-- BA -->
         <col style="width:3.6%;"><!-- Sleeps -->
         <col style="width:8%;"><!-- Beach Position -->
-        <col style="width:9%;"><!-- Island Area -->
+        <col style="width:10%;"><!-- Island Area -->
         <col style="width:9%;"><!-- Crowdedness -->
-        <col style="width:9.5%;"><!-- Rent Cost -->
+        <col style="width:7.5%;"><!-- Rent Cost -->
         <col style="width:6%;"><!-- Per-Person -->
         <col style="width:6%;"><!-- Total -->
         <col style="width:3%;"><!-- Pool -->
-        <col style="width:13%;"><!-- Family Ratings -->
+        <col style="width:15%;"><!-- Family Ratings -->
         <col style="width:3.5%;"><!-- Edit -->
       </colgroup>
       <thead><tr>
@@ -496,7 +497,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/47847/44+-+floor+plan-view-_elp2027.jpg?v=85498"
     ]},
   {id:"an-irish-seabreeze", iso:"Collins", name:"An Irish Seabreeze", link:"https://www.collinsvacationrentals.com/rentals/an-irish-seabreeze", address:"2254 Sailfish Drive, St. George Island, FL 32328", turnday:"Saturday", br:4, ba:3.5, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Verify pet policy", julyRent:5830, julyDates:"7/31-8/7", julyNote:"Collins seasonal range top.", augRent:4430, augDates:"8/7-8/14", augNote:"Est. ~24% below July (verify).", pool:false, photos:[]},
-  {id:"a-sea-break", iso:"Collins", name:"A Sea Break", link:"https://www.collinsvacationrentals.com/rentals/a-sea-break", address:"1504 Canopy Lane, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.5, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 2 dogs <80lb", julyRent:6600, julyDates:"7/31-8/7", julyNote:"Collins range top ($4,000-$6,600); confirmed 'Book any Summer week $5,900' special seen too.", augRent:5020, augDates:"8/7-8/14", augNote:"Est. ~24% below July (verify) — live Aug 2027 calendar currently shows all Saturdays blocked/Notify, call to confirm.", augUnavailable:true, pool:false,
+  {id:"a-sea-break", iso:"Collins", name:"A Sea Break", link:"https://www.collinsvacationrentals.com/rentals/a-sea-break", address:"1504 Canopy Lane, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:3.5, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 2 dogs <80lb", julyRent:6600, julyDates:"7/31-8/7", julyNote:"Collins range top ($4,000-$6,600); confirmed 'Book any Summer week $5,900' special seen too.", augRent:5020, augDates:"", augNote:"Est. ~24% below July (verify) — live Aug 2027 calendar currently shows all Saturdays blocked/Notify, call to confirm.", augUnavailable:true, pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/16944/1+-+Beachside+Exterior+3+rev.jpg?v=80954",
       "https://photos.barefoot.com/v3ccln0929/images/properties/16944/2+-+exterior-1504+canopy+lane-elp004.jpg?v=80956",
@@ -554,6 +555,18 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/47579/28+-+lower+level-bedroom-elp059.jpg?v=81886",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47579/17+-+upper+level+main+floor-bath-elp157.jpg?v=81887",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47579/25+-+lower+level-bath-elp039.jpg?v=81909"
+    ]},
+  {id:"shell-cottage", iso:"Collins", name:"Shell Cottage", link:"https://www.collinsvacationrentals.com/rentals/shell-cottage", address:"2040 Whelk Court West, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:8, locpos:"beachview", area:"Plantation (West End)", crowd:"quiet", dogfee:"$75/dog, 2 dogs <100lb", julyRent:3150, julyDates:"7/31-8/7", julyNote:"CONFIRMED exact 2027 calendar price.", augRent:3150, augDates:"8/7-8/14", augNote:"CONFIRMED exact 2027 calendar price; drops to $2,395/wk starting 8/14.", pool:false,
+    photos:[
+      "https://photos.barefoot.com/v3ccln0929/images/properties/38981/1+-+Exterior-Front+Elevation-_KLH7241.JPG?v=70356",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/38981/3+-+Main+Level-Living+Room-_KLH7274.JPG?v=70342",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/38981/7+-+Main+Level-Kitchen-_KLH7394.JPG?v=70347",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/38981/11+-+Main+Level-Bedroom-_KLH7284.JPG?v=70333",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/38981/16+-+Main+Level-Bedroom-_KLH7314.JPG?v=70352",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/38981/20+-+Upper+Level-Primary+Bedroom-_KLH7349.JPG?v=70329",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/38981/13+-+Main+Level-Bath-_KLH7294.JPG?v=70340",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/38981/25+-+Upper+Level-Primary+Bath-_KLH7364.JPG?v=70337",
+      "https://photos.barefoot.com/v3ccln0929/images/properties/38981/33+-+Exterior-Back+Elevation-_KLH7239.JPG?v=70354"
     ]},
   {id:"just-beachy", iso:"Cape & Coast", name:"Just Beachy", link:"https://www.capeandcoast.com/rentals/just-beachy", address:"St. George Island, Gulf Beaches (exact address not published — confirmed beachfront)", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, size/count limits TBD", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true,
     photos:[
@@ -932,7 +945,7 @@ function render(rows){
       <td data-label="#"><span class="rank-badge">${i+1}</span></td>
       <td data-label="Photo" class="photo-cell">${photoHtml}</td>
       <td data-label="Name" class="name-cell"><a href="${d.link}" target="_blank" rel="noopener">${d.name}</a><span class="iso-tag">${d.iso}</span>${d._unavailable?`<span class="unavail-banner" title="Rate it anyway, just can't book this month">Not available in ${currentMonth==='july'?'July':'August'}</span>`:''}</td>
-      <td data-label="Turn Day">${d.turnday}${d._dates?`<span class="area-sub">${currentMonth==='july'?'Jul':'Aug'}: ${d._dates}</span>`:''}</td>
+      <td data-label="Turn Day">${d.turnday}${(d._dates && !d._unavailable)?`<span class="area-sub">${currentMonth==='july'?'Jul':'Aug'}: ${d._dates}</span>`:''}</td>
       <td data-label="BR" class="num">${d.br}</td>
       <td data-label="BA" class="num">${d.ba}</td>
       <td data-label="Sleeps" class="num">${d.sleeps}</td>
