@@ -91,6 +91,9 @@
     #filters-controls.open{display:flex;}
   }
   .rater-pill-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+  .crowd-tag{cursor:pointer;border-bottom:1px dotted var(--muted);}
+  .admin-name-pill{display:inline-block;margin:3px 4px 3px 0;padding:4px 10px;border-radius:14px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-size:11px;font-weight:700;cursor:pointer;}
+  .admin-name-pill:hover{background:var(--navy);color:#fff;}
   .rater-pill{background:var(--paper-2);border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600;color:var(--ink);}
   .rater-pill.has-comment{cursor:pointer;background:#e8e0d0;color:var(--brick-dark);}
   .rater-pill.has-comment:hover{background:var(--brick);color:#fff;}
@@ -130,6 +133,9 @@
   .price-input-row button.cancel{background:#fff;color:var(--muted);border-color:var(--line);}
   .area-sub{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;}
   .stars{display:flex;gap:1px;}
+  .star-val-row{display:flex;align-items:center;justify-content:space-between;margin-top:2px;gap:6px;}
+  .clear-rating-btn{background:none;border:1px solid var(--brick);color:var(--brick-dark);border-radius:10px;padding:1px 8px;font-size:9.5px;font-weight:700;cursor:pointer;}
+  .clear-rating-btn:hover{background:var(--brick);color:#fff;}
   .starwrap{position:relative;width:17px;height:17px;font-size:17px;line-height:17px;cursor:pointer;}
   .starwrap .se{position:absolute;top:0;left:0;color:#d8cfb8;}
   .starwrap .sf{position:absolute;top:0;left:0;color:var(--star);overflow:hidden;white-space:nowrap;}
@@ -209,13 +215,22 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v2.15</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v2.16</p>
   </header>
 
   <div class="identity-bar">
     <div class="row" id="identity-buttons"></div>
     <p style="font-size:12.5px;color:var(--muted);line-height:1.5;margin:10px 0 0;max-width:640px;">Rate each stay on its own merits first — pricing for a home stays hidden to you until you lock in a rating for it. Once locked, a rating is final. If new homes get added later, they start out open for rating even if you've already locked everything else; nothing you've already finished gets reopened.</p>
     <div class="id-status" id="identity-status"></div>
+    <div id="admin-progress-panel"></div>
+
+    <div class="modal-overlay" id="admin-progress-modal-overlay">
+      <div class="modal-box">
+        <button class="modal-close" id="admin-progress-modal-close">&times;</button>
+        <h3 id="admin-progress-modal-title"></h3>
+        <div id="admin-progress-modal-body" style="max-height:60vh;overflow-y:auto;"></div>
+      </div>
+    </div>
     <div>
       <button class="save-progress" id="save-progress-btn" style="display:none;">Save progress (come back later)</button>
       <button class="submit-final" id="submit-final-btn" style="display:none;">Lock In My Ratings So Far</button>
@@ -268,19 +283,19 @@
       <colgroup>
         <col style="width:1.9%;"><!-- # -->
         <col style="width:3.9%;"><!-- Photo -->
-        <col style="width:11%;"><!-- Name -->
-        <col style="width:7%;"><!-- Turn Day -->
+        <col style="width:9%;"><!-- Name -->
+        <col style="width:8%;"><!-- Turn Day -->
         <col style="width:2.6%;"><!-- BR -->
         <col style="width:2.6%;"><!-- BA -->
         <col style="width:3.6%;"><!-- Sleeps -->
-        <col style="width:8%;"><!-- Beach Position -->
-        <col style="width:10%;"><!-- Island Area -->
-        <col style="width:9%;"><!-- Crowdedness -->
-        <col style="width:7.5%;"><!-- Rent Cost -->
+        <col style="width:9%;"><!-- Beach Position -->
+        <col style="width:11%;"><!-- Island Area -->
+        <col style="width:6%;"><!-- Crowdedness -->
+        <col style="width:8%;"><!-- Rent Cost -->
         <col style="width:6%;"><!-- Per-Person -->
         <col style="width:6%;"><!-- Total -->
         <col style="width:3%;"><!-- Pool -->
-        <col style="width:15%;"><!-- Family Ratings -->
+        <col style="width:11%;"><!-- Family Ratings -->
         <col style="width:3.5%;"><!-- Edit -->
       </colgroup>
       <thead><tr>
@@ -729,13 +744,6 @@ const BASE_DATA = [
   {id:"good-vibes", iso:"Fickling", name:"Good Vibes", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:6, ba:6.5, sleeps:14, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
   {id:"tangled-up-blue", iso:"Fickling", name:"Tangled Up in Blue", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:4, ba:4.5, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly, 1-2 dogs", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
   {id:"sandy-feet-retreat", iso:"Fickling", name:"Sandy Feet Retreat", link:"https://www.ficklingvacationrentals.com", turnday:"Saturday", br:4, ba:4.0, sleeps:13, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
-  {id:"dunestruck", iso:"VRBO", name:"DuneStruck (Beachfront, Plantation)", link:"https://www.vrbo.com/7292397ha", turnday:"Flexible / verify", br:3, ba:4.0, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
-  {id:"vrbo-3287525", iso:"VRBO", name:"Beachfront Plantation 4BR (heated pool)", link:"https://www.vrbo.com/3287525", turnday:"Flexible / verify", br:4, ba:3.0, sleeps:10, locpos:"oceanfront", area:"Plantation (West End)", crowd:"quiet", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
-  {id:"vrbo-2991447", iso:"VRBO", name:"Dog-friendly beachfront bungalow", link:"https://www.vrbo.com/2991447", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
-  {id:"vrbo-2991443", iso:"VRBO", name:"Beachside dog-friendly home w/ private pool", link:"https://www.vrbo.com/2991443", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
-  {id:"vrbo-3229812", iso:"VRBO", name:"Pet Friendly, Beach Front, Pool (SGI)", link:"https://www.vrbo.com/3229812", turnday:"Flexible / verify", br:4, ba:4.0, sleeps:14, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:true, photos:[]},
-  {id:"skinny-mini", iso:"VRBO", name:"Skinny Mini beachfront bungalow", link:"https://www.vrbo.com", turnday:"Flexible / verify", br:3, ba:4.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
-  {id:"pura-vida", iso:"VRBO", name:"Pura Vida Beach Front Coastal Cottage", link:"https://www.vrbo.com", turnday:"Flexible / verify", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"moderate", dogfee:"Pet friendly", julyRent:null, julyDates:"", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false, photos:[]},
 ];
 
 let customData = [];
@@ -752,7 +760,8 @@ function tierLabel(t){ return {ideal:"Ideal",stretch:"Stretch",max:"Premium",tbd
 function locLabel(l){ return {oceanfront:"Ocean Front",beachview:"Beach View",secondrow:"Second Row"}[l]||l; }
 function locClass(l){ return {oceanfront:"",beachview:"beachview",secondrow:"secondrow"}[l]||""; }
 function crowdClass(c){ return {quiet:"crowd-quiet",moderate:"crowd-moderate",busy:"crowd-busy"}[c]||""; }
-function crowdLabel(c){ return {quiet:"Quiet / secluded beach",moderate:"Moderate crowds",busy:"Busy beach"}[c]||c; }
+function crowdLabel(c){ return {quiet:"Quiet",moderate:"Moderate",busy:"Busy"}[c]||c; }
+function crowdExplain(c){ return {quiet:"Fewer people on this stretch of beach, more secluded", moderate:"Average foot traffic for the island", busy:"Closer to town/access points, more people around"}[c]||""; }
 function simpleHash(s){ let h=0; for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;} return h.toString(36); }
 function perDogFeeAmount(dogfeeStr){
   if(!dogfeeStr) return 75;
@@ -894,8 +903,10 @@ function updateIdentityStatus(){
     status.innerHTML=`Viewing as <b>Brad</b> <span class="admin-badge">Admin — always unlocked</span>. You can still rate/lock rows like everyone else.`;
     submitBtn.style.display="inline-block"; saveBtn.style.display="inline-block"; gatedBanner.style.display="none";
     tierSelect.disabled = false; tierSelect.title="";
+    renderAdminProgressPanel();
     return;
   }
+  document.getElementById("admin-progress-panel").innerHTML = "";
   const me=meRecord();
   const total=allData().length;
   const lockedCount=Object.keys(me.entries).filter(k=>me.entries[k].locked).length;
@@ -907,6 +918,34 @@ function updateIdentityStatus(){
   tierSelect.disabled = !canFilterPrice;
   tierSelect.title = canFilterPrice ? "" : "Complete all your ratings to filter by price";
   if(!canFilterPrice) tierSelect.value = "";
+}
+
+function renderAdminProgressPanel(){
+  const box = document.getElementById("admin-progress-panel");
+  const total = allData().length;
+  box.innerHTML = `<div style="font-size:11px;color:var(--muted);font-weight:700;margin:8px 0 4px;">Family progress (click a name):</div>` +
+    NAMES.filter(n=>n!==ADMIN).map(n=>{
+      const rec = ratings[n] || {entries:{}};
+      const locked = Object.keys(rec.entries).filter(k=>rec.entries[k].locked).length;
+      const ratedNotLocked = Object.keys(rec.entries).filter(k=>!rec.entries[k].locked && rec.entries[k].stars>0).length;
+      return `<button class="admin-name-pill" data-viewname="${n}">${n}: ${locked}/${total} locked${ratedNotLocked?`, ${ratedNotLocked} in progress`:''}</button>`;
+    }).join("");
+  box.querySelectorAll("[data-viewname]").forEach(btn=>btn.addEventListener("click", ()=>openAdminProgressModal(btn.getAttribute("data-viewname"))));
+}
+
+function openAdminProgressModal(name){
+  const rec = ratings[name] || {entries:{}};
+  const rows = allData().map(d=>{
+    const e = rec.entries[d.id];
+    if(!e || (!e.stars && !e.comment)) return `<tr><td>${d.name}</td><td colspan="2" style="color:var(--muted);">not rated yet</td></tr>`;
+    return `<tr><td>${d.name}</td><td>${e.stars||0}★ ${e.locked?'🔒':'(not locked)'}</td><td>${e.comment||''}</td></tr>`;
+  }).join("");
+  const modalHtml = `<table style="width:100%;font-size:12px;border-collapse:collapse;">
+    <thead><tr><th style="text-align:left;padding:4px;">Home</th><th style="text-align:left;padding:4px;">Rating</th><th style="text-align:left;padding:4px;">Comment</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+  document.getElementById("admin-progress-modal-title").textContent = `${name}'s progress`;
+  document.getElementById("admin-progress-modal-body").innerHTML = modalHtml;
+  document.getElementById("admin-progress-modal-overlay").classList.add("open");
 }
 document.getElementById("save-progress-btn").addEventListener("click", async ()=>{ await saveRatings(); alert("Progress saved."); });
 document.getElementById("submit-final-btn").addEventListener("click", async ()=>{
@@ -983,7 +1022,7 @@ function halfStarWidget(propId, val, editable){
       ${editable?`<span class="hit-l" data-star="${i-0.5}"></span><span class="hit-r" data-star="${i}"></span>`:''}
     </div>`;
   }
-  h += `</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">${val?val+' / 5':'not rated'}</div>`;
+  h += `</div><div class="star-val-row"><span style="font-size:10px;color:var(--muted);">${val?val+' / 5':'not rated'}</span>${(editable && val>0)?`<button class="clear-rating-btn" data-clearrating="${propId}">Clear</button>`:''}</div>`;
   return h;
 }
 
@@ -1022,13 +1061,11 @@ function render(rows){
         ratingsHtml = (locked ? `<span class="locked-tag">🔒 locked</span>` : ``) + `<div class="avg-rating">${avg} ★ ${count?`(${count})`:'(no ratings)'}</div><div class="rater-pill-row">${namePills.join("")}</div>`;
         if(isAdmin() && !locked){
           ratingsHtml += halfStarWidget(d.id, myEntry.stars||0, true)
-            + `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`
-            + (myEntry.stars>0 ? `<button class="price-edit-btn" data-clearrating="${d.id}" style="margin-top:3px;">Clear my rating</button>` : ``);
+            + `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`;
         }
       } else {
         ratingsHtml = halfStarWidget(d.id, myEntry.stars||0, true)
-          + `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`
-          + (myEntry.stars>0 ? `<button class="price-edit-btn" data-clearrating="${d.id}" style="margin-top:3px;">Clear my rating</button>` : ``);
+          + `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`;
       }
     }
 
@@ -1048,9 +1085,9 @@ function render(rows){
       <td data-label="Sleeps" class="num">${d.sleeps}</td>
       <td data-label="Beach Position"><span class="loc-pill ${locClass(d.locpos)}">${locLabel(d.locpos)}</span></td>
       <td data-label="Island Area">${d.area}<button class="map-link" data-mapview="${d.id}">Map View 📍</button></td>
-      <td data-label="Crowdedness" class="${crowdClass(d.crowd)}">${crowdLabel(d.crowd)}</td>
+      <td data-label="Crowdedness" class="${crowdClass(d.crowd)}"><span class="crowd-tag" data-crowdpop="1" data-crowdtext="${crowdExplain(d.crowd)}">${crowdLabel(d.crowd)}</span></td>
       <td data-label="Rent Cost" class="num${visible?'':' locked-blur'}">
-        <span class="tier-pill ${pillClass}">${pillLabel}</span><br><b>${rentDisplay}</b>
+        ${price ? `<span class="tier-pill ${pillClass}">${pillLabel}</span><br>` : ``}<b>${rentDisplay}</b>
         <span class="price-info-icon" data-infopop="${d.id}" data-notetext="${(d._edited ? d._editNote : d._note).replace(/"/g,'&quot;')}">ⓘ</span>
         ${(isAdmin() && visible) ? `<button class="price-edit-btn" data-editprice="${d.id}">Edit price</button>
         <div class="price-input-row" data-inputrow="${d.id}" style="display:none;">
@@ -1140,6 +1177,20 @@ function render(rows){
       setTimeout(()=>{ document.addEventListener("click", function closeIt(){ pop.remove(); document.removeEventListener("click", closeIt); }); }, 10);
     });
   });
+  document.querySelectorAll("[data-crowdpop]").forEach(tag=>{
+    tag.addEventListener("click", (e)=>{
+      e.stopPropagation();
+      document.querySelectorAll(".info-popover").forEach(p=>p.remove());
+      const pop = document.createElement("div");
+      pop.className = "info-popover";
+      pop.textContent = tag.getAttribute("data-crowdtext");
+      document.body.appendChild(pop);
+      const rect = tag.getBoundingClientRect();
+      pop.style.left = Math.min(rect.left, window.innerWidth-240) + "px";
+      pop.style.top = (rect.bottom + 6) + "px";
+      setTimeout(()=>{ document.addEventListener("click", function closeIt(){ pop.remove(); document.removeEventListener("click", closeIt); }); }, 10);
+    });
+  });
 }
 
 // ---- lightbox ----
@@ -1201,6 +1252,7 @@ function openMapModal(propId){
   document.getElementById("map-modal-overlay").classList.add("open");
 }
 document.getElementById("map-close").addEventListener("click", ()=>document.getElementById("map-modal-overlay").classList.remove("open"));
+document.getElementById("admin-progress-modal-close").addEventListener("click", ()=>document.getElementById("admin-progress-modal-overlay").classList.remove("open"));
 
 // click outside modal content closes it
 document.querySelectorAll(".modal-overlay").forEach(ov=>{
