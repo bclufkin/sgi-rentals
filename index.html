@@ -72,6 +72,10 @@
   .tier-max{background:var(--tier-max);} .tier-tbd{background:var(--tier-tbd);} .edited-pill{background:var(--edited);}
   .price-note{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;max-width:170px;white-space:normal;}
   .price-info-icon{display:inline-block;font-size:12px;color:var(--edited);cursor:pointer;margin-left:4px;position:relative;}
+  .verified-tag{font-size:9px;color:var(--tier-ideal);font-weight:700;margin-left:4px;}
+  .split-badge{display:block;background:#fff3cd;color:#8a6d00;font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:4px;margin:3px 0;width:fit-content;cursor:help;}
+  .pin-btn{background:none;border:none;font-size:15px;cursor:pointer;color:#c9a227;padding:0 3px 0 0;vertical-align:middle;}
+  .pin-btn.pinned{color:#c9a227;}
   .info-popover{position:fixed;background:var(--navy);color:#fff;padding:8px 12px;border-radius:6px;font-size:11.5px;max-width:220px;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,.3);}
   .loc-pill{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;background:var(--tier-ideal);}
   .loc-pill.beachview{background:var(--tier-stretch);}
@@ -83,6 +87,10 @@
   .rate-mode-bar{margin-bottom:14px;display:none;gap:8px;}
   .rate-mode-bar .toggle-btn{flex:1;font-size:12.5px;padding:10px;}
   .filters-toggle-header{display:none;width:100%;text-align:left;background:var(--navy);color:var(--paper);border:none;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+  .onboarding-card{position:relative;background:#fff;border:1px solid var(--line);border-left:4px solid var(--brick);border-radius:10px;padding:14px 18px;margin-bottom:16px;max-width:520px;}
+  .onboarding-card h3{margin:0 0 8px;font-size:15px;color:var(--navy);}
+  .onboarding-card ol{margin:0 0 10px;padding-left:18px;font-size:12.5px;line-height:1.6;}
+  .onboarding-close{position:absolute;top:8px;right:10px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);}
   .filters-toggle-header .chev{float:right;transition:transform .2s;}
   .filters-toggle-header.open .chev{transform:rotate(180deg);}
   @media (max-width:820px){
@@ -215,10 +223,21 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v2.20</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.0</p>
   </header>
 
   <div class="identity-bar">
+    <div class="onboarding-card" id="onboarding-card" style="display:none;">
+      <button class="onboarding-close" id="onboarding-close">&times;</button>
+      <h3>How this works</h3>
+      <ol>
+        <li>Pick your name below (Brad needs a PIN).</li>
+        <li>Rate homes with the star widget — prices stay hidden for a home until you lock in a rating for it.</li>
+        <li>Locking is permanent for that home, but new homes added later start open even after you've locked everything else.</li>
+        <li>Click ☆ next to any name to pin it to your Shortlist for easy side-by-side comparison later.</li>
+      </ol>
+      <button class="toggle-btn" id="onboarding-gotit">Got it</button>
+    </div>
     <div class="row" id="identity-buttons"></div>
     <p style="font-size:12.5px;color:var(--muted);line-height:1.5;margin:10px 0 0;max-width:640px;">Rate each stay on its own merits first — pricing for a home stays hidden to you until you lock in a rating for it. Once locked, a rating is final. If new homes get added later, they start out open for rating even if you've already locked everything else; nothing you've already finished gets reopened.</p>
     <div class="id-status" id="identity-status"></div>
@@ -256,6 +275,18 @@
       <div class="field"><label>Pool</label><select id="f-pool"><option value="">Any</option><option value="yes">Yes</option><option value="no">No</option></select></div>
     </div>
     <div class="count-line">Showing <b id="shown-count">0</b> of <b id="total-count">0</b>. Click headers to sort.</div>
+  </div>
+
+  <div class="rate-mode-bar" id="shortlist-bar" style="display:none;">
+    <button class="toggle-btn" id="shortlist-toggle">⭐ View Shortlist</button>
+  </div>
+
+  <div class="modal-overlay" id="shortlist-modal-overlay">
+    <div class="modal-box" style="max-width:1000px;">
+      <button class="modal-close" id="shortlist-modal-close">&times;</button>
+      <h3>Shortlist Comparison</h3>
+      <div id="shortlist-modal-body" style="max-height:75vh;overflow-y:auto;"></div>
+    </div>
   </div>
 
   <div class="rate-mode-bar" id="rate-mode-bar" style="display:none;">
@@ -1838,6 +1869,7 @@ const BASE_DATA = [
 let customData = [];
 let fieldOverrides = {};
 let priceOverrides = {};
+let shortlist = [];
 let ratings = {};
 let adminPinHash = null;
 let currentUser = null, identityLocked = false;
@@ -1868,6 +1900,7 @@ function mergedRow(d){
   const baseUnavailable = currentMonth==="july" ? !!merged.julyUnavailable : !!merged.augUnavailable;
   merged._effPrice = po ? po.price : baseRent;
   merged._edited = !!po;
+  merged._verifiedAt = po ? po.verifiedAt : null;
   merged._editNote = po ? po.note : "";
   merged._effTier = merged._effPrice ? tierForPrice(merged._effPrice) : "tbd";
   merged._dates = baseDates;
@@ -1901,15 +1934,18 @@ async function loadAll(){
   const po = await kvGet("sgi-price-overrides-v2"); if(po) priceOverrides = po;
   const rt = await kvGet("sgi-ratings-v2"); if(rt) ratings = rt;
   const pin = await kvGet("sgi-admin-pin"); if(pin) adminPinHash = pin;
+  const sl = await kvGet("sgi-shortlist"); if(sl) shortlist = sl;
   try{ currentUser=localStorage.getItem("sgi-current-user"); identityLocked=localStorage.getItem("sgi-identity-locked")==="true"; }catch(e){}
   buildIdentityBar(); buildAreaFilter(); buildCompanyFilter(); setMonthButtons(); applyFilters();
   loadPending();
+  maybeShowOnboarding();
 }
 async function saveCustom(){ await kvSet("sgi-custom-listings", customData); }
 async function saveFieldOverrides(){ await kvSet("sgi-field-overrides", fieldOverrides); }
 async function savePriceOverrides(){ await kvSet("sgi-price-overrides-v2", priceOverrides); }
 async function saveRatings(){ await kvSet("sgi-ratings-v2", ratings); }
 async function saveAdminPin(){ await kvSet("sgi-admin-pin", adminPinHash); }
+async function saveShortlist(){ await kvSet("sgi-shortlist", shortlist); }
 
 function buildIdentityBar(){
   const box = document.getElementById("identity-buttons");
@@ -2012,14 +2048,26 @@ function updateIdentityStatus(){
 
 function renderAdminProgressPanel(){
   const box = document.getElementById("admin-progress-panel");
-  const total = allData().length;
+  const all = allData().map(mergedRow);
+  const total = all.length;
+  const active = all.filter(d=>!d._retired);
+  const withJulyPrice = active.filter(d=>d.julyRent || d.julyUnavailable).length;
+  const withAugPrice = active.filter(d=>d.augRent || d.augUnavailable).length;
+  const withPhotos = active.filter(d=>d.photos && d.photos.length).length;
+  const withAddress = active.filter(d=>d.address && !/not (published|found)/i.test(d.address)).length;
+  const statsHtml = `<div style="font-size:11px;color:var(--muted);font-weight:700;margin:12px 0 4px;">Data completeness (${active.length} active homes):</div>
+    <div style="font-size:11.5px;line-height:1.7;">
+      Pricing: ${withJulyPrice}/${active.length} July, ${withAugPrice}/${active.length} August<br>
+      Photos: ${withPhotos}/${active.length}<br>
+      Verified address: ${withAddress}/${active.length}
+    </div>`;
   box.innerHTML = `<div style="font-size:11px;color:var(--muted);font-weight:700;margin:8px 0 4px;">Family progress (click a name):</div>` +
     NAMES.filter(n=>n!==ADMIN).map(n=>{
       const rec = ratings[n] || {entries:{}};
       const locked = Object.keys(rec.entries).filter(k=>rec.entries[k].locked).length;
       const ratedNotLocked = Object.keys(rec.entries).filter(k=>!rec.entries[k].locked && rec.entries[k].stars>0).length;
       return `<button class="admin-name-pill" data-viewname="${n}">${n}: ${locked}/${total} locked${ratedNotLocked?`, ${ratedNotLocked} in progress`:''}</button>`;
-    }).join("");
+    }).join("") + statsHtml;
   box.querySelectorAll("[data-viewname]").forEach(btn=>btn.addEventListener("click", ()=>openAdminProgressModal(btn.getAttribute("data-viewname"))));
 }
 
@@ -2101,6 +2149,7 @@ function applyFilters(){
   render(rows);
   renderRetired();
   refreshRateModeBar();
+  refreshShortlistBar();
 }
 
 function renderRetired(){
@@ -2176,12 +2225,14 @@ function render(rows){
       const locked = rowLockedByMe(d.id);
       const myEntry = (ratings[currentUser] && ratings[currentUser].entries[d.id]) || {stars:0,comment:""};
       if(locked || isAdmin()){
-        let sum=0,count=0,namePills=[];
-        NAMES.forEach(n=>{ const rec=ratings[n]; if(rec && rec.entries[d.id] && rec.entries[d.id].locked && rec.entries[d.id].stars>0){ sum+=rec.entries[d.id].stars; count++;
+        let sum=0,count=0,namePills=[],starVals=[];
+        NAMES.forEach(n=>{ const rec=ratings[n]; if(rec && rec.entries[d.id] && rec.entries[d.id].locked && rec.entries[d.id].stars>0){ sum+=rec.entries[d.id].stars; count++; starVals.push(rec.entries[d.id].stars);
           const hasComment = !!rec.entries[d.id].comment;
           namePills.push(`<span class="rater-pill${hasComment?' has-comment':''}" ${hasComment?`data-raterpop="1" data-ratername="${n}" data-raterstars="${rec.entries[d.id].stars}" data-ratercomment="${rec.entries[d.id].comment.replace(/"/g,'&quot;')}"`:''}>${n} ${rec.entries[d.id].stars}★${hasComment?' 💬':''}</span>`); } });
         const avg = count ? (sum/count).toFixed(1) : "—";
-        ratingsHtml = (locked ? `<span class="locked-tag">🔒 locked</span>` : ``) + `<div class="avg-rating">${avg} ★ ${count?`(${count})`:'(no ratings)'}</div><div class="rater-pill-row">${namePills.join("")}</div>`;
+        const spread = starVals.length>1 ? (Math.max(...starVals)-Math.min(...starVals)) : 0;
+        const splitBadge = (starVals.length>=2 && spread>=2) ? `<span class="split-badge" title="Ratings range from ${Math.min(...starVals)}★ to ${Math.max(...starVals)}★ — worth a conversation">🔀 Split opinion</span>` : '';
+        ratingsHtml = (locked ? `<span class="locked-tag">🔒 locked</span>` : ``) + `<div class="avg-rating">${avg} ★ ${count?`(${count})`:'(no ratings)'}</div>${splitBadge}<div class="rater-pill-row">${namePills.join("")}</div>`;
         if(isAdmin() && !locked){
           ratingsHtml += halfStarWidget(d.id, myEntry.stars||0, true)
             + `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`;
@@ -2201,7 +2252,7 @@ function render(rows){
     tr.innerHTML = `
       <td data-label="#"><span class="rank-badge">${i+1}</span></td>
       <td data-label="Photo" class="photo-cell">${photoHtml}</td>
-      <td data-label="Name" class="name-cell"><a href="${d.link}" target="_blank" rel="noopener">${d.name}</a><span class="iso-tag">${d.iso}</span>${d._unavailable?`<span class="unavail-banner" title="Rate it anyway, just can't book this month">Not available in ${currentMonth==='july'?'July':'August'}</span>`:''}</td>
+      <td data-label="Name" class="name-cell"><button class="pin-btn ${shortlist.includes(d.id)?'pinned':''}" data-pin="${d.id}" title="${shortlist.includes(d.id)?'Remove from shortlist':'Add to shortlist'}">${shortlist.includes(d.id)?'★':'☆'}</button><a href="${d.link}" target="_blank" rel="noopener">${d.name}</a><span class="iso-tag">${d.iso}</span>${d._unavailable?`<span class="unavail-banner" title="Rate it anyway, just can't book this month">Not available in ${currentMonth==='july'?'July':'August'}</span>`:''}</td>
       <td data-label="Turn Day">${d.turnday}${(d._dates && !d._unavailable)?`<span class="area-sub">${currentMonth==='july'?'Jul':'Aug'}: ${d._dates}</span>`:''}</td>
       <td data-label="BR" class="num">${d.br}</td>
       <td data-label="BA" class="num">${d.ba}</td>
@@ -2211,7 +2262,7 @@ function render(rows){
       <td data-label="Crowdedness" class="${crowdClass(d.crowd)}"><span class="crowd-tag" data-crowdpop="1" data-crowdtext="${crowdExplain(d.crowd)}">${crowdLabel(d.crowd)}</span></td>
       <td data-label="Rent Cost" class="num${visible?'':' locked-blur'}">
         ${allInPrice ? `<span class="tier-pill ${pillClass}">${pillLabel}</span><br>` : ``}<b>${rentDisplay}</b>
-        <span class="price-info-icon" data-infopop="${d.id}" data-notetext="${((d._edited ? d._editNote : d._note) + (allInPrice?' (includes est. dog fees)':'')).replace(/"/g,'&quot;')}">ⓘ</span>
+        <span class="price-info-icon" data-infopop="${d.id}" data-notetext="${((d._edited ? d._editNote : d._note) + (allInPrice?' (includes est. dog fees)':'') + (d._verifiedAt?` — checked ${new Date(d._verifiedAt).toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'})}`:'')).replace(/"/g,'&quot;')}">ⓘ</span>${d._verifiedAt?`<span class="verified-tag">✓ ${new Date(d._verifiedAt).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})}</span>`:''}
         ${(isAdmin() && visible) ? `<button class="price-edit-btn" data-editprice="${d.id}">Edit price</button>
         <div class="price-input-row" data-inputrow="${d.id}" style="display:none;">
           <input type="number" placeholder="$/week" data-priceinput="${d.id}" value="${price||''}">
@@ -2266,7 +2317,7 @@ function render(rows){
   document.querySelectorAll("[data-cancel]").forEach(btn=>btn.addEventListener("click", ()=>{ const id=btn.getAttribute("data-cancel"); document.querySelector(`[data-inputrow="${id}"]`).style.display="none"; document.querySelector(`[data-editprice="${id}"]`).style.display="block"; }));
   document.querySelectorAll("[data-save]").forEach(btn=>btn.addEventListener("click", async ()=>{
     const id=btn.getAttribute("data-save"); const val=parseFloat(document.querySelector(`[data-priceinput="${id}"]`).value); const note=document.querySelector(`[data-pricenote="${id}"]`).value;
-    if(val>0){ if(!priceOverrides[id]) priceOverrides[id]={}; priceOverrides[id][currentMonth]={price:val, note:note||"Manually confirmed price"}; await savePriceOverrides(); applyFilters(); }
+    if(val>0){ if(!priceOverrides[id]) priceOverrides[id]={}; priceOverrides[id][currentMonth]={price:val, note:note||"Manually confirmed price", verifiedAt:Date.now()}; await savePriceOverrides(); applyFilters(); }
   }));
   document.querySelectorAll("[data-rowedit]").forEach(btn=>btn.addEventListener("click", ()=>openEditModal(btn.getAttribute("data-rowedit"))));
   document.querySelectorAll("[data-retire]").forEach(btn=>btn.addEventListener("click", async ()=>{
@@ -2279,6 +2330,15 @@ function render(rows){
     applyFilters();
   }));
   document.querySelectorAll("[data-gallery]").forEach(img=>img.addEventListener("click", ()=>openLightbox(img.getAttribute("data-gallery"))));
+  document.querySelectorAll("[data-pin]").forEach(btn=>btn.addEventListener("click", async (e)=>{
+    e.preventDefault();
+    const id = btn.getAttribute("data-pin");
+    if(shortlist.includes(id)) shortlist = shortlist.filter(x=>x!==id);
+    else shortlist.push(id);
+    await saveShortlist();
+    applyFilters();
+    refreshShortlistBar();
+  }));
   document.querySelectorAll("[data-mapview]").forEach(btn=>btn.addEventListener("click", ()=>openMapModal(btn.getAttribute("data-mapview"))));
   document.querySelectorAll("[data-infopop]").forEach(icon=>{
     let pop=null;
@@ -2436,6 +2496,17 @@ document.getElementById("em-save").addEventListener("click", async ()=>{
 // ---- add new listing (open to everyone) ----
 let pendingSuggestions = [];
 async function loadPending(){ const p = await kvGet("sgi-pending-suggestions"); if(p) pendingSuggestions = p; renderPendingSuggestions(); }
+function maybeShowOnboarding(){
+  let seen = false;
+  try{ seen = localStorage.getItem("sgi-onboarding-seen")==="true"; }catch(e){}
+  if(!seen) document.getElementById("onboarding-card").style.display="block";
+}
+function dismissOnboarding(){
+  document.getElementById("onboarding-card").style.display="none";
+  try{ localStorage.setItem("sgi-onboarding-seen","true"); }catch(e){}
+}
+document.getElementById("onboarding-close").addEventListener("click", dismissOnboarding);
+document.getElementById("onboarding-gotit").addEventListener("click", dismissOnboarding);
 async function savePending(){ await kvSet("sgi-pending-suggestions", pendingSuggestions); }
 function renderPendingSuggestions(){
   const box = document.getElementById("pending-suggestions");
@@ -2482,6 +2553,44 @@ let swipeQueue = [], swipeIdx = 0, swipeTouchStartX = null;
 
 let userChoseTableView = false;
 function isMobile(){ return window.innerWidth <= 820; }
+
+function refreshShortlistBar(){
+  const bar = document.getElementById("shortlist-bar");
+  if(!shortlist.length){ bar.style.display="none"; return; }
+  bar.style.display="flex";
+  document.getElementById("shortlist-toggle").textContent = `⭐ View Shortlist (${shortlist.length})`;
+}
+function openShortlistModal(){
+  const items = shortlist.map(id=>mergedRow(allData().find(x=>x.id===id))).filter(Boolean);
+  const body = document.getElementById("shortlist-modal-body");
+  if(!items.length){ body.innerHTML = "<p>Nothing pinned yet — click the ☆ next to a home's name to add it.</p>"; }
+  else {
+    body.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;">` +
+      items.map(d=>{
+        const photo = (d.photos && d.photos[0]) || "";
+        const visible = rowVisibleToMe(d.id);
+        const price = d._unavailable ? null : d._effPrice;
+        const perDog = perDogFeeAmount(d.dogfee);
+        const allIn = price ? price + perDog*2 : null;
+        let sum=0,count=0;
+        NAMES.forEach(n=>{ const rec=ratings[n]; if(rec && rec.entries[d.id] && rec.entries[d.id].locked && rec.entries[d.id].stars>0){ sum+=rec.entries[d.id].stars; count++; } });
+        const avg = count ? (sum/count).toFixed(1) : "—";
+        return `<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;">
+          ${photo?`<img src="${photo}" style="width:100%;height:130px;object-fit:cover;">`:''}
+          <div style="padding:10px;">
+            <div style="font-weight:700;font-size:13px;color:var(--navy);margin-bottom:4px;">${d.name}</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">${d.br}BR/${d.ba}BA/Sleeps ${d.sleeps} · ${locLabel(d.locpos)} · ${d.area}</div>
+            <div style="font-size:13px;font-weight:700;">${visible ? (allIn?`$${allIn.toLocaleString()}`:'TBD') : 'Locked'}</div>
+            <div style="font-size:12px;margin-top:4px;">${avg} ★ ${count?`(${count} rated)`:'(no ratings yet)'}</div>
+            <a href="${d.link}" target="_blank" rel="noopener" style="font-size:11px;">View listing ↗</a>
+          </div>
+        </div>`;
+      }).join("") + `</div>`;
+  }
+  document.getElementById("shortlist-modal-overlay").classList.add("open");
+}
+document.getElementById("shortlist-toggle").addEventListener("click", openShortlistModal);
+document.getElementById("shortlist-modal-close").addEventListener("click", ()=>document.getElementById("shortlist-modal-overlay").classList.remove("open"));
 
 function refreshRateModeBar(){
   const bar = document.getElementById("rate-mode-bar");
