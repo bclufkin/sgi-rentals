@@ -215,7 +215,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v2.19</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v2.20</p>
   </header>
 
   <div class="identity-bar">
@@ -308,6 +308,8 @@
       <tbody id="table-body"></tbody>
     </table>
   </div>
+
+  <div id="retired-section"></div>
 
   <div class="add-panel panel">
     <h2>Found another option?</h2>
@@ -1871,6 +1873,7 @@ function mergedRow(d){
   merged._dates = baseDates;
   merged._note = baseNote;
   merged._unavailable = baseUnavailable;
+  merged._retired = !!merged.retired;
   return merged;
 }
 
@@ -2068,6 +2071,7 @@ function applyFilters(){
         pool=document.getElementById("f-pool").value, search=document.getElementById("f-search").value.trim().toLowerCase();
 
   let rows = allData().map(mergedRow).filter(d=>{
+    if(d._retired) return false;
     if(company && d.iso!==company) return false;
     if(tier && d._effTier!==tier) return false;
     if(minBa && d.ba<minBa) return false;
@@ -2095,7 +2099,39 @@ function applyFilters(){
       if(av<bv) return -1*sortDir; if(av>bv) return 1*sortDir; return 0; });
   }
   render(rows);
+  renderRetired();
   refreshRateModeBar();
+}
+
+function renderRetired(){
+  const box = document.getElementById("retired-section");
+  const retired = allData().map(mergedRow).filter(d=>d._retired);
+  if(!retired.length){ box.innerHTML = ""; return; }
+  box.innerHTML = `<h2 style="margin-top:28px;">Retired / Not Considering (${retired.length})</h2>
+    <p class="helptext">These homes were taken out of active consideration. No ratings needed — prices and details are always fully visible here to everyone.</p>
+    <div class="table-scroll" style="max-height:none;">
+    <table><thead><tr><th>Photo</th><th>Name</th><th>Address</th><th>BR/BA/Sleeps</th><th>Rent (Jul/Aug)</th><th>Why retired</th>${isAdmin()?'<th>Restore</th>':''}</tr></thead><tbody>
+    ${retired.map(d=>{
+      const photo = (d.photos && d.photos[0]) ? `<img src="${d.photos[0]}" style="width:56px;height:42px;object-fit:cover;border-radius:5px;">` : '';
+      const julyP = d.julyRent ? `$${d.julyRent.toLocaleString()}` : "TBD";
+      const augP = d.augRent ? `$${d.augRent.toLocaleString()}` : "TBD";
+      return `<tr>
+        <td>${photo}</td>
+        <td><a href="${d.link}" target="_blank" rel="noopener">${d.name}</a></td>
+        <td style="font-size:11px;">${d.address||''}</td>
+        <td style="font-size:11px;">${d.br}/${d.ba}/${d.sleeps}</td>
+        <td style="font-size:11px;">${julyP} / ${augP}</td>
+        <td style="font-size:11px;color:var(--muted);">${d.retiredReason||''}</td>
+        ${isAdmin()?`<td><button class="price-edit-btn" data-restore="${d.id}">Restore</button></td>`:''}
+      </tr>`;
+    }).join("")}
+    </tbody></table></div>`;
+  box.querySelectorAll("[data-restore]").forEach(btn=>btn.addEventListener("click", async ()=>{
+    const id = btn.getAttribute("data-restore");
+    fieldOverrides[id] = Object.assign({}, fieldOverrides[id]||{}, {retired:false});
+    await saveFieldOverrides();
+    applyFilters();
+  }));
 }
 
 function halfStarWidget(propId, val, editable){
@@ -2157,7 +2193,7 @@ function render(rows){
     }
 
     const editCell = isAdmin()
-      ? `<button class="edit-row-btn" data-rowedit="${d.id}">Edit</button>`
+      ? `<button class="edit-row-btn" data-rowedit="${d.id}">Edit</button><button class="edit-row-btn" data-retire="${d.id}" style="margin-top:3px;">Retire</button>`
       : `<span class="no-edit-note">Ask Brad</span>`;
 
     if(d._unavailable) tr.classList.add("unavailable-row");
@@ -2233,6 +2269,15 @@ function render(rows){
     if(val>0){ if(!priceOverrides[id]) priceOverrides[id]={}; priceOverrides[id][currentMonth]={price:val, note:note||"Manually confirmed price"}; await savePriceOverrides(); applyFilters(); }
   }));
   document.querySelectorAll("[data-rowedit]").forEach(btn=>btn.addEventListener("click", ()=>openEditModal(btn.getAttribute("data-rowedit"))));
+  document.querySelectorAll("[data-retire]").forEach(btn=>btn.addEventListener("click", async ()=>{
+    const id = btn.getAttribute("data-retire");
+    const d = allData().find(x=>x.id===id);
+    if(!confirm(`Retire "${d.name}"? It'll move to the Retired section below — visible to everyone, no ratings needed. You can restore it anytime.`)) return;
+    const reason = prompt("Optional: why is this being retired? (shown to everyone in the retired list)") || "";
+    fieldOverrides[id] = Object.assign({}, fieldOverrides[id]||{}, {retired:true, retiredReason:reason});
+    await saveFieldOverrides();
+    applyFilters();
+  }));
   document.querySelectorAll("[data-gallery]").forEach(img=>img.addEventListener("click", ()=>openLightbox(img.getAttribute("data-gallery"))));
   document.querySelectorAll("[data-mapview]").forEach(btn=>btn.addEventListener("click", ()=>openMapModal(btn.getAttribute("data-mapview"))));
   document.querySelectorAll("[data-infopop]").forEach(icon=>{
