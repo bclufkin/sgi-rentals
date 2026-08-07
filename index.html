@@ -227,7 +227,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.8</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.9</p>
   </header>
 
   <div class="identity-bar">
@@ -3211,7 +3211,7 @@ function familyAvgFor(id){
   return count ? sum/count : null;
 }
 
-function applyFilters(){
+function getFilteredSortedRows(){
   const company=document.getElementById("f-company").value, tier=document.getElementById("f-tier").value,
         minBa=parseFloat(document.getElementById("f-ba").value), minSleeps=parseInt(document.getElementById("f-sleeps").value),
         locpos=document.getElementById("f-locpos").value, area=document.getElementById("f-area").value,
@@ -3256,6 +3256,11 @@ function applyFilters(){
       if(typeof av==="string") av=av.toLowerCase(); if(typeof bv==="string") bv=bv.toLowerCase();
       if(av<bv) return -1*sortDir; if(av>bv) return 1*sortDir; return 0; });
   }
+  return rows;
+}
+
+function applyFilters(){
+  const rows = getFilteredSortedRows();
   render(rows);
   renderRetired();
   refreshRateModeBar();
@@ -3716,7 +3721,7 @@ function refreshRateModeBar(){
 function enterRateMode(){
   if(!currentUser){ alert("Pick your name first."); return; }
   const me = meRecord();
-  swipeQueue = allData().filter(d=>!(me.entries[d.id]&&me.entries[d.id].locked)).map(d=>d.id);
+  swipeQueue = getFilteredSortedRows().filter(d=>!(me.entries[d.id]&&me.entries[d.id].locked)).map(d=>d.id);
   if(!swipeQueue.length){ alert("You've already locked ratings for every current home!"); return; }
   swipeIdx = 0;
   userChoseTableView = false;
