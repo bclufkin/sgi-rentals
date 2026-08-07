@@ -227,7 +227,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.10</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.11</p>
   </header>
 
   <div class="identity-bar">
@@ -3219,7 +3219,12 @@ function getFilteredSortedRows(){
   let rows = allData().map(mergedRow).filter(d=>{
     if(d._retired) return false;
     if(company && d.iso!==company) return false;
-    if(tier && d._effTier!==tier) return false;
+    // Price tier filter must NEVER exclude a row that's still locked (hidden)
+    // to the current viewer — otherwise selecting a tier would leak the real
+    // price by elimination (row disappears => it's not in that tier) even
+    // though the number itself stays blurred. Only filter rows the viewer
+    // can already see (locked by them, or admin).
+    if(tier && rowVisibleToMe(d.id) && d._effTier!==tier) return false;
     if(minBa && d.ba<minBa) return false;
     if(minSleeps && d.sleeps<minSleeps) return false;
     if(locpos && d.locpos!==locpos) return false;
