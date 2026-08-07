@@ -7,7 +7,7 @@
 <title>St. George Island Trip 2027</title>
 <meta property="og:title" content="St. George Island Trip 2027">
 <meta property="og:description" content="Family rental comparison &amp; ratings tool for our July/August 2027 beach trip">
-<meta property="og:image" content="https://photos.barefoot.com/v3ccln0929/images/properties/47264/136++E+Gorrie+Dr+Drone-1.jpg">
+<meta property="og:image" content="https://www.travelandleisure.com/thmb/XZqPcs0ACAHiC3_E4VoYJYtq5O8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/TAL-lead-image-STGEORGEFL0425-2166f007bf954ee8aaa7a4f1f6450a25.jpg">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://bclufkin.github.io/sgi-rentals/">
 <meta name="twitter:card" content="summary_large_image">
@@ -53,18 +53,19 @@
   .month-toggle button{border:none;background:#fff;color:var(--navy);padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;}
   .month-toggle button.active{background:var(--navy);color:#fff;}
   .count-line{font-size:12px;color:var(--muted);margin-top:8px;}
-  .table-scroll{overflow-x:auto;overflow-y:auto;max-height:72vh;border:1px solid var(--line);border-radius:10px;background:var(--card);max-width:100%;}
-  table{border-collapse:collapse;width:100%;font-size:12.5px;table-layout:fixed;min-width:1300px;}
+  .table-scroll{overflow-x:visible;overflow-y:visible;max-height:none;border:1px solid var(--line);border-radius:10px;background:var(--card);max-width:100%;}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;table-layout:fixed;min-width:0;}
   thead th{position:sticky;top:0;z-index:3;background:var(--navy);color:var(--paper);text-align:left;padding:8px 6px;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.02em;cursor:pointer;white-space:normal;line-height:1.2;border-bottom:2px solid var(--brick);overflow-wrap:break-word;}
   td{padding:7px 8px;vertical-align:top;overflow-wrap:break-word;}
   td.name-cell{padding-left:14px;}
   thead th.no-sort{cursor:default;}
   tbody tr{border-bottom:1px solid var(--line);}
   tbody tr:nth-child(even){background:rgba(201,190,163,.18);}
-  .photo-cell img{width:56px;height:42px;object-fit:cover;border-radius:5px;border:1px solid var(--line);display:block;cursor:pointer;}
+  .photo-cell img{width:100%;height:100%;min-height:64px;max-height:120px;object-fit:cover;border-radius:5px;border:1px solid var(--line);display:block;cursor:pointer;}
+  td.photo-cell{padding:2px;}
   .photo-fallback,.no-photo{width:56px;height:42px;border-radius:5px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);text-align:center;padding:2px;}
   .photo-fallback a,.no-photo a{color:var(--brick-dark);font-weight:700;text-decoration:none;}
-  .name-cell a{color:var(--brick-dark);font-weight:700;text-decoration:none;font-size:13px;}
+  .name-cell a{color:var(--brick-dark);font-weight:700;text-decoration:none;font-size:15px;}
   .iso-tag{display:block;font-size:10px;color:var(--muted);margin-top:1px;}
   .num{font-variant-numeric:tabular-nums;white-space:nowrap;}
   .tier-pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;color:#fff;}
@@ -223,20 +224,22 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.3</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.4</p>
   </header>
 
   <div class="identity-bar">
-    <div class="onboarding-card" id="onboarding-card" style="display:none;">
-      <button class="onboarding-close" id="onboarding-close">&times;</button>
-      <h3>How this works</h3>
-      <ol>
-        <li>Pick your name below (Brad needs a PIN).</li>
-        <li>Rate homes with the star widget — prices stay hidden for a home until you lock in a rating for it.</li>
-        <li>Locking is permanent for that home, but new homes added later start open even after you've locked everything else.</li>
-        <li>Click ☆ next to any name to pin it to your Shortlist for easy side-by-side comparison later.</li>
-      </ol>
-      <button class="toggle-btn" id="onboarding-gotit">Got it</button>
+    <div class="modal-overlay" id="onboarding-modal-overlay">
+      <div class="modal-box" style="max-width:460px;">
+        <button class="modal-close" id="onboarding-close">&times;</button>
+        <h3>How this works</h3>
+        <ol style="padding-left:18px;font-size:13px;line-height:1.7;">
+          <li>Pick your name below (Brad needs a PIN).</li>
+          <li>Rate homes with the star widget — prices stay hidden for a home until you lock in a rating for it.</li>
+          <li>Locking is permanent for that home, but new homes added later start open even after you've locked everything else.</li>
+          <li>Click ☆ next to any name to pin it to your Shortlist for easy side-by-side comparison later.</li>
+        </ol>
+        <button class="toggle-btn" id="onboarding-gotit">Got it</button>
+      </div>
     </div>
     <div class="row" id="identity-buttons"></div>
     <p style="font-size:12.5px;color:var(--muted);line-height:1.5;margin:10px 0 0;max-width:640px;">Rate each stay on its own merits first — pricing for a home stays hidden to you until you lock in a rating for it. Once locked, a rating is final. If new homes get added later, they start out open for rating even if you've already locked everything else; nothing you've already finished gets reopened.</p>
@@ -313,8 +316,8 @@
     <table id="rental-table">
       <colgroup>
         <col style="width:1.9%;"><!-- # -->
-        <col style="width:3.9%;"><!-- Photo -->
-        <col style="width:10%;"><!-- Name -->
+        <col style="width:5.5%;"><!-- Photo -->
+        <col style="width:14%;"><!-- Name -->
         <col style="width:6%;"><!-- Turn Day -->
         <col style="width:2.6%;"><!-- BR -->
         <col style="width:2.6%;"><!-- BA -->
@@ -322,7 +325,7 @@
         <col style="width:9%;"><!-- Beach Position -->
         <col style="width:9%;"><!-- Island Area -->
         <col style="width:6%;"><!-- Crowdedness -->
-        <col style="width:12%;"><!-- Rent Cost -->
+        <col style="width:8%;"><!-- Rent Cost -->
         <col style="width:7%;"><!-- Per-Person -->
         <col style="width:3%;"><!-- Pool -->
         <col style="width:15%;"><!-- Family Ratings -->
@@ -331,7 +334,7 @@
       <thead><tr>
         <th class="no-sort">#</th><th class="no-sort">Photo</th><th data-key="name">Name</th>
         <th data-key="turnday">Turn Day</th><th data-key="br">BR</th><th data-key="ba">BA</th><th data-key="sleeps">Sleeps</th>
-        <th data-key="locpos">Beach Position</th><th data-key="area">Island Area</th><th data-key="crowd">Crowdedness</th>
+        <th data-key="locpos">Beach Position</th><th data-key="area">Island Area</th><th data-key="crowd" style="white-space:nowrap;">Crowdedness</th>
         <th data-key="rent">Rent Cost</th>
         <th data-key="perperson">Per-Person</th>
         <th data-key="pool">Pool</th><th class="no-sort">Family Ratings</th><th class="no-sort">Edit</th>
@@ -431,11 +434,49 @@ const ADMIN = "Brad";
 const BASE_DATA = [
   {id:"island-days", iso:"Cape & Coast", name:"Island Days", link:"https://www.capeandcoast.com/rentals/island-days?checkin=07/24/2027&checkout=07/31/2027", address:"601 E Gorrie Dr, St George Island, FL 32328", turnday:"Saturday", br:5, ba:4.0, sleeps:15, locpos:"beachview", area:"Central Beach", crowd:"Moderate", dogfee:"Pet friendly, rules apply", julyRent:8778, julyDates:"7/24-7/31", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false,
     photos:[
-      
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/8db986fd-df41-409d-8113-5c652c2a1045",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/1df0896b-5de0-4ad8-8fdf-62a6d76f679b",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/ed72e814-44c6-4e07-82c7-dba1ccdfcc86",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/22844e08-8323-4c3d-b200-fa83e7d1c02a",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/b2993a8c-1e72-4755-8513-79f973c1eef7",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/5d2b4f71-63d4-452a-b519-2a8818e1c798",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/1ec9df86-beb3-4ae6-b377-c10427765661",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/1f7b32ba-9c61-4366-b750-2331ccf6c89e",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/c048a0f0-d393-4835-b31c-9d6b060540cb",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/5c5a5ef6-4d44-4d99-b491-f57fbbf0e8f3",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/f732463a-32f6-4a9d-95e7-8fa893572c37",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/9f4e7b04-dea2-42e9-ad15-5982fbd18433",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/e83ebd74-c08d-44a5-8ea4-d14164c580c8",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/ebc23572-bec4-418e-b7e2-805a5892ae1e",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/434af9ef-2dda-45cc-b0e1-3bcc63fad032",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/396730e1-ff09-468e-be3b-74b93ec9e5a5",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/5fa468ac-3c30-4824-9826-cb86c5d7ccd2",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/e5515e81-6555-413e-8425-a166d9944510",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/de26e0ce-4671-4da9-ae9e-65448023fa5f",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/f554fe24-3e66-407b-bfbc-74b90e129bbc"
     ]},
   {id:"sunny-moon", iso:"Cape & Coast", name:"Sunny Moon", link:"https://www.capeandcoast.com/rentals/sunny-moon?checkin=07/18/2027&checkout=07/25/2027", address:"873 E Gorrie Dr, St George Island, FL 32328", turnday:"Sunday", br:4, ba:3.0, sleeps:10, locpos:"beachview", area:"East End", crowd:"Moderate", dogfee:"Pet friendly, rules apply", julyRent:7364, julyDates:"7/18-7/25", julyNote:"TBD - call for quote", augRent:null, augDates:"", augNote:"TBD - call for quote", pool:false,
     photos:[
-      
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/d1012f88-b569-4380-959e-af67e7109062",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/71eea282-9b20-4a81-ac47-0415704e2d23",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/90e546cb-f5ec-48f9-b922-77f164acb340",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/480a6499-52ba-4fa4-b35b-078c485d2e57",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/195bf609-5087-49de-b879-bdebd8d7f13d",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/76b5bd8a-9c44-4b70-9de5-9a8c3d4bf192",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/00e57ffc-baf0-464a-bd6c-38c473c3c14d",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/194896a5-d29a-4ece-9001-fba2a796aa7b",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/e5c8b56e-b473-48ce-aba8-22b30ae85b90",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/35c92bc7-61b4-48f2-bac2-11034bcf4fa4",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/a4c1d16a-81d2-4aab-b618-f7188e93c0c6",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/6d91bb1e-884d-4c7d-a72d-7438c137a140",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/74884867-6ab6-4c0b-a3df-ff5c8cbad25b",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/7044db0e-ac76-4562-9365-61516acaeb04",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/45724796-534d-45d8-b06f-4d98f5aa646e",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/9fad5f98-04a6-4c5e-99ea-e814ed4c3543",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/566a89a3-e83e-42d4-8064-7cff392bc937",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/2388c4b1-2fab-4978-95e3-bded7172efc9",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/6156afcd-d271-4c37-8d90-a90e67f56200",
+      "https://img.trackhs.com/1200x/https://track-pm.s3.amazonaws.com/capeandcoast/image/0ca29d32-d1b3-4735-9778-9e29948d7892"
     ]},
   {id:"a-great-escape", iso:"Collins", name:"A Great Escape", link:"https://www.collinsvacationrentals.com/rentals/a-great-escape", address:"1744 East Gulf Beach Drive, St. George Island, FL 32328", turnday:"Sunday", br:4, ba:2.0, sleeps:8, locpos:"oceanfront", area:"East End", crowd:"Moderate", dogfee:"$75/dog, 2 dogs <50lb", julyRent:null, julyDates:"7/25-8/1", julyNote:"Confirmed July 4th holiday week rate ($5,400).", augRent:4608, augDates:"8/8-8/15", augNote:"Live Aug 2027 calendar currently shows every Sunday blocked/Notify — call to confirm or waitlist. Price is an est. ~24% below July.", augUnavailable:true, pool:false,
     photos:[
@@ -2686,31 +2727,240 @@ const BASE_DATA = [
     ]},
   {id:"firstbeach", iso:"Sandcastles", name:"1st To The Beach", link:"https://www.sandcastlesvacationrentals.com/vacation-rentals/rental/1sttothe/", address:"1868 Sunset Dr, Saint George Island, FL 32328", turnday:"Saturday", br:5, ba:5.0, sleeps:14, locpos:"oceanfront", area:"East End", crowd:"Quiet", dogfee:"Pet friendly", julyRent:9659, julyDates:"7/24-7/31", julyNote:"TBD - call for quote", augRent:8560, augDates:"8/7-8/14", augNote:"TBD - call for quote", pool:false,
     photos:[
-      
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-5.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-6.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-7.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-8.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-4.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-32.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-35.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-37.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-110.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-40.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-41.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-42.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-43.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-44.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-45.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-46.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-47.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-49.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-50.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-53.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-54.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-55.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-56.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-57.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-58.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-60.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-61.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-62.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-63.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-64.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-65.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-81.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-83.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-84.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-85.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-86.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-87.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-88.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-89.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-90.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-91.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-97.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-92.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-96.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-9.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-99.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6854/Array_1868SunsetDr-100.jpg"
     ]},
   {id:"sandyturtle", iso:"Sandcastles", name:"The Sandy Turtle", link:"https://www.sandcastlesvacationrentals.com/vacation-rentals/rental/thesandyturtle/", address:"158 East Gorrie Drive, Saint George Island, FL 32328", turnday:"Saturday", br:3, ba:3.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"Busy", dogfee:"Pet friendly", julyRent:4785, julyDates:"7/24-7/31", julyNote:"TBD - call for quote", augRent:4058, augDates:"8/7-8/14", augNote:"TBD - call for quote", pool:false,
     photos:[
-      
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7927.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7928.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7918.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1252.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1245.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7919.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1247.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7929.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1249.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1253.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1254.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7933.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7932.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7931.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1250.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1246.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7930.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1238.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7921.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1239.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7920.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1241.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7922.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1242.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1243.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7923.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1240.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1255.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_1256.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7917.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7043/IMG_7924.jpg"
     ]},
   {id:"svplay", iso:"Sandcastles", name:"Sea Vous Play", link:"https://www.sandcastlesvacationrentals.com/vacation-rentals/rental/seavous/", address:"1328 E Gulf Beach Dr, Eastpoint, FL 32328", turnday:"Saturday", br:3, ba:3.0, sleeps:10, locpos:"oceanfront", area:"East End", crowd:"Quiet", dogfee:"Pet friendly", julyRent:6997, julyDates:"7/24-7/31", julyNote:"TBD - call for quote", augRent:6610, augDates:"8/7-8/14", augNote:"TBD - call for quote", pool:true,
     photos:[
-      
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/IMG_3383.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/1-web-or-mls-FDP00012.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/6-web-or-mls-FDP00009.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/9-web-or-mls-FDP00021.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/8-web-or-mls-FDP00018.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/7-web-or-mls-FDP00015.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/10-web-or-mls-FDP00022.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/16-web-or-mls-FDP00040.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/15-web-or-mls-FDP00037.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/11-web-or-mls-FDP00025.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/17-web-or-mls-FDP00045.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/18-web-or-mls-FDP00050.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/21-web-or-mls-FDP00065.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/27-web-or-mls-FDP00083.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/25-web-or-mls-FDP00077.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/26-web-or-mls-FDP00080.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/29-web-or-mls-FDP00089.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/30-web-or-mls-FDP00092.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/32-web-or-mls-FDP00098.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/34-web-or-mls-FDP00104.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/38-web-or-mls-FDP00119.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/36-web-or-mls-FDP00113.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/35-web-or-mls-FDP00110.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/33-web-or-mls-FDP00101.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/60-web-or-mls-50-print-DJI_20250827083703_0402_D.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/59-web-or-mls-51-print-DJI_20250827083745_0405_D.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/57-web-or-mls-DJI_20250827084146_0426_D.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/14-web-or-mls-FDP00034.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/13-web-or-mls-FDP00031.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/12-web-or-mls-FDP00028.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6864/5-web-or-mls-FDP00006.JPG"
     ]},
   {id:"smini", iso:"Sandcastles", name:"Skinny Mini", link:"https://www.sandcastlesvacationrentals.com/vacation-rentals/rental/skinnymini/", address:"56 East Gorrie Drive, Saint George Island, FL 32328", turnday:"Saturday", br:3, ba:3.0, sleeps:9, locpos:"oceanfront", area:"Central Beach", crowd:"Busy", dogfee:"Pet friendly", julyRent:3729, julyDates:"7/24-7/31", julyNote:"TBD - call for quote", augRent:3242, augDates:"8/7-8/14", augNote:"TBD - call for quote", pool:false,
     photos:[
-      
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_3712.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_3692.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7503.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7488.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7489.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7485.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7490.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7486.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7487.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7588.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7498.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7584.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7497.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7585.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7581.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7576.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7587.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7590.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7589.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_3710.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7572.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7573.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7570.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7574.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7575.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7478.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7592.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7591.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7593.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/7314/IMG_7480.jpeg"
     ]},
   {id:"sunmama", iso:"Sandcastles", name:"Sunflower Mama", link:"https://www.sandcastlesvacationrentals.com/vacation-rentals/rental/sunmama/", address:"772 W Gorrie Dr, St George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:7, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Pet friendly", julyRent:4931, julyDates:"7/24-7/31", julyNote:"TBD - call for quote", augRent:3971, augDates:"8/7-8/14", augNote:"TBD - call for quote", pool:false,
     photos:[
-      
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/1-web-or-mls-FDP00126.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/5-web-or-mls-FDP00138.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/4-web-or-mls-FDP00135.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/3-web-or-mls-FDP00132.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/2-web-or-mls-FDP00129.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/58-web-or-mls-44-print-DJI_20251030063041_0523_D.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/7-web-or-mls-FDP00144.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/8-web-or-mls-FDP00149.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/9-web-or-mls-FDP00152.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/10-web-or-mls-FDP00155.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/13-web-or-mls-FDP00164.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/15-web-or-mls-FDP00170.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/17-web-or-mls-FDP00176.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/18-web-or-mls-FDP00181.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/19-web-or-mls-FDP00186.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/20-web-or-mls-FDP00191.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/21-web-or-mls-FDP00196.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/23-web-or-mls-FDP00206.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/25-web-or-mls-FDP00216.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/27-web-or-mls-FDP00226.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/28-web-or-mls-FDP00236.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/30-web-or-mls-FDP00244.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/IMG_0666.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/32-web-or-mls-FDP00250.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/33-web-or-mls-FDP00253.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/34-web-or-mls-FDP00256.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/36-web-or-mls-FDP00262.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/37-web-or-mls-FDP00265.JPG",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/41-web-or-mls-DJI_20251030062821_0514_D.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/43-web-or-mls-DJI_20251030063011_0520_D.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6989/45-web-or-mls-DJI_20251030063055_0526_D.jpg"
     ]},
   {id:"seawatch", iso:"Sandcastles", name:"Sea Watch", link:"https://www.sandcastlesvacationrentals.com/vacation-rentals/rental/seawatch/", address:"716 W Gorrie Dr, St George Island, FL 32328", turnday:"Saturday", br:4, ba:3.0, sleeps:12, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Pet friendly", julyRent:8879, julyDates:"7/24-7/31", julyNote:"TBD - call for quote", augRent:7092, augDates:"8/7-8/14", augNote:"TBD - call for quote", pool:false,
     photos:[
-      
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_9329.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_6238.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_6243.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/Sea-Watch-5.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_9320.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/Sea-Watch-6.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/Sea-Watch-2.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/Sea-Watch-1.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/Sea-Watch-4.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_9334.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_9336.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/Sea-Watch-3.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_9317.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_9328.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_6244.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_6237.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_6239.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_6240.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_9313.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6865/IMG_6242.jpeg"
     ]},
   {id:"seaescape", iso:"Sandcastles", name:"Sea Escape", link:"https://www.sandcastlesvacationrentals.com/vacation-rentals/rental/seeescape/", address:"1236 E Gulf Beach Drive, St. George Island , FL", turnday:"Saturday", br:4, ba:4.0, sleeps:10, locpos:"oceanfront", area:"East End", crowd:"Moderate", dogfee:"Pet friendly", julyRent:8384, julyDates:"7/24-7/31", julyNote:"TBD - call for quote", augRent:6682, augDates:"8/7-8/14", augNote:"TBD - call for quote", pool:false,
     photos:[
-      
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/7-web-or-mls-FDP00021+(4).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/9-web-or-mls-FDP00027+(4).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/8-web-or-mls-FDP00024+(4).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/11-web-or-mls-FDP00033+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/12-web-or-mls-FDP00036+(2).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/10-web-or-mls-FDP00030+(2).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/19-web-or-mls-FDP00061+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/23-web-or-mls-FDP00073.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/22-web-or-mls-FDP00070.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/20-web-or-mls-FDP00064+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/17-web-or-mls-FDP00051+(2).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/26-web-or-mls-FDP00086+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/29-web-or-mls-FDP00101+(2).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/28-web-or-mls-FDP00096+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/27-web-or-mls-FDP00091+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/18-web-or-mls-FDP00056+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/32-web-or-mls-FDP00116+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/31-web-or-mls-FDP00111+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/35-web-or-mls-FDP00125.jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/IMG_5424.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/IMG_5426.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/IMG_5427.jpeg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/58-web-or-mls-DJI_20250529082110_0004_D+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/57-web-or-mls-DJI_20250529082041_0001_D+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/59-web-or-mls-DJI_20250529082205_0007_D+(1).jpg",
+      "https://www.sandcastlesvacationrentals.com/unitimages/6828/2-web-or-mls-FDP00006+(2).jpg"
     ]},
 ];
 
@@ -2728,9 +2978,9 @@ function tierForPrice(p){ if(p<6000) return "ideal"; if(p<7500) return "stretch"
 function tierLabel(t){ return {ideal:"Ideal",stretch:"Stretch",max:"Premium",tbd:"TBD"}[t]||t; }
 function locLabel(l){ return {oceanfront:"Ocean Front",beachview:"Beach View",secondrow:"Second Row"}[l]||l; }
 function locClass(l){ return {oceanfront:"",beachview:"beachview",secondrow:"secondrow"}[l]||""; }
-function crowdClass(c){ return {quiet:"crowd-quiet",moderate:"crowd-moderate",busy:"crowd-busy"}[c]||""; }
-function crowdLabel(c){ return {quiet:"Quiet",moderate:"Moderate",busy:"Busy"}[c]||c; }
-function crowdExplain(c){ return {quiet:"Fewer people on this stretch of beach, more secluded", moderate:"Average foot traffic for the island", busy:"Closer to town/access points, more people around"}[c]||""; }
+function crowdClass(c){ return {quiet:"crowd-quiet",moderate:"crowd-moderate",busy:"crowd-busy"}[(c||"").toLowerCase()]||""; }
+function crowdLabel(c){ return {quiet:"Quiet",moderate:"Moderate",busy:"Busy"}[(c||"").toLowerCase()]||c; }
+function crowdExplain(c){ return {quiet:"Fewer people on this stretch of beach, more secluded", moderate:"Average foot traffic for the island", busy:"Closer to town/access points, more people around"}[(c||"").toLowerCase()]||""; }
 function simpleHash(s){ let h=0; for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;} return h.toString(36); }
 function perDogFeeAmount(dogfeeStr){
   if(!dogfeeStr) return 75;
@@ -3188,48 +3438,39 @@ function render(rows){
     refreshShortlistBar();
   }));
   document.querySelectorAll("[data-mapview]").forEach(btn=>btn.addEventListener("click", ()=>openMapModal(btn.getAttribute("data-mapview"))));
+  const supportsHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  function showInfoPopover(el, html){
+    document.querySelectorAll(".info-popover").forEach(p=>p.remove());
+    const pop = document.createElement("div");
+    pop.className = "info-popover";
+    pop.innerHTML = html;
+    document.body.appendChild(pop);
+    const rect = el.getBoundingClientRect();
+    pop.style.left = Math.min(rect.left, window.innerWidth-240) + "px";
+    pop.style.top = (rect.bottom + 6) + "px";
+    return pop;
+  }
+  function wireInfoTrigger(el, getHtml){
+    if(supportsHover){
+      let pop=null;
+      el.addEventListener("mouseenter", ()=>{ pop = showInfoPopover(el, getHtml()); });
+      el.addEventListener("mouseleave", ()=>{ if(pop){ pop.remove(); pop=null; } });
+    } else {
+      el.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const pop = showInfoPopover(el, getHtml());
+        setTimeout(()=>{ document.addEventListener("click", function closeIt(){ pop.remove(); document.removeEventListener("click", closeIt); }); }, 10);
+      });
+    }
+  }
   document.querySelectorAll("[data-infopop]").forEach(icon=>{
-    let pop=null;
-    icon.addEventListener("mouseenter", ()=>{
-      document.querySelectorAll(".info-popover").forEach(p=>p.remove());
-      pop = document.createElement("div");
-      pop.className = "info-popover";
-      pop.textContent = icon.getAttribute("data-notetext");
-      document.body.appendChild(pop);
-      const rect = icon.getBoundingClientRect();
-      pop.style.left = Math.min(rect.left, window.innerWidth-240) + "px";
-      pop.style.top = (rect.bottom + 6) + "px";
-    });
-    icon.addEventListener("mouseleave", ()=>{ if(pop){ pop.remove(); pop=null; } });
-    icon.addEventListener("click", (e)=>{ e.stopPropagation(); }); // tap-to-keep-open on touch devices via mouseenter fallback
+    wireInfoTrigger(icon, ()=>icon.getAttribute("data-notetext"));
   });
   document.querySelectorAll("[data-raterpop]").forEach(pill=>{
-    pill.addEventListener("click", (e)=>{
-      e.stopPropagation();
-      document.querySelectorAll(".info-popover").forEach(p=>p.remove());
-      const pop = document.createElement("div");
-      pop.className = "info-popover";
-      pop.innerHTML = `<b>${pill.getAttribute("data-ratername")} — ${pill.getAttribute("data-raterstars")}★</b><br>${pill.getAttribute("data-ratercomment")}`;
-      document.body.appendChild(pop);
-      const rect = pill.getBoundingClientRect();
-      pop.style.left = Math.min(rect.left, window.innerWidth-240) + "px";
-      pop.style.top = (rect.bottom + 6) + "px";
-      setTimeout(()=>{ document.addEventListener("click", function closeIt(){ pop.remove(); document.removeEventListener("click", closeIt); }); }, 10);
-    });
+    wireInfoTrigger(pill, ()=>`<b>${pill.getAttribute("data-ratername")} — ${pill.getAttribute("data-raterstars")}★</b><br>${pill.getAttribute("data-ratercomment")}`);
   });
   document.querySelectorAll("[data-crowdpop]").forEach(tag=>{
-    tag.addEventListener("click", (e)=>{
-      e.stopPropagation();
-      document.querySelectorAll(".info-popover").forEach(p=>p.remove());
-      const pop = document.createElement("div");
-      pop.className = "info-popover";
-      pop.textContent = tag.getAttribute("data-crowdtext");
-      document.body.appendChild(pop);
-      const rect = tag.getBoundingClientRect();
-      pop.style.left = Math.min(rect.left, window.innerWidth-240) + "px";
-      pop.style.top = (rect.bottom + 6) + "px";
-      setTimeout(()=>{ document.addEventListener("click", function closeIt(){ pop.remove(); document.removeEventListener("click", closeIt); }); }, 10);
-    });
+    wireInfoTrigger(tag, ()=>tag.getAttribute("data-crowdtext"));
   });
 }
 
@@ -3347,10 +3588,10 @@ async function loadPending(){ const p = await kvGet("sgi-pending-suggestions"); 
 function maybeShowOnboarding(){
   let seen = false;
   try{ seen = localStorage.getItem("sgi-onboarding-seen")==="true"; }catch(e){}
-  if(!seen) document.getElementById("onboarding-card").style.display="block";
+  if(!seen) document.getElementById("onboarding-modal-overlay").classList.add("open");
 }
 function dismissOnboarding(){
-  document.getElementById("onboarding-card").style.display="none";
+  document.getElementById("onboarding-modal-overlay").classList.remove("open");
   try{ localStorage.setItem("sgi-onboarding-seen","true"); }catch(e){}
 }
 document.getElementById("onboarding-close").addEventListener("click", dismissOnboarding);
