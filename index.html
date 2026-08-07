@@ -61,8 +61,8 @@
   thead th.no-sort{cursor:default;}
   tbody tr{border-bottom:1px solid var(--line);}
   tbody tr:nth-child(even){background:rgba(201,190,163,.18);}
-  .photo-cell img{width:100%;height:100%;min-height:64px;max-height:120px;object-fit:cover;border-radius:5px;border:1px solid var(--line);display:block;cursor:pointer;}
-  td.photo-cell{padding:2px;}
+  .photo-cell img{width:80px;height:60px;object-fit:cover;border-radius:5px;border:1px solid var(--line);display:block;cursor:pointer;}
+  td.photo-cell{padding:4px;}
   .photo-fallback,.no-photo{width:56px;height:42px;border-radius:5px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);text-align:center;padding:2px;}
   .photo-fallback a,.no-photo a{color:var(--brick-dark);font-weight:700;text-decoration:none;}
   .name-cell a{color:var(--brick-dark);font-weight:700;text-decoration:none;font-size:15px;}
@@ -136,12 +136,15 @@
   .swipe-card.locked-msg{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;}
   .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--navy);color:var(--paper);font-size:10px;font-weight:700;}
   .price-edit-btn,.row-edit-btn,.map-link{display:block;margin-top:3px;font-size:10px;background:none;border:none;color:var(--edited);cursor:pointer;text-decoration:underline;padding:0;}
+  .price-clickable{cursor:pointer;border-bottom:1px dashed var(--edited);}
+  .price-clickable:hover{color:var(--edited);}
   .price-input-row{display:flex;flex-direction:column;gap:4px;margin-top:4px;}
   .price-input-row input{width:150px;padding:3px 6px;font-size:11px;}
   .price-input-row button{font-size:10px;padding:3px 7px;border-radius:4px;border:1px solid var(--edited);background:var(--edited);color:#fff;cursor:pointer;}
   .price-input-row button.cancel{background:#fff;color:var(--muted);border-color:var(--line);}
   .area-sub{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;}
   .stars{display:flex;gap:1px;}
+  .stars-row{display:flex;align-items:center;}
   .star-val-row{display:flex;align-items:center;justify-content:space-between;margin-top:2px;gap:6px;}
   .clear-rating-btn{background:none;border:1px solid var(--brick);color:var(--brick-dark);border-radius:10px;padding:1px 8px;font-size:9.5px;font-weight:700;cursor:pointer;}
   .clear-rating-btn:hover{background:var(--brick);color:#fff;}
@@ -155,7 +158,7 @@
   .locked-tag{font-size:9px;color:var(--tier-ideal);font-style:italic;display:block;margin-top:2px;}
   .unavail-banner{display:inline-block;width:fit-content;background:var(--brick);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;margin-top:4px;max-width:120px;white-space:normal;line-height:1.3;}
   tr.unavailable-row{background:rgba(168,74,38,0.08)!important;}
-  .edit-row-btn{background:var(--navy);color:#fff;border:none;padding:5px 9px;border-radius:5px;font-size:10.5px;cursor:pointer;white-space:nowrap;}
+  .edit-row-btn{background:var(--navy);color:#fff;border:none;padding:4px 6px;border-radius:5px;font-size:9.5px;cursor:pointer;white-space:nowrap;width:100%;}
   .no-edit-note{font-size:10px;color:var(--muted);font-style:italic;}
   .modal-overlay{position:fixed;inset:0;background:rgba(22,38,43,.65);display:none;align-items:center;justify-content:center;z-index:60;padding:16px;}
   .modal-overlay.open{display:flex;}
@@ -224,7 +227,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.4</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.5</p>
   </header>
 
   <div class="identity-bar">
@@ -315,8 +318,8 @@
   <div class="table-scroll" id="table-scroll-wrap">
     <table id="rental-table">
       <colgroup>
-        <col style="width:1.9%;"><!-- # -->
-        <col style="width:5.5%;"><!-- Photo -->
+        <col style="width:2.8%;"><!-- # -->
+        <col style="width:5%;"><!-- Photo -->
         <col style="width:14%;"><!-- Name -->
         <col style="width:6%;"><!-- Turn Day -->
         <col style="width:2.6%;"><!-- BR -->
@@ -326,10 +329,10 @@
         <col style="width:9%;"><!-- Island Area -->
         <col style="width:6%;"><!-- Crowdedness -->
         <col style="width:8%;"><!-- Rent Cost -->
-        <col style="width:7%;"><!-- Per-Person -->
+        <col style="width:6.5%;"><!-- Per-Person -->
         <col style="width:3%;"><!-- Pool -->
         <col style="width:15%;"><!-- Family Ratings -->
-        <col style="width:3.5%;"><!-- Edit -->
+        <col style="width:5%;"><!-- Edit -->
       </colgroup>
       <thead><tr>
         <th class="no-sort">#</th><th class="no-sort">Photo</th><th data-key="name">Name</th>
@@ -781,7 +784,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/45414/58+-+main+level-view-elp314.jpg?v=85790",
       "https://photos.barefoot.com/v3ccln0929/images/properties/45414/4+-+exterior-beach+access-elp041.jpg?v=85760"
     ]},
-  {id:"angels-share", iso:"Collins", name:"Angel's Share", link:"https://www.collinsvacationrentals.com/rentals/angels-share", address:"672 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:4492, julyDates:"7/25-8/1", julyNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3448, augDates:"8/1-8/8", augNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
+  {id:"angels-share", iso:"Collins", name:"Angel's Share", link:"https://www.collinsvacationrentals.com/rentals/angels-share", address:"672 East Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:4492, julyDates:"7/25-8/1", julyNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3448, augDates:"8/1-8/8", augNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/7260/1+-+exterior-angels+share-elp199.jpg?v=90726",
       "https://photos.barefoot.com/v3ccln0929/images/properties/7260/2+-+main+level-deck-elp181.jpg?v=90709",
@@ -836,7 +839,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/7260/51+-+exterior-view+from+back-elp197.jpg?v=90720",
       "https://photos.barefoot.com/v3ccln0929/images/properties/7260/52+-+exterior-back+elevation-elp200.jpg?v=90729"
     ]},
-  {id:"back-to-the-island", iso:"Collins", name:"Back To The Island", link:"https://www.collinsvacationrentals.com/rentals/back-to-the-island", address:"964 West Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:4702, julyDates:"7/25-8/1", julyNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:4470, augDates:"8/1-8/8", augNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
+  {id:"back-to-the-island", iso:"Collins", name:"Back To The Island", link:"https://www.collinsvacationrentals.com/rentals/back-to-the-island", address:"964 West Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:4702, julyDates:"7/25-8/1", julyNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:4470, augDates:"8/1-8/8", augNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/51321/47+-+exterior-back+elevation-elp016.jpg?v=89897",
       "https://photos.barefoot.com/v3ccln0929/images/properties/51321/DJI_20250518173915_0025_D.jpg?v=91507",
@@ -888,7 +891,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/51321/Drone+Footage.jpg?v=91523",
       "https://photos.barefoot.com/v3ccln0929/images/properties/51321/Drone+Footage+2.png?v=91524"
     ]},
-  {id:"barefoot-dreams", iso:"Collins", name:"Barefoot Dreams", link:"https://www.collinsvacationrentals.com/rentals/barefoot-dreams", address:"1656 East Gulf Beach Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:8, locpos:"beachview", area:"East End", crowd:"Quiet", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:3804, julyDates:"7/24-7/31", julyNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3363, augDates:"8/7-8/14", augNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
+  {id:"barefoot-dreams", iso:"Collins", name:"Barefoot Dreams", link:"https://www.collinsvacationrentals.com/rentals/barefoot-dreams", address:"1656 East Gulf Beach Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:8, locpos:"beachview", area:"East End", crowd:"Quiet", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:3804, julyDates:"7/24-7/31", julyNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3363, augDates:"8/7-8/14", augNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/7134/%231.jpg?v=92902",
       "https://photos.barefoot.com/v3ccln0929/images/properties/7134/%2337.jpg?v=92932",
@@ -998,7 +1001,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/36766/1000+E+Gorrie+Dr+Drone-9.jpg?v=83915",
       "https://photos.barefoot.com/v3ccln0929/images/properties/36766/1000+E+Gorrie+Dr+Drone-7.jpg?v=83917"
     ]},
-  {id:"beauvoir", iso:"Collins", name:"Beauvoir", link:"https://www.collinsvacationrentals.com/rentals/beauvoir", address:"1016 West Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:6, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:3974, julyDates:"7/24-7/31", julyNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3007, augDates:"8/7-8/14", augNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", augUnavailable:true, pool:false,
+  {id:"beauvoir", iso:"Collins", name:"Beauvoir", link:"https://www.collinsvacationrentals.com/rentals/beauvoir", address:"1016 West Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:6, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:3974, julyDates:"7/24-7/31", julyNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3007, augDates:"8/7-8/14", augNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", augUnavailable:true, pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/7142/Beauvior_01.JPG?v=7229",
       "https://photos.barefoot.com/v3ccln0929/images/properties/7142/DJI_20260517165236_0446_D.jpg?v=95667",
@@ -1027,7 +1030,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/7142/LOR_3500__1_.jpg?v=22137",
       "https://photos.barefoot.com/v3ccln0929/images/properties/7142/LOR_3502__1_.jpg?v=22138"
     ]},
-  {id:"daddys-money", iso:"Collins", name:"Daddy's Money", link:"https://www.collinsvacationrentals.com/rentals/daddys-money", address:"864 West Gulf Beach Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:6, locpos:"beachview", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:4028, julyDates:"7/24-7/31", julyNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:2923, augDates:"8/7-8/14", augNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:true,
+  {id:"daddys-money", iso:"Collins", name:"Daddy's Money", link:"https://www.collinsvacationrentals.com/rentals/daddys-money", address:"864 West Gulf Beach Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:6, locpos:"beachview", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:4028, julyDates:"7/24-7/31", julyNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:2923, augDates:"8/7-8/14", augNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:true,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/45299/864+W+Gulf+Beach+Dr+Drone-12.JPG?v=78406",
       "https://photos.barefoot.com/v3ccln0929/images/properties/45299/864+W+Gulf+Beach+Dr+Drone-2.JPG?v=78405",
@@ -1194,7 +1197,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/49154/72+-+908+West+Gorrie+Dr.-12.jpg?v=86667",
       "https://photos.barefoot.com/v3ccln0929/images/properties/49154/54+-+high+res+floor+plans-combined-128482.jpg?v=86641"
     ]},
-  {id:"golden-ruhl", iso:"Collins", name:"Golden Ruhl", link:"https://www.collinsvacationrentals.com/rentals/golden-ruhl", address:"524 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:4364, julyDates:"7/24-7/31", julyNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3171, augDates:"7/31-8/7", augNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
+  {id:"golden-ruhl", iso:"Collins", name:"Golden Ruhl", link:"https://www.collinsvacationrentals.com/rentals/golden-ruhl", address:"524 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:4364, julyDates:"7/24-7/31", julyNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3171, augDates:"7/31-8/7", augNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/54186/%231.jpg?v=94902",
       "https://photos.barefoot.com/v3ccln0929/images/properties/54186/%232.jpg?v=94913",
@@ -1294,7 +1297,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/40976/30+-+Floor+Plan-Pool-_KLH6538.JPG?v=70108",
       "https://photos.barefoot.com/v3ccln0929/images/properties/40976/22+-+Floor+Plan-View-_KLH6541.JPG?v=70094"
     ]},
-  {id:"in-turtle-time", iso:"Collins", name:"In Turtle Time", link:"https://www.collinsvacationrentals.com/rentals/in-turtle-time", address:"1156 East Gulf Beach Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:8, locpos:"beachview", area:"East End", crowd:"Quiet", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:5266, julyDates:"7/24-7/31", julyNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3819, augDates:"8/7-8/14", augNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:true,
+  {id:"in-turtle-time", iso:"Collins", name:"In Turtle Time", link:"https://www.collinsvacationrentals.com/rentals/in-turtle-time", address:"1156 East Gulf Beach Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:8, locpos:"beachview", area:"East End", crowd:"Quiet", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:5266, julyDates:"7/24-7/31", julyNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3819, augDates:"8/7-8/14", augNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:true,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/47200/1+-+1156+East+Gulf+Beach+Drive-1.jpg?v=83464",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47200/2+-+1156+East+Gulf+Beach+Drive-3.jpg?v=83458",
@@ -1350,7 +1353,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/47200/48+-+1156+East+Gulf+Beach+Drive-9.jpg?v=83477",
       "https://photos.barefoot.com/v3ccln0929/images/properties/47200/49+-+1156+East+Gulf+Beach+Drive-11.jpg?v=83483"
     ]},
-  {id:"last-hurrah", iso:"Collins", name:"Last Hurrah", link:"https://www.collinsvacationrentals.com/rentals/last-hurrah", address:"432 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:4526, julyDates:"7/24-7/31", julyNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3332, augDates:"7/31-8/7", augNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
+  {id:"last-hurrah", iso:"Collins", name:"Last Hurrah", link:"https://www.collinsvacationrentals.com/rentals/last-hurrah", address:"432 East Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:10, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:4526, julyDates:"7/24-7/31", julyNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:3332, augDates:"7/31-8/7", augNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/54187/%231.jpg?v=94944",
       "https://photos.barefoot.com/v3ccln0929/images/properties/54187/%232.jpg?v=94953",
@@ -1398,7 +1401,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/54187/Drone+Footage+1.jpg?v=94987",
       "https://photos.barefoot.com/v3ccln0929/images/properties/54187/Drone+Footage+2.jpg?v=94988"
     ]},
-  {id:"nahale-kai", iso:"Collins", name:"Nahale Kai", link:"https://www.collinsvacationrentals.com/rentals/nahale-kai", address:"916 West Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:3697, julyDates:"7/25-8/1", julyNote:"CONFIRMED exact 2027 calendar price (peak all July).", augRent:2802, augDates:"8/8-8/15", augNote:"CONFIRMED exact 2027 calendar price; drops to $2,390/wk starting 8/8.", pool:false,
+  {id:"nahale-kai", iso:"Collins", name:"Nahale Kai", link:"https://www.collinsvacationrentals.com/rentals/nahale-kai", address:"916 West Gorrie Drive, St. George Island, FL 32328", turnday:"Sunday", br:3, ba:2.0, sleeps:8, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:3697, julyDates:"7/25-8/1", julyNote:"(peak all July).", augRent:2802, augDates:"8/8-8/15", augNote:"; drops to $2,390/wk starting 8/8.", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/7227/Photo_039.jpg?v=91982",
       "https://photos.barefoot.com/v3ccln0929/images/properties/7227/Photo_034.jpg?v=91985",
@@ -1539,7 +1542,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/33857/%2323.jpg?v=94690",
       "https://photos.barefoot.com/v3ccln0929/images/properties/33857/%2325.jpg?v=94691"
     ]},
-  {id:"shangrila", iso:"Collins", name:"Shangrila", link:"https://www.collinsvacationrentals.com/rentals/shangrila", address:"816 West Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:6, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:null, julyDates:"", julyNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:2807, augDates:"8/7-8/14", augNote:"UNVERIFIABLE: live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
+  {id:"shangrila", iso:"Collins", name:"Shangrila", link:"https://www.collinsvacationrentals.com/rentals/shangrila", address:"816 West Gorrie Drive, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.0, sleeps:6, locpos:"oceanfront", area:"Central Beach", crowd:"Moderate", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:null, julyDates:"", julyNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest July price cannot be determined.", augRent:2807, augDates:"8/7-8/14", augNote:"live 2027 calendar shows availability only, with no weekly dollar prices; lowest August price cannot be determined.", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/46479/1+-+exterior-main-elp002.jpg?v=80628",
       "https://photos.barefoot.com/v3ccln0929/images/properties/46479/2+-+exterior-front+elevation-elp008.jpg?v=80636",
@@ -1626,7 +1629,7 @@ const BASE_DATA = [
       "https://photos.barefoot.com/v3ccln0929/images/properties/28496/9+-+Plantation+Walking+Trails.jpg?v=72078",
       "https://photos.barefoot.com/v3ccln0929/images/properties/28496/10+-+Plantation+Bike+Path.jpg?v=72083"
     ]},
-  {id:"the-ruby-pearl", iso:"Collins", name:"The Ruby Pearl", link:"https://www.collinsvacationrentals.com/rentals/the-ruby-pearl", address:"1732 Lilac Lane, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.5, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"Quiet", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:5204, julyDates:"7/24-7/31", julyNote:"CONFIRMED exact 2027 calendar price.", augRent:3806, augDates:"8/7-8/14", augNote:"CONFIRMED exact 2027 calendar price.", pool:false,
+  {id:"the-ruby-pearl", iso:"Collins", name:"The Ruby Pearl", link:"https://www.collinsvacationrentals.com/rentals/the-ruby-pearl", address:"1732 Lilac Lane, St. George Island, FL 32328", turnday:"Saturday", br:3, ba:2.5, sleeps:8, locpos:"oceanfront", area:"Plantation (West End)", crowd:"Quiet", dogfee:"Not disclosed on property page; site says Pet Friendly (rules apply).", julyRent:5204, julyDates:"7/24-7/31", julyNote:".", augRent:3806, augDates:"8/7-8/14", augNote:".", pool:false,
     photos:[
       "https://photos.barefoot.com/v3ccln0929/images/properties/54068/1+-+Exterior-Back+Elevation-_KLH6204.JPG?v=94717",
       "https://photos.barefoot.com/v3ccln0929/images/properties/54068/1.5+-+1st+Floor-Porch-_KLH6335.JPG?v=94719",
@@ -3153,12 +3156,7 @@ function renderAdminProgressPanel(){
   const withAugPrice = active.filter(d=>d.augRent || d.augUnavailable).length;
   const withPhotos = active.filter(d=>d.photos && d.photos.length).length;
   const withAddress = active.filter(d=>d.address && !/not (published|found)/i.test(d.address)).length;
-  const statsHtml = `<div style="font-size:11px;color:var(--muted);font-weight:700;margin:12px 0 4px;">Data completeness (${active.length} active homes):</div>
-    <div style="font-size:11.5px;line-height:1.7;">
-      Pricing: ${withJulyPrice}/${active.length} July, ${withAugPrice}/${active.length} August<br>
-      Photos: ${withPhotos}/${active.length}<br>
-      Verified address: ${withAddress}/${active.length}
-    </div>`;
+  const statsHtml = `<div style="font-size:11px;color:var(--muted);font-weight:700;margin:12px 0 4px;">Data completeness (${active.length} active homes): <span style="font-weight:400;">Pricing ${withJulyPrice}/${active.length} July, ${withAugPrice}/${active.length} Aug &nbsp;·&nbsp; Photos ${withPhotos}/${active.length} &nbsp;·&nbsp; Verified address ${withAddress}/${active.length}</span></div>`;
   box.innerHTML = `<div style="font-size:11px;color:var(--muted);font-weight:700;margin:8px 0 4px;">Family progress (click a name):</div>` +
     NAMES.filter(n=>n!==ADMIN).map(n=>{
       const rec = ratings[n] || {entries:{}};
@@ -3252,10 +3250,11 @@ function applyFilters(){
 
 function renderRetired(){
   const box = document.getElementById("retired-section");
+  if(!isAdmin()){ box.innerHTML = ""; return; }
   const retired = allData().map(mergedRow).filter(d=>d._retired);
   if(!retired.length){ box.innerHTML = ""; return; }
-  box.innerHTML = `<h2 style="margin-top:28px;">Retired / Not Considering (${retired.length})</h2>
-    <p class="helptext">These homes were taken out of active consideration. No ratings needed — prices and details are always fully visible here to everyone.</p>
+  box.innerHTML = `<h2 style="margin-top:28px;">Retired / Not Considering (${retired.length}) <span style="font-size:11px;color:var(--muted);font-weight:400;">— only visible to you as admin</span></h2>
+    <p class="helptext">These homes were taken out of active consideration. No ratings needed — prices and details are always fully visible here.</p>
     <div class="table-scroll" style="max-height:none;">
     <table><thead><tr><th>Photo</th><th>Name</th><th>Address</th><th>BR/BA/Sleeps</th><th>Rent (Jul/Aug)</th><th>Why retired</th>${isAdmin()?'<th>Restore</th>':''}</tr></thead><tbody>
     ${retired.map(d=>{
@@ -3282,7 +3281,7 @@ function renderRetired(){
 }
 
 function halfStarWidget(propId, val, editable){
-  let h = `<div class="stars" data-propid="${propId}">`;
+  let h = `<div class="stars-row"><div class="stars" data-propid="${propId}">`;
   for(let i=1;i<=5;i++){
     let fillPct = 0;
     if(val >= i) fillPct = 100; else if(val >= i-0.5) fillPct = 50;
@@ -3292,7 +3291,10 @@ function halfStarWidget(propId, val, editable){
       ${editable?`<span class="hit-l" data-star="${i-0.5}"></span><span class="hit-r" data-star="${i}"></span>`:''}
     </div>`;
   }
-  h += `</div><div class="star-val-row"><span style="font-size:10px;color:var(--muted);">${val?val+' / 5':'not rated'}</span>${(editable && val>0)?`<button class="clear-rating-btn" data-clearrating="${propId}">Clear</button>`:''}</div>`;
+  h += `</div>${val?'':'<span style="font-size:10px;color:var(--muted);margin-left:6px;">not rated</span>'}</div>`;
+  if(val){
+    h += `<div class="star-val-row"><span style="font-size:10px;color:var(--muted);">${val} / 5</span>${(editable && val>0)?`<button class="clear-rating-btn" data-clearrating="${propId}">Clear</button>`:''}</div>`;
+  }
   return h;
 }
 
@@ -3359,10 +3361,9 @@ function render(rows){
       <td data-label="Island Area">${d.area}<button class="map-link" data-mapview="${d.id}">Map View 📍</button></td>
       <td data-label="Crowdedness" class="${crowdClass(d.crowd)}"><span class="crowd-tag" data-crowdpop="1" data-crowdtext="${crowdExplain(d.crowd)}">${crowdLabel(d.crowd)}</span></td>
       <td data-label="Rent Cost" class="num${visible?'':' locked-blur'}">
-        ${allInPrice ? `<span class="tier-pill ${pillClass}">${pillLabel}</span><br>` : ``}<b>${rentDisplay}</b>
-        <span class="price-info-icon" data-infopop="${d.id}" data-notetext="${((d._edited ? d._editNote : d._note) + (allInPrice?' (includes est. dog fees)':'') + (d._verifiedAt?` — checked ${new Date(d._verifiedAt).toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'})}`:'')).replace(/"/g,'&quot;')}">ⓘ</span>${d._verifiedAt?`<span class="verified-tag">✓ ${new Date(d._verifiedAt).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})}</span>`:''}
-        ${(isAdmin() && visible) ? `<button class="price-edit-btn" data-editprice="${d.id}">Edit price</button>
-        <div class="price-input-row" data-inputrow="${d.id}" style="display:none;">
+        ${allInPrice ? `<span class="tier-pill ${pillClass}">${pillLabel}</span><br>` : ``}<b${(isAdmin() && visible)?` class="price-clickable" data-editprice="${d.id}" title="Click to edit"`:``}>${rentDisplay}</b>
+        ${price ? (()=>{ let noteText = d._edited ? d._editNote : d._note; if(/tbd/i.test(noteText)) noteText=""; return `<span class="price-info-icon" data-infopop="${d.id}" data-notetext="${(noteText + (allInPrice?' (includes est. dog fees)':'') + (d._verifiedAt?` — checked ${new Date(d._verifiedAt).toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'})}`:'')).replace(/"/g,'&quot;')}">ⓘ</span>`; })() : ``}${d._verifiedAt?`<span class="verified-tag">✓ ${new Date(d._verifiedAt).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})}</span>`:''}
+        ${(isAdmin() && visible) ? `<div class="price-input-row" data-inputrow="${d.id}" style="display:none;">
           <input type="number" placeholder="$/week" data-priceinput="${d.id}" value="${price||''}">
           <input type="text" placeholder="note e.g. incl. military discount" data-pricenote="${d.id}" value="${d._editNote||''}">
           <button data-save="${d.id}">Save (${currentMonth==='july'?'July':'August'})</button>
@@ -3411,8 +3412,8 @@ function render(rows){
     await saveRatings();
     applyFilters();
   }));
-  document.querySelectorAll("[data-editprice]").forEach(btn=>btn.addEventListener("click", ()=>{ const id=btn.getAttribute("data-editprice"); document.querySelector(`[data-inputrow="${id}"]`).style.display="flex"; btn.style.display="none"; }));
-  document.querySelectorAll("[data-cancel]").forEach(btn=>btn.addEventListener("click", ()=>{ const id=btn.getAttribute("data-cancel"); document.querySelector(`[data-inputrow="${id}"]`).style.display="none"; document.querySelector(`[data-editprice="${id}"]`).style.display="block"; }));
+  document.querySelectorAll("[data-editprice]").forEach(btn=>btn.addEventListener("click", ()=>{ const id=btn.getAttribute("data-editprice"); document.querySelector(`[data-inputrow="${id}"]`).style.display="flex"; }));
+  document.querySelectorAll("[data-cancel]").forEach(btn=>btn.addEventListener("click", ()=>{ const id=btn.getAttribute("data-cancel"); document.querySelector(`[data-inputrow="${id}"]`).style.display="none"; }));
   document.querySelectorAll("[data-save]").forEach(btn=>btn.addEventListener("click", async ()=>{
     const id=btn.getAttribute("data-save"); const val=parseFloat(document.querySelector(`[data-priceinput="${id}"]`).value); const note=document.querySelector(`[data-pricenote="${id}"]`).value;
     if(val>0){ if(!priceOverrides[id]) priceOverrides[id]={}; priceOverrides[id][currentMonth]={price:val, note:note||"Manually confirmed price", verifiedAt:Date.now()}; await savePriceOverrides(); applyFilters(); }
