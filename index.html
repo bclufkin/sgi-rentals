@@ -227,7 +227,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.9</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.10</p>
   </header>
 
   <div class="identity-bar">
@@ -271,7 +271,7 @@
       </div>
       <div class="field"><label>Search</label><input type="text" id="f-search" placeholder="name…"></div>
       <div class="field"><label>Company</label><select id="f-company"><option value="">All</option></select></div>
-      <div class="field"><label>Price tier</label>
+      <div class="field" id="f-tier-field" style="display:none;"><label>Price tier</label>
         <select id="f-tier"><option value="">All</option><option value="ideal">Ideal (&lt;$6,000)</option><option value="stretch">Stretch ($6k-7.5k)</option><option value="max">Premium ($7.5k-10k)</option><option value="tbd">TBD</option></select>
       </div>
       <div class="field"><label>Min. baths</label><select id="f-ba"><option value="0">Any</option><option value="2">2.0+</option><option value="2.5">2.5+</option><option value="3">3.0+</option><option value="4">4.0+</option></select></div>
@@ -3122,17 +3122,17 @@ function rowVisibleToMe(id){ return isAdmin() || rowLockedByMe(id); }
 function updateIdentityStatus(){
   const status=document.getElementById("identity-status"), submitBtn=document.getElementById("submit-final-btn"),
         saveBtn=document.getElementById("save-progress-btn"), gatedBanner=document.getElementById("gated-banner");
-  const tierSelect = document.getElementById("f-tier");
+  const tierField = document.getElementById("f-tier-field"), tierSelect = document.getElementById("f-tier");
   if(!currentUser){
     status.innerHTML="Pick your name to start rating homes — prices hidden per-row until you lock that row.";
     submitBtn.style.display="none"; saveBtn.style.display="none"; gatedBanner.style.display="none";
-    tierSelect.disabled = true; tierSelect.value=""; tierSelect.title="Complete all your ratings to filter by price";
+    tierField.style.display="none"; tierSelect.value="";
     return;
   }
   if(isAdmin()){
     status.innerHTML=`Viewing as <b>Brad</b> <span class="admin-badge">Admin — always unlocked</span>. You can still rate/lock rows like everyone else.`;
     submitBtn.style.display="inline-block"; saveBtn.style.display="inline-block"; gatedBanner.style.display="none";
-    tierSelect.disabled = false; tierSelect.title="";
+    tierField.style.display="block";
     renderAdminProgressPanel();
     return;
   }
@@ -3143,10 +3143,9 @@ function updateIdentityStatus(){
   const ratedUnlocked=Object.keys(me.entries).filter(k=>!me.entries[k].locked && me.entries[k].stars>0).length;
   status.innerHTML = `Viewing as <b>${currentUser}</b> — ${lockedCount} of ${total} homes locked, ${ratedUnlocked} rated but not yet locked.`;
   submitBtn.style.display="inline-block"; saveBtn.style.display="inline-block"; gatedBanner.style.display="block";
-  gatedBanner.textContent = "Each home's price stays hidden to you until you lock a rating for it. Locking is permanent for that home. Price filtering unlocks once every current home is locked.";
-  const canFilterPrice = !!me.everCompleted;
-  tierSelect.disabled = !canFilterPrice;
-  tierSelect.title = canFilterPrice ? "" : "Complete all your ratings to filter by price";
+  gatedBanner.textContent = "Each home's price stays hidden to you until you lock a rating for it. Locking is permanent for that home. Price filtering appears once you've locked in at least one rating.";
+  const canFilterPrice = lockedCount > 0;
+  tierField.style.display = canFilterPrice ? "block" : "none";
   if(!canFilterPrice) tierSelect.value = "";
 }
 
