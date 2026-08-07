@@ -188,6 +188,13 @@
   .notes-toggle{width:100%;text-align:left;background:var(--navy);color:var(--paper);border:none;padding:12px 16px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
   .notes-toggle .chev{transition:transform .2s ease;}
   .notes-toggle.open .chev{transform:rotate(180deg);}
+  .instructions-content{font-size:13px;line-height:1.65;color:var(--ink);max-height:70vh;overflow-y:auto;padding-right:4px;}
+  .instructions-content h3{margin:0 0 10px;font-size:18px;color:var(--navy);font-family:Georgia,serif;}
+  .instructions-content h4{margin:18px 0 6px;font-size:14px;color:var(--brick-dark);}
+  .instructions-content h4:first-of-type{margin-top:4px;}
+  .instructions-content ul,.instructions-content ol{margin:4px 0 10px;padding-left:20px;}
+  .instructions-content li{margin-bottom:5px;}
+  .instructions-content p{margin:0 0 10px;}
   .notes-body{display:none;background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;padding:16px 20px;font-size:13px;line-height:1.6;}
   .notes-body.open{display:block;}
   .notes-body h3{font-family:Georgia,serif;font-size:16px;margin:18px 0 6px;color:var(--navy);border-bottom:1px solid var(--line);padding-bottom:4px;}
@@ -227,7 +234,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.11</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.12</p>
   </header>
 
   <div class="identity-bar">
@@ -244,6 +251,68 @@
         <button class="toggle-btn" id="onboarding-gotit">Got it</button>
       </div>
     </div>
+
+    <div class="modal-overlay" id="instructions-modal-overlay">
+      <div class="modal-box" style="max-width:640px;">
+        <button class="modal-close" id="instructions-close">&times;</button>
+        <div class="instructions-content">
+          <h3>How Everything Works</h3>
+
+          <h4>The big idea</h4>
+          <p>We're rating ~59 real options for our July/August 2027 trip. The whole point of hiding prices is so we rate houses on their actual merits — photos, layout, location, pool, etc. — instead of subconsciously scoring the cheap ones higher just because they're cheap, or the expensive ones higher because "you get what you pay for." Once everyone's rated everything, we can look at the highest-rated houses that are still within budget and pick from there, instead of anchoring on price first.</p>
+          <p><b>Please don't go look up prices on the rental company websites while you're rating.</b> It defeats the purpose — if you know the price going in, it's really hard to rate blind even if you're trying not to let it influence you.</p>
+
+          <h4>How the rating lock works</h4>
+          <ol>
+            <li>Pick your name at the top (Brad needs a PIN).</li>
+            <li>For each house, rate it 0-5 stars (half-stars allowed) and leave a comment if you want.</li>
+            <li>Once you <b>lock in</b> your rating for a house, two things unlock for you on that house only: the <b>price</b> becomes visible, and <b>everyone else's ratings and comments</b> for that house become visible.</li>
+            <li>Locking is <b>permanent</b> for that house — you can't go back and change it after. So take your time before locking, but don't stress — you can rate and leave it unlocked as long as you want first.</li>
+            <li>If new houses get added later, they show up unlocked for everyone, even if you've already finished rating everything else.</li>
+          </ol>
+          <p><b>Why lock-to-reveal for other people's ratings too?</b> Same reason as the price — if you see that someone gave a house 5 stars before you've rated it yourself, that's going to bias your rating. Once you've locked yours in, you can't be influenced anymore, so it's safe to show you everyone else's.</p>
+
+          <h4>What each column means</h4>
+          <ul>
+            <li><b>Photo</b> — click it to open a full photo gallery for that house. It auto-advances through the photos every couple seconds; tap Pause/Resume or the arrows to control it, and swipe left/right on mobile to move between photos manually.</li>
+            <li><b>Name</b> — links to the actual listing. The ☆ next to it lets you pin a house to your personal <b>Shortlist</b> (a side-by-side comparison view of just your favorites) — this has nothing to do with the star rating, it's just a personal bookmark.</li>
+            <li><b>Turn Day</b> — Saturday or Sunday check-in, whichever that property uses.</li>
+            <li><b>BR / BA / Sleeps</b> — bedrooms, bathrooms, max occupancy.</li>
+            <li><b>Beach Position</b> — Ocean Front (right on the beach), Beach View (a house or two back, correct side of the road), or Second Row (not beachfront).</li>
+            <li><b>Island Area</b> — Plantation (West End), East End, or Central Beach. Click "Map View" to see exactly where it sits on the island relative to the lighthouse.</li>
+            <li><b>Crowdedness</b> — Quiet, Moderate, or Busy, based on how close it is to the main drag/town center. Hover (desktop) or tap (mobile) the label for a quick explanation of what that means.</li>
+            <li><b>Rent Cost</b> — the all-in weekly price (including estimated pet fees), for whichever month is selected. Hidden until you lock your rating for that house. Hover/tap the ⓘ for sourcing notes on where the price came from.</li>
+            <li><b>Per-Person</b> — that rent split 5 ways, so it's easier to compare houses of different sizes on a level footing.</li>
+            <li><b>Pool</b> — private pool, yes or no.</li>
+            <li><b>Family Ratings</b> — once a house is unlocked for you, you'll see the average star rating, how many people have rated it so far, and a little pill for each person who's locked theirs in — tap/hover a pill to see their comment.</li>
+          </ul>
+
+          <h4>July vs. August toggle</h4>
+          <p>At the top, switch between July and August — prices and specific date ranges update for whichever month you're looking at. Some houses may not be available in one month or the other; those get flagged clearly rather than showing a misleading price.</p>
+
+          <h4>Filters</h4>
+          <p>You can filter by company, bedrooms/bathrooms, sleeps, beach position, area, and pool. <b>One filter — "Price tier" — stays hidden until you've locked in at least one rating.</b> Once it shows up, it only filters houses you've already unlocked; anything you haven't rated yet stays in the list no matter what price tier you pick, so you can never accidentally figure out a hidden price by watching houses disappear from a filtered list.</p>
+
+          <h4>Mobile vs. desktop</h4>
+          <ul>
+            <li><b>On mobile</b>, you'll automatically land in <b>Rate Mode</b> — a swipeable card view showing one house at a time (photo, specs, stars, comment box) with Prev/Next/Skip buttons, so you're not scrolling a giant table on a small screen. There's a "📋 Table View" button if you'd rather browse the full list instead — same data, laid out as stacked cards (label on the left, value on the right) rather than a wide table.</li>
+            <li><b>On desktop</b>, you get the full table, with all filters visible and a "Save Progress" / "Lock In My Ratings So Far" bar at the top.</li>
+            <li>Either way, your ratings sync instantly — start on your phone at the beach, finish on your laptop later, no issue.</li>
+          </ul>
+
+          <h4>A couple other things</h4>
+          <ul>
+            <li><b>Saving vs. Locking</b>: you can save your progress (stars + comments) anytime without locking — it'll be there when you come back. Locking is the one-way step that reveals price + others' ratings for that specific house.</li>
+            <li>Houses you haven't rated yet automatically float to the top of your list, so you always know what's left to do.</li>
+            <li>If you want to change or clear a rating before you've locked it, there's a small "Clear" button right under the stars.</li>
+          </ul>
+
+          <p style="margin-top:16px;">That's basically it! Rate honestly, don't peek at prices, and we'll figure out the best affordable option together once everyone's weighed in.</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="toggle-btn" id="instructions-open-btn" style="margin-bottom:12px;">❓ How Everything Works</button>
     <div class="row" id="identity-buttons"></div>
     <p style="font-size:12.5px;color:var(--muted);line-height:1.5;margin:10px 0 0;max-width:640px;">Rate each stay on its own merits first — pricing for a home stays hidden to you until you lock in a rating for it. Once locked, a rating is final. If new homes get added later, they start out open for rating even if you've already locked everything else; nothing you've already finished gets reopened.</p>
     <div class="id-status" id="identity-status"></div>
@@ -3620,6 +3689,8 @@ function dismissOnboarding(){
 }
 document.getElementById("onboarding-close").addEventListener("click", dismissOnboarding);
 document.getElementById("onboarding-gotit").addEventListener("click", dismissOnboarding);
+document.getElementById("instructions-open-btn").addEventListener("click", ()=>document.getElementById("instructions-modal-overlay").classList.add("open"));
+document.getElementById("instructions-close").addEventListener("click", ()=>document.getElementById("instructions-modal-overlay").classList.remove("open"));
 async function savePending(){ await kvSet("sgi-pending-suggestions", pendingSuggestions); }
 function renderPendingSuggestions(){
   const box = document.getElementById("pending-suggestions");
