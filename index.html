@@ -240,7 +240,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.15</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.16</p>
   </header>
 
   <div class="identity-bar">
@@ -3626,9 +3626,27 @@ function showLightboxImg(){
   thumbBox.innerHTML = lightboxPhotos.map((p,i)=>`<img src="${p}" class="${i===lightboxIdx?'active':''}" data-thumbidx="${i}">`).join("");
   thumbBox.querySelectorAll("[data-thumbidx]").forEach(t=>t.addEventListener("click", ()=>{ lightboxIdx=parseInt(t.getAttribute("data-thumbidx")); lightboxPlaying=false; stopLightboxAuto(); showLightboxImg(); }));
 }
+function lightboxGoPrev(){ lightboxIdx=(lightboxIdx-1+lightboxPhotos.length)%lightboxPhotos.length; lightboxPlaying=false; stopLightboxAuto(); showLightboxImg(); }
+function lightboxGoNext(){ lightboxIdx=(lightboxIdx+1)%lightboxPhotos.length; lightboxPlaying=false; stopLightboxAuto(); showLightboxImg(); }
 document.getElementById("lightbox-close").addEventListener("click", ()=>{ document.getElementById("lightbox-overlay").classList.remove("open"); stopLightboxAuto(); });
-document.getElementById("lightbox-prev").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx-1+lightboxPhotos.length)%lightboxPhotos.length; lightboxPlaying=false; stopLightboxAuto(); showLightboxImg(); });
-document.getElementById("lightbox-next").addEventListener("click", ()=>{ lightboxIdx=(lightboxIdx+1)%lightboxPhotos.length; lightboxPlaying=false; stopLightboxAuto(); showLightboxImg(); });
+document.getElementById("lightbox-prev").addEventListener("click", lightboxGoPrev);
+document.getElementById("lightbox-next").addEventListener("click", lightboxGoNext);
+document.addEventListener("keydown", (e)=>{
+  if(document.getElementById("lightbox-overlay").classList.contains("open")){
+    if(e.key==="ArrowLeft"){ e.preventDefault(); lightboxGoPrev(); }
+    else if(e.key==="ArrowRight"){ e.preventDefault(); lightboxGoNext(); }
+    else if(e.key==="Escape"){ document.getElementById("lightbox-overlay").classList.remove("open"); stopLightboxAuto(); }
+    return;
+  }
+  const swipeContainer = document.getElementById("swipe-container");
+  if(swipeContainer && swipeContainer.style.display==="block"){
+    const active = document.activeElement;
+    const typing = active && (active.tagName==="TEXTAREA" || active.tagName==="INPUT");
+    if(typing) return;
+    if(e.key==="ArrowLeft"){ e.preventDefault(); if(currentSwipePhotos.length>1){ swipePhotoIdx=(swipePhotoIdx-1+currentSwipePhotos.length)%currentSwipePhotos.length; updateSwipePhoto(currentSwipePhotos); } }
+    else if(e.key==="ArrowRight"){ e.preventDefault(); if(currentSwipePhotos.length>1){ swipePhotoIdx=(swipePhotoIdx+1)%currentSwipePhotos.length; updateSwipePhoto(currentSwipePhotos); } }
+  }
+});
 document.getElementById("lightbox-pause").addEventListener("click", ()=>{
   lightboxPlaying = !lightboxPlaying;
   document.getElementById("lightbox-pause").textContent = lightboxPlaying ? "⏸ Pause" : "▶ Resume";
@@ -3849,6 +3867,7 @@ function exitRateMode(){
 window.addEventListener("resize", ()=>{ refreshRateModeBar(); });
 
 let swipePhotoIdx = 0;
+let currentSwipePhotos = [];
 function renderSwipeCard(){
   const card = document.getElementById("swipe-card");
   const progress = document.getElementById("swipe-progress");
@@ -3856,6 +3875,7 @@ function renderSwipeCard(){
     card.className = "swipe-card locked-msg";
     card.innerHTML = `That's everyone left to rate! Hit "Lock in ratings so far" below to save these permanently, or Exit to browse.`;
     progress.textContent = "";
+    currentSwipePhotos = [];
     return;
   }
   const d = mergedRow(allData().find(x=>x.id===swipeQueue[swipeIdx]));
@@ -3863,6 +3883,7 @@ function renderSwipeCard(){
   const me = meRecord();
   const entry = me.entries[d.id] || {stars:0, comment:""};
   const photos = d.photos && d.photos.length ? d.photos : [];
+  currentSwipePhotos = photos;
   swipePhotoIdx = 0;
   card.className = "swipe-card";
   card.innerHTML = `
