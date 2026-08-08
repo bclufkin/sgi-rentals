@@ -126,7 +126,7 @@
   .swipe-card .swipe-body{padding:14px;}
   .swipe-card h3{font-family:Georgia,serif;color:var(--navy);margin:0 0 6px;font-size:18px;}
   .swipe-card .swipe-stars{display:flex;justify-content:center;gap:4px;margin:14px 0 8px;}
-  .swipe-card .swipe-stars .starwrap{width:34px;height:34px;font-size:34px;}
+  .swipe-card .swipe-stars .starwrap{width:34px;height:34px;font-size:34px;line-height:34px;}
   .swipe-card textarea{width:100%;min-height:60px;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;}
   .swipe-nav-buttons{display:flex;gap:8px;margin-top:12px;}
   .swipe-nav-buttons button{flex:1;padding:12px;border-radius:8px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-weight:700;font-size:13px;cursor:pointer;}
@@ -220,9 +220,10 @@
     thead{display:none;}
     .table-scroll{overflow-x:visible;overflow-y:visible;max-height:none;border:none;background:transparent;}
     tbody tr{background:var(--card)!important;border:1px solid var(--line);border-radius:10px;margin-bottom:14px;padding:0;overflow:hidden;}
-    tbody tr td.photo-cell{padding:0;}
-    tbody tr td.photo-cell img{width:100%;height:150px;object-fit:cover;border-radius:0;border:none;}
-    tbody tr td.photo-cell .photo-fallback,tbody tr td.photo-cell .no-photo{width:100%;height:80px;border-radius:0;border:none;background:var(--paper-2);}
+    tbody tr td.photo-cell{padding:8px;display:block;}
+    tbody tr td.photo-cell::before{display:none;}
+    tbody tr td.photo-cell img{width:100%;height:150px;object-fit:cover;border-radius:8px;border:none;display:block;}
+    tbody tr td.photo-cell .photo-fallback,tbody tr td.photo-cell .no-photo{width:100%;height:80px;border-radius:8px;border:none;background:var(--paper-2);}
     td{padding:7px 12px;border:none;border-bottom:1px solid var(--line);display:grid;grid-template-columns:100px 1fr;gap:10px;align-items:start;}
     tbody tr td:last-child{border-bottom:none;}
     td::before{content:attr(data-label);font-weight:700;font-size:10px;text-transform:uppercase;color:var(--muted);}
@@ -237,7 +238,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.13</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.14</p>
   </header>
 
   <div class="identity-bar">
@@ -3850,6 +3851,7 @@ function renderSwipeCard(){
         <div><span class="swipe-info-label">Crowdedness</span><span class="swipe-info-val">${crowdLabel(d.crowd)}</span></div>
         <div><span class="swipe-info-label">Private Pool</span><span class="swipe-info-val">${d.pool?'Yes':'No'}</span></div>
       </div>
+      <button class="map-link" data-swipemapview="${d.id}" style="margin:-4px 0 12px;display:inline-block;">Map View 📍</button>
       <div class="swipe-stars" data-propid="${d.id}" data-swipe="1">
         ${(()=>{ let h=""; for(let i=1;i<=5;i++){ let fillPct=0; if((entry.stars||0)>=i) fillPct=100; else if((entry.stars||0)>=i-0.5) fillPct=50;
           h+=`<div class="starwrap"><span class="se">&#9733;</span><span class="sf" style="width:${fillPct}%;">&#9733;</span><span class="hit-l" data-star="${i-0.5}"></span><span class="hit-r" data-star="${i}"></span></div>`; }
@@ -3870,6 +3872,8 @@ function renderSwipeCard(){
       renderSwipeCard();
     });
   });
+  const mapBtn = card.querySelector("[data-swipemapview]");
+  if(mapBtn) mapBtn.addEventListener("click", ()=>openMapModal(mapBtn.getAttribute("data-swipemapview")));
   const ta = card.querySelector("[data-swipecomment]");
   if(ta) ta.addEventListener("change", async ()=>{
     const me2 = meRecord();
