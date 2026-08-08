@@ -32,6 +32,8 @@
   .identity-bar .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
   .id-btn{border:1px solid var(--navy);background:#fff;color:var(--navy);padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;}
   .id-btn.active{background:var(--navy);color:var(--paper);}
+  .id-btn.viewing-as{background:#8a6d00;color:#fff;border-color:#8a6d00;}
+  .comment-preview{font-size:10.5px;color:var(--muted);font-style:italic;margin-top:3px;padding:4px 6px;background:var(--paper-2);border-radius:4px;}
   .id-btn.locked-out{opacity:.35;cursor:not-allowed;}
   .id-btn.family-avg{border-color:var(--brick);color:var(--brick);}
   .id-btn.family-avg.active{background:var(--brick);color:#fff;}
@@ -238,7 +240,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>St. George Island Trip 2027</h1>
-    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.14</p>
+    <p style="font-size:12px;color:#dbe4de;margin:6px 0 0;">v3.15</p>
   </header>
 
   <div class="identity-bar">
@@ -3130,11 +3132,23 @@ function buildIdentityBar(){
   NAMES.forEach(n=>{
     const b = document.createElement("button");
     const lockedOut = identityLocked && currentUser !== n;
-    b.className = "id-btn"+(currentUser===n?" active":"")+(lockedOut?" locked-out":"");
-    b.textContent = n;
-    b.disabled = lockedOut;
+    const isViewingThis = adminViewingAs===n;
+    b.className = "id-btn"+(currentUser===n && !adminViewingAs?" active":"")+(lockedOut?" locked-out":"")+(isViewingThis?" viewing-as":"");
+    b.textContent = isAdmin() && n!==ADMIN ? `👁 ${n}` : n;
+    b.disabled = (lockedOut && !isAdmin());
     b.addEventListener("click", async ()=>{
-      if(n === ADMIN){ await handleAdminClick(); return; }
+      if(n === ADMIN){
+        if(isAdmin()){ adminViewingAs=null; buildIdentityBar(); applyFilters(); return; } // click Brad again = exit preview
+        await handleAdminClick(); return;
+      }
+      if(isAdmin()){
+        // Admin clicking another name previews exactly what that person
+        // sees — it never switches Brad's own session or writes under
+        // their name.
+        adminViewingAs = (adminViewingAs===n) ? null : n;
+        buildIdentityBar(); applyFilters();
+        return;
+      }
       if(identityLocked) return;
       showIdentityConfirm(n);
     });
@@ -3184,13 +3198,15 @@ function meRecord(){
   if(!ratings[currentUser]) ratings[currentUser] = {entries:{}, everCompleted:false};
   return ratings[currentUser];
 }
+let adminViewingAs = null;
 function isAdmin(){ return currentUser === ADMIN; }
 function rowLockedByMe(id){
-  if(!currentUser) return false;
-  const me = ratings[currentUser];
-  return !!(me && me.entries[id] && me.entries[id].locked);
+  const who = adminViewingAs || currentUser;
+  if(!who) return false;
+  const rec = ratings[who];
+  return !!(rec && rec.entries[id] && rec.entries[id].locked);
 }
-function rowVisibleToMe(id){ return isAdmin() || rowLockedByMe(id); }
+function rowVisibleToMe(id){ if(adminViewingAs) return rowLockedByMe(id); return isAdmin() || rowLockedByMe(id); }
 
 function updateIdentityStatus(){
   const status=document.getElementById("identity-status"), submitBtn=document.getElementById("submit-final-btn"),
@@ -3203,7 +3219,15 @@ function updateIdentityStatus(){
     return;
   }
   if(isAdmin()){
-    status.innerHTML=`Viewing as <b>Brad</b> <span class="admin-badge">Admin — always unlocked</span>. You can still rate/lock rows like everyone else.`;
+    if(adminViewingAs){
+      status.innerHTML=`👁 <b>Previewing as ${adminViewingAs}</b> <span class="admin-badge" style="background:#8a6d00;">Read-only preview</span> — this is exactly what ${adminViewingAs} sees. Your own admin session is untouched. <button class="toggle-btn off" id="exit-viewas-btn" style="margin-left:8px;padding:3px 10px;font-size:11px;">Exit preview</button>`;
+      submitBtn.style.display="none"; saveBtn.style.display="none"; gatedBanner.style.display="none";
+      tierField.style.display="block";
+      renderAdminProgressPanel();
+      setTimeout(()=>{ const btn=document.getElementById("exit-viewas-btn"); if(btn) btn.addEventListener("click", ()=>{ adminViewingAs=null; buildIdentityBar(); applyFilters(); }); }, 0);
+      return;
+    }
+    status.innerHTML=`Viewing as <b>Brad</b> <span class="admin-badge">Admin — always unlocked</span>. You can still rate/lock rows like everyone else. Click any other name above (👁) to preview exactly what they see.`;
     submitBtn.style.display="inline-block"; saveBtn.style.display="inline-block"; gatedBanner.style.display="none";
     tierField.style.display="block";
     renderAdminProgressPanel();
@@ -3418,9 +3442,11 @@ function render(rows){
     if(!currentUser){
       ratingsHtml = `<span style="font-size:11px;color:var(--muted);">Pick a name to rate</span>`;
     } else {
+      const viewingAsOther = !!adminViewingAs;
+      const effectiveUser = adminViewingAs || currentUser;
       const locked = rowLockedByMe(d.id);
-      const myEntry = (ratings[currentUser] && ratings[currentUser].entries[d.id]) || {stars:0,comment:""};
-      if(locked || isAdmin()){
+      const myEntry = (ratings[effectiveUser] && ratings[effectiveUser].entries[d.id]) || {stars:0,comment:""};
+      if(locked || (isAdmin() && !viewingAsOther)){
         let sum=0,count=0,namePills=[],starVals=[];
         NAMES.forEach(n=>{ const rec=ratings[n]; if(rec && rec.entries[d.id] && rec.entries[d.id].locked && rec.entries[d.id].stars>0){ sum+=rec.entries[d.id].stars; count++; starVals.push(rec.entries[d.id].stars);
           const hasComment = !!rec.entries[d.id].comment;
@@ -3429,17 +3455,21 @@ function render(rows){
         const spread = starVals.length>1 ? (Math.max(...starVals)-Math.min(...starVals)) : 0;
         const splitBadge = (starVals.length>=2 && spread>=2) ? `<span class="split-badge" title="Ratings range from ${Math.min(...starVals)}★ to ${Math.max(...starVals)}★ — worth a conversation">🔀 Split opinion</span>` : '';
         ratingsHtml = (locked ? `<span class="locked-tag">🔒 locked</span>` : ``) + `<div class="avg-rating">${avg} ★ ${count?`(${count})`:'(no ratings)'}</div>${splitBadge}<div class="rater-pill-row">${namePills.join("")}</div>`;
-        if(isAdmin() && !locked){
+        if(isAdmin() && !viewingAsOther && !locked){
           ratingsHtml += halfStarWidget(d.id, myEntry.stars||0, true)
             + `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`;
         }
       } else {
-        ratingsHtml = halfStarWidget(d.id, myEntry.stars||0, true)
-          + `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`;
+        // not locked: show exactly what the effective user (viewed person, or
+        // yourself) currently has — editable only when it's genuinely you
+        ratingsHtml = halfStarWidget(d.id, myEntry.stars||0, !viewingAsOther)
+          + (viewingAsOther
+              ? (myEntry.comment ? `<div class="comment-preview">${myEntry.comment}</div>` : `<span style="font-size:10px;color:var(--muted);">no comment yet</span>`)
+              : `<textarea class="rating-comment" data-comment="${d.id}" placeholder="Comment (optional)">${myEntry.comment||""}</textarea>`);
       }
     }
 
-    const editCell = isAdmin()
+    const editCell = (isAdmin() && !adminViewingAs)
       ? `<button class="edit-row-btn" data-rowedit="${d.id}">Edit</button><button class="edit-row-btn" data-retire="${d.id}" style="margin-top:3px;">Retire</button>`
       : `<span class="no-edit-note">Ask Brad</span>`;
 
